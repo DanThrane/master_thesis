@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "name": "JPM",
+  "description": "The Jolie Package manager",
+  "source": {
+    "module": "DanThrane/jpm"
+  },
+  "version": {
+    "patch": 0,
+    "major": 1,
+    "minor": 0
+  },
+  "dependencies": [
+    {
+        "module": "GitHub",
+        "version": "0.1.0"
+    },
+    {
+        "module": "Git",
+        "version": "0.1.0"
+    },
+    {
+        "module": "consoleui",
+        "version": "0.1.0"
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+#!/bin/bash
+curr=$PWD
+cd $JPM_HOME
+jolie jpm_cli.ol $curr $@
+cd $curr
