@@ -149,9 +149,72 @@ manager for the client side (i.e. bower).
 However this problematic is resolved by NPM (not sure how, but it sounds like it
 is responsible for telling modules where their dependencies are located).
 
-
 ### Package Convention
 
 NPM uses a file called `package.json`. In contains almost the exact same fields
 that bower does. This makes sense, given the similar ecosystems, and the fact
 that installation and updates of bower is done through npm itself.
+
+However it would seem that NPM has slightly more properties, such as:.
+
+__scripts:__ This property provides a list of scripts to run when certain
+lifetime events occur. These include `prepublish`, `publish`, `preinstall`,
+`install`, `prestart`, `start`, etc. These would probably all make a lot of
+sense for a language like Jolie, since we may configure how certain things are
+started with the `start` command. An example provided by the NPM documentation:
+
+```json
+{
+  "start": "node server.js"
+}
+```
+
+This would probably translate quite well into how you would want to start a
+Jolie service. Although there are certain things we would probably want to
+consider. This might make more sense if the package is a "global" one, i.e. a
+service we want to run standalone.
+
+An `install` hook might be useful for retrieving API keys etc. 
+
+A prepublish hook could be used for validating state of package, such as running
+tests, ensuring a version bump, ensuring changes are written in `CHANGELOG`.
+
+__engines:__ Describes which versions of certain engines (such as "node") are
+required to run the package. This would probably also be very useful.
+Additionally they also have fields which describe CPU architecture and operating
+system. Both blacklist and whitelists are allowed.
+
+### Architecture
+
+The NPM architecture itself is quite interesting and seems to follow a
+microservice architecture. Looking at the CLI commands makes it seem like it
+exposes a bunch of commands, which other commands themselves are supposed to
+call. An example of this would be [npm-cache](https://docs.npmjs.com/cli/cache).
+
+## Cargo
+
+|                            |                                                               |
+|----------------------------|---------------------------------------------------------------|
+| __Website:__               | [crates.io](http://crates.io)                                 |
+| __Source code (Manager):__ | [GitHub: rust-lang/cargo](https://github.com/rust-lang/cargo) |
+| __Manages:__               | Rust dependency management, tests and build process           |
+| __Language:__              | Rust                                                          |
+
+Cargo, a bit like NPM, differentiates between the type of package being built.
+Cargo will want to know if you're building a library or a binary executable.
+This kind of concept would probably make a lot of sense for jpm. In this case it
+would probably be a service designed for embedding, a service designed for self-
+hosting, and a service which is external.
+
+Cargo is directly responsible for running tests and building the
+executables/libraries, using the underlying compiler (`rustc`).
+
+Publishing of packages is bound to GitHub, and uses GitHub authroization for
+everything. Can't find the exact data, but they most likely download tar balls
+directly from GitHub.
+
+Cargo also has the concept of development dependencies.
+
+Cargo also supports features, which can be turned on or off. This is done in the
+configuration file, while internally these can be turned on with something like
+annotations.
