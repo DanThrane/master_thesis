@@ -1,0 +1,40 @@
+% Status: Draft
+
+\section{Architecture}
+
+% At this point we have covered the responsibilities of JPM. Here we will be
+% discussing the actual technical details of JPM. As well as taking a deeper
+% look into features provided, and why they are useful.
+
+The entirety of the ecosystem around JPM is written in Jolie, using the
+features that the Jolie Module System provides, along with the features that
+JPM itself provides.
+
+At the ten-thousand foot view of the architecture, it consists of three
+core services, as shown in figure \ref{fig:high_level_arch}:
+
+\begin{enumerate}
+
+\item \textbf{Registry}: Responsible for serving packages known to the
+registry.
+
+\item \textbf{JPM}: Provides the back-end of JPM. This includes communication
+with one, or more, registries, for example to download packages.
+
+\item \textbf{CLI}: Provides the front-end of JPM. The front-end is responsible
+for displaying a user-facing interface, and will communicate with the back-end
+to perform the actual work.
+
+\end{enumerate}
+
+% TODO Replace with non-ascii
+\begin{listing}[H]
+\begin{minted}{text}
+                +-----------+     +-------+     +------------+
+                |  jpm-cli  | ==> |  jpm  | ==> |  registry  |
+                +-----------+     +-------+     +------------+
+\end{minted}
+\caption{Ten-thousand foot view of the JPM architecture}
+\label{fig:high_level_arch}
+\end{listing}
+

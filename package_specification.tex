@@ -1,0 +1,363 @@
+\section{Appendix A: JPM Manifest Specification}\label{package-specification}
+
+This document covers the specification of the file which defines a
+package. The format used for this document will be JSON, but the format
+and whether or not to allow for several documents is still up for
+discussion. For now we should avoid using any features which the generic
+Jolie value cannot support.
+
+\subsection{Purpose}\label{purpose}
+
+The purpose of the package document is to define what a package is.
+Every Jolie package will contain such a document, and it describes
+several important properties about the package. These properties are
+described in the section ``Format and Properties''.
+
+\subsection{Table of Contents}\label{table-of-contents}
+
+\begin{itemize}
+\tightlist
+\item
+  \protect\hyperlink{format-and-properties}{Format and Properties}
+
+  \begin{itemize}
+  \tightlist
+  \item
+    \protect\hyperlink{name}{name}
+  \item
+    \protect\hyperlink{version}{version}
+  \item
+    \protect\hyperlink{license}{license}
+  \item
+    \protect\hyperlink{authors}{authors}
+  \item
+    \protect\hyperlink{private}{private}
+  \item
+    \protect\hyperlink{main}{main}
+  \item
+    \protect\hyperlink{dependencies}{dependencies}
+  \item
+    \protect\hyperlink{dependency}{dependency}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      \protect\hyperlink{name-1}{name}
+    \item
+      \protect\hyperlink{version-1}{version}
+    \item
+      \protect\hyperlink{registry}{registry}
+    \end{itemize}
+  \item
+    \protect\hyperlink{registries}{registries}
+  \item
+    \protect\hyperlink{registry-1}{registry}
+
+    \begin{itemize}
+    \tightlist
+    \item
+      \protect\hyperlink{name-2}{name}
+    \item
+      \protect\hyperlink{location}{location}
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{format-and-properties}{\subsection{Format and
+Properties}\label{format-and-properties}}
+
+\hypertarget{name}{\subsubsection{name}\label{name}}
+
+\textbf{Name:} \texttt{name}
+
+\textbf{Optional:} false
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} The \texttt{name} property uniquely defines a
+package in a registry. Every registry must only contain a single package
+with a given name.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  The name of a package is \emph{not} case-sensitive
+\item
+  The length of a name is less than 255 characters
+\item
+  Names are US-ASCII
+\item
+  Names may only contain unreserved URI characters (see section 2.3 of
+  \href{https://www.ietf.org/rfc/rfc3986.txt}{RFC 3986})
+\end{itemize}
+
+If any of these rules are broken the JPM tool should complain when
+\emph{any} command is invoked. Similarly a registry should reject any
+such package.
+
+\hypertarget{version}{\subsubsection{version}\label{version}}
+
+\textbf{Name:} \texttt{version}
+
+\textbf{Optional:} false
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} This property describes the current version of
+this package.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  The version string must be a valid SemVer 2.0.0 string (see
+  http://semver.org/spec/v2.0.0.html)
+\end{itemize}
+
+\hypertarget{license}{\subsubsection{license}\label{license}}
+
+\textbf{Name:} \texttt{property\_name}
+
+\textbf{Optional:} false
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} Describes the license that this package is under.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  Must be a valid identifier. See https://spdx.org/licenses/
+\end{itemize}
+
+\hypertarget{authors}{\subsubsection{authors}\label{authors}}
+
+\textbf{Name:} \texttt{authors}
+
+\textbf{Optional:} false
+
+\textbf{Type:}
+\texttt{string\textbar{}array\textless{}string\textgreater{}}
+
+\textbf{Description:} Describes the authors of this package
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  The array must contain at least a single entry
+\item
+  Each entry should follow this grammar:
+\end{itemize}
+
+\begin{verbatim}
+name ["<" email ">"] ["(" homepage ")"]
+\end{verbatim}
+
+\hypertarget{private}{\subsubsection{private}\label{private}}
+
+\textbf{Name:} \texttt{private}
+
+\textbf{Optional:} true
+
+\textbf{Type:} \texttt{boolean}
+
+\textbf{Description:} Describes if this package should be considered
+private. If a package is private it cannot be published to the
+``public'' repository.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  By default this property has the value of \texttt{true} to avoid
+  accidential publishing of private packages.
+\end{itemize}
+
+\hypertarget{main}{\subsubsection{main}\label{main}}
+
+\textbf{Name:} \texttt{main}
+
+\textbf{Optional:} true
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} Describes the main file of a package.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  The value is considered to be a relative file path from the package
+  root.
+\end{itemize}
+
+\hypertarget{dependencies}{\subsubsection{dependencies}\label{dependencies}}
+
+\textbf{Name:} \texttt{dependencies}
+
+\textbf{Optional:} true
+
+\textbf{Type:} \texttt{array\textless{}dependency\textgreater{}}
+
+\textbf{Description:} Contains an array of dependencies. See the
+``dependency'' sub-section for more details.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  If the property is not listed, a default value of an empty array
+  should be used
+\end{itemize}
+
+\hypertarget{dependency}{\subsubsection{dependency}\label{dependency}}
+
+\textbf{Type:} \texttt{object}
+
+\textbf{Description:} A dependency describes a single dependency of a
+package. This points to a package at a specific point on a specific
+registry.
+
+\hypertarget{name-1}{\paragraph{name}\label{name-1}}
+
+\textbf{Name:} \texttt{name}
+
+\textbf{Optional:} false
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} Describes the name of the dependency. This refers
+to the package name, as defined earlier.
+
+\textbf{Rules:} A dependency name follows the exact same rules as a
+package name.
+
+\hypertarget{version-1}{\paragraph{version}\label{version-1}}
+
+\textbf{Name:} \texttt{version}
+
+\textbf{Optional:} false
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} Describes the version to use
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  Must be a valid SemVer 2.0.0 string
+\item
+  (This property follows the same rules as the package version does)
+\end{itemize}
+
+\hypertarget{registry}{\paragraph{registry}\label{registry}}
+
+\textbf{Name:} \texttt{registry}
+
+\textbf{Optional:} true
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} This describes the exact registry to use. If no
+registry is listed the ``public'' registry will be used.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  The value of this property must be a valid registry as listed in the
+  \texttt{registries} property.
+\end{itemize}
+
+\hypertarget{registries}{\subsubsection{registries}\label{registries}}
+
+\textbf{Name:} \texttt{registries}
+
+\textbf{Optional:} true
+
+\textbf{Type:} \texttt{array\textless{}registry\textgreater{}}
+
+\textbf{Description:} Contains an array of known registries. See the
+registry sub-section for more details.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  This property contains an implicit entry which points to the public
+  registry. This registry is named ``public''.
+\end{itemize}
+
+\hypertarget{registry-1}{\subsubsection{registry}\label{registry-1}}
+
+\textbf{Type:} \texttt{object}
+
+\textbf{Description:} A registry describes a single JPM registry. A JPM
+registry is where the package manager can locate a package, and also
+request a specific version of a package.
+
+\hypertarget{name-2}{\paragraph{name}\label{name-2}}
+
+\textbf{Name:} \texttt{name}
+
+\textbf{Optional:} false
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} This property uniquely identifies the registry.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  A name cannot be longer than 1024 characters
+\item
+  The name cannot be ``public''
+\item
+  No two registries may have the same name
+\end{itemize}
+
+\textbf{TODO:}
+
+\begin{itemize}
+\tightlist
+\item
+  Encoding of name
+\item
+  Should the length limit be dropped? There is no technical reason for
+  the limit
+\end{itemize}
+
+\hypertarget{location}{\paragraph{location}\label{location}}
+
+\textbf{Name:} \texttt{location}
+
+\textbf{Optional:} false
+
+\textbf{Type:} \texttt{string}
+
+\textbf{Description:} Describes the location of the registry.
+
+\textbf{Rules:}
+
+\begin{itemize}
+\tightlist
+\item
+  Must be a valid Jolie location string (e.g.
+  ``socket://localhost:8080'')
+\end{itemize}

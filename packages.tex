@@ -1,0 +1,66 @@
+% Status: Draft
+
+\section{Packages}
+
+A Jolie Package is an extension of a Jolie Module. Recall that a Jolie Module
+was defined as a collection of resources, a name, and optionally an entry-point
+for the module. A package extends this concept by adding information required
+for package management. % TODO Last sentence sucks
+
+A Jolie Package is described by a package manifest. The package manifest is a
+JSON file, which is always placed at the root of the package, and must be
+called \verb!package.json!. The fixed location allows for the package manager
+to easily identify a package. The JSON format was chosen as it plain-text, and
+easy to both read and write for both humans and machines.
+
+In listing \ref{lst:simple_manifest} we show a simple package manifest. This
+manifest showcases the most important features of the manifest.A complete
+specification of the package manifest format can be seen in Appendix A. The
+service that this manifest describes is shown in figure \ref{fig:simple_calc}.
+
+\begin{listing}[H]
+\begin{minted}{json}
+{
+    "name": "calculator",
+    "main": "calc.ol",
+    "description": "A simple calculator service",
+    "authors": ["Dan Sebastian Thrane <dathr12@student.sdu.dk>"],
+    "license" "MIT",
+    "interfaceDependencies": [
+        { "name": "math", "version": "1.0.0" }
+    ],
+    "dependencies": [
+        { "name": "sum", "version": "1.2.X" },
+        { "name": "multiplication", "version": "2.1.0" }
+    ]
+}
+\end{minted}
+\caption{A Simple Package Manifest}
+\label{lst:simple_manifest}
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}[linenos=false]{text}
+                +--------------+     +-------+
+                |              | ==> |  sum  |
+                |              |     +-------+
+                |  calculator  |
+                |              |     +------------------+
+                |              | ==> |  multiplication  |
+                +--------------+     +------------------+
+\end{minted}
+\caption{A Calculator Service}
+\label{fig:simple_calc}
+\end{listing}
+
+Lines 2-3 take care of the module definition. The remaining attributes,
+however, are entirely unique to packages. Some attributes included in the
+manifest are there for indexing and discoverability purposes, examples of such
+attributes are shown in lines 4-6. The rest of the document describes the
+dependencies of this package.
+
+In JPM a dependency is (TODO Difference between a microservice dependency and
+package dependency)
+
+JPM deals with two different types of dependencies: interface dependencies, and
+ordinary dependencies.

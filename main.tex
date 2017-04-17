@@ -1,0 +1,200 @@
+\documentclass[11pt, a4paper]{report} % add draft if needed
+
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage[a4paper]{geometry}
+\usepackage[parfill]{parskip}
+\usepackage{hyperref}
+\usepackage{lipsum}
+\usepackage[toc,page]{appendix}
+\usepackage{lastpage}
+\usepackage{fancyhdr}
+\usepackage[explicit]{titlesec}
+\usepackage{color}
+\usepackage{amsthm}
+\usepackage{todo}
+\usepackage{tikz}
+\usepackage{subcaption}
+\usepackage{caption}
+\usepackage{chemfig}
+\usepackage{cleveref}
+\usepackage{minted}
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\setminted{linenos,frame=lines,framesep=2mm}
+\setminted[text]{linenos=false}
+
+
+%tikz extras
+\usetikzlibrary{arrows, shapes, snakes, automata, backgrounds, positioning}
+
+\tikzset{
+    triple/.style args={[#1] in [#2] in [#3]}{
+        #1,preaction={preaction={draw,#3},draw,#2}
+    }
+}
+
+%chemo macros
+\newcommand{\cheminl}[1]{$\mathrm{#1}$}
+
+% math envirs
+\newtheorem{defin}{Definition}
+\newtheorem{theo}{Theorem}
+
+% Chapter title formatting
+\definecolor{gray75}{gray}{0.75}
+\newcommand{\hsp}{\hspace{20pt}}
+
+\titleformat{\chapter}[display]{}{
+}{-85pt}{\Huge\bfseries\centering\textcolor{gray75}{|}\hsp#1\hsp\textcolor{gray75}{|}\\\hspace{10pt}}
+
+% Header and footer
+\fancypagestyle{plain}{% plain style is used on chapter pages
+  \fancyhf{}%
+  \fancyfoot[C]{\thepage}% Page \thepage\ of \pageref*{LastPage}
+  \renewcommand{\headrulewidth}{0pt}% Line at the header invisible
+  %\renewcommand{\footrulewidth}{0.4pt}% Line at the footer visible
+}
+
+\pagestyle{fancy}
+\fancypagestyle{MyStyle}{
+    \fancyhf{}
+    \fancyhead[L]{ \leftmark }
+    \fancyhead[R]{ \today }
+    \fancyfoot[C]{ \thepage } % chktex 2
+    \renewcommand{\chaptermark}[1]{\markboth{\textsl{##1}}{}}
+    \renewcommand{\headrulewidth}{0pt}
+}
+
+\newcommand{\blankpage}{
+  \newpage
+  \thispagestyle{empty}
+  \mbox{}
+  \newpage
+}
+
+% \definecolor{mygreen}{rgb}{0,0.6,0}
+% \definecolor{mygray}{rgb}{0.5,0.5,0.5}
+% \definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+% \lstset{ %
+%   backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+%   basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+%   breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+%   breaklines=true,                 % sets automatic line breaking
+%   captionpos=b,                    % sets the caption-position to bottom
+%   commentstyle=\color{mygreen},    % comment style
+%   deletekeywords={...},            % if you want to delete keywords from the given language
+%   escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+%   extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+%   frame=single,                       % adds a frame around the code
+%   keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+%   keywordstyle=\color{blue},       % keyword style
+%   language=Octave,                 % the language of the code
+%   morekeywords={*,...},           % if you want to add more keywords to the set
+%   numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+%   numbersep=5pt,                   % how far the line-numbers are from the code
+%   numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+%   rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+%   showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+%   showstringspaces=false,          % underline spaces within strings only
+%   showtabs=false,                  % show tabs within strings adding particular underscores
+%   stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+%   stringstyle=\color{mymauve},     % string literal style
+%   tabsize=2,                       % sets default tabsize to 2 spaces
+%   title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+% }
+
+
+\title{Dynamic Simulation on Hyper Graphs}
+\author{Anders Busch}
+
+\begin{document}
+\begin{titlepage}
+
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} % Defines a new command for the horizontal lines, change thickness here
+
+%\ % Center everything on the page
+\flushright %centering
+%----------------------------------------------------------------------------------------
+%   LOGO SECTION
+%----------------------------------------------------------------------------------------
+%\begin{minipage}{0.9\textwidth}
+%\centering
+%\hspace*{2cm}
+%
+\includegraphics[scale=0.35,bb=0 0 250 0]{pictures/SDU_logo.eps}\\[1cm] % Include a department/university logo - this will require the graphicx package
+
+%----------------------------------------------------------------------------------------
+%   HEADING SECTIONS
+%----------------------------------------------------------------------------------------
+
+\textsc{\LARGE University of Southern Denmark}\\%[0.3cm] % Name of your university/college
+\textsc{\normalsize Department of Mathematics and Computer Science,\\ IMADA}\\[2.6cm]
+ % Major heading such as course name
+ % Minor heading such as course title
+
+%----------------------------------------------------------------------------------------
+%   TITLE SECTION
+%----------------------------------------------------------------------------------------
+\textsc{\Large Master Thesis}\\[0.5cm]
+\hfill \\%[0.10cm]
+{ \Huge \bfseries Building a Package Manager for Jolie }\\[0.4cm] % Title of your document
+\hfill \\[2.8cm]
+
+%----------------------------------------------------------------------------------------
+%   AUTHOR SECTION
+%----------------------------------------------------------------------------------------
+\large
+\emph{Author:}\\
+Dan Sebastian \textsc{Thrane} % Your name
+\\[0.8cm]
+%~
+\large
+\emph{Supervisor:} \\
+Fabrizio \textsc{Montesi} % Supervisor's Name
+
+
+\vfill
+% If you don't want a supervisor, uncomment the two lines below and remove the section above
+%\Large \emph{Author:}\\
+%John \textsc{Smith}\\[3cm] % Your name
+
+%----------------------------------------------------------------------------------------
+%   DATE SECTION
+%----------------------------------------------------------------------------------------
+
+{\large \today}%\\[2cm] % Date, change the \today to a set date if you want to be precise
+%\end{minipage}
+
+\end{titlepage}
+
+\tableofcontents
+
+\blankpage
+
+\pagestyle{MyStyle}
+
+\chapter{Introduction}
+\input{introduction}
+
+\chapter{Background}
+\input{background}
+
+\chapter{Jolie Packages}
+\input{packages}
+
+\chapter{Package Manager}
+\input{package_manager}
+
+\appendix
+\chapter{Appendix}
+\input{appendix}
+
+\end{document}

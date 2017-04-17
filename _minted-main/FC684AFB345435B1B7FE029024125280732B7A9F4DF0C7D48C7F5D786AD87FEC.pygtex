@@ -1,0 +1,16 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{p}{\PYGZob{}}
+    \PYG{n+nt}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}calculator\PYGZdq{}}\PYG{p}{,}
+    \PYG{n+nt}{\PYGZdq{}main\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}calc.ol\PYGZdq{}}\PYG{p}{,}
+    \PYG{n+nt}{\PYGZdq{}description\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}A simple calculator service\PYGZdq{}}\PYG{p}{,}
+    \PYG{n+nt}{\PYGZdq{}authors\PYGZdq{}}\PYG{p}{:} \PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}Dan Sebastian Thrane \PYGZlt{}dathr12@student.sdu.dk\PYGZgt{}\PYGZdq{}}\PYG{p}{],}
+    \PYG{n+nt}{\PYGZdq{}license\PYGZdq{}} \PYG{l+s+s2}{\PYGZdq{}MIT\PYGZdq{}}\PYG{p}{,}
+    \PYG{n+nt}{\PYGZdq{}interfaceDependencies\PYGZdq{}}\PYG{p}{:} \PYG{p}{[}
+        \PYG{p}{\PYGZob{}} \PYG{n+nt}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}math\PYGZdq{}}\PYG{p}{,} \PYG{n+nt}{\PYGZdq{}version\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}1.0.0\PYGZdq{}} \PYG{p}{\PYGZcb{}}
+    \PYG{p}{],}
+    \PYG{n+nt}{\PYGZdq{}dependencies\PYGZdq{}}\PYG{p}{:} \PYG{p}{[}
+        \PYG{p}{\PYGZob{}} \PYG{n+nt}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}sum\PYGZdq{}}\PYG{p}{,} \PYG{n+nt}{\PYGZdq{}version\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}1.2.X\PYGZdq{}} \PYG{p}{\PYGZcb{},}
+        \PYG{p}{\PYGZob{}} \PYG{n+nt}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}multiplication\PYGZdq{}}\PYG{p}{,} \PYG{n+nt}{\PYGZdq{}version\PYGZdq{}}\PYG{p}{:} \PYG{l+s+s2}{\PYGZdq{}2.1.0\PYGZdq{}} \PYG{p}{\PYGZcb{}}
+    \PYG{p}{]}
+\PYG{p}{\PYGZcb{}}
+\end{Verbatim}
