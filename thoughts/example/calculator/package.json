@@ -1,0 +1,7 @@
+{
+    "name": "Calculator",
+    "version": "1.0.0",
+    "dependencies": [],
+    "license": "MIT",
+    "authors": ["Dan Sebastian Thrane <dathr12@student.sdu.dk>"]
+}

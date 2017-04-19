@@ -7,8 +7,7 @@ was defined as a collection of resources, a name, and optionally an entry-point
 for the module. A package extends this concept by adding information required
 for package management. % TODO Last sentence sucks
 
-A Jolie Package is described by a package manifest. The package manifest is a
-JSON file, which is always placed at the root of the package, and must be
+A Jolie Package is described by a package manifest. The package manifest is a JSON file, which is always placed at the root of the package, and must be
 called \verb!package.json!. The fixed location allows for the package manager
 to easily identify a package. The JSON format was chosen as it plain-text, and
 easy to both read and write for both humans and machines.
@@ -59,8 +58,32 @@ manifest are there for indexing and discoverability purposes, examples of such
 attributes are shown in lines 4-6. The rest of the document describes the
 dependencies of this package.
 
-In JPM a dependency is (TODO Difference between a microservice dependency and
-package dependency)
+A JPM dependency is defined as a ``code dependency''. What this means is that
+the dependencies listed, should only be packages that we depend on for code.
+This might be different from the typical definition in microservices. For
+example, one might state that the calculator also has a dependency on the
+client who speaks to it. In JPM however, we will not need to list the client,
+as we do not depend on any code that the client has (in fact we know nothing
+about how the client works).
 
 JPM deals with two different types of dependencies: interface dependencies, and
-ordinary dependencies.
+ordinary dependencies. These two serve similar, but slightly different
+purposes, and all depends on how the dependency is to be used.
+
+An ordinary dependency should be used if we wish to use the code of some other
+service, and want to option of embedding it. This will tell JPM to download
+both ordinary dependencies, as well as interface dependencies.
+
+Interface dependencies are instead dependencies that are only required to
+interface with the package itself, and dependencies we need to interface with
+others. An interface dependency will only cause us to download the interface
+dependencies of each sub-dependency.
+
+% TODO Need an example and algorithm for this stuff!
+
+The interface dependency type isn't common in other package managers, but
+having multiple types of dependencies is fairy common.  For example, a package
+manager might provide dependencies which are only used during testing, we see
+this in Maven, or it might provide dependencies only used during development,
+seen in NPM.
+

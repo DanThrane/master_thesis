@@ -1,0 +1,89 @@
+% Status: draft
+
+\section{Introduction to Jolie}
+
+We need to cover:
+
+\begin{itemize}
+\item Basic syntax
+\item Control-flow, defines, interfaces, types, type-checking, that sort of
+thing
+\item Ports, protocols, that sort of thing
+\item Basic example (steal this one from article)
+\end{itemize}
+
+% ---
+
+Jolie is a service-oriented programming language, and is build to support a
+microservice natively. In this section we will cover what kind of language
+Jolie is, and how it is currently used.
+
+Jolie has a C-inspired syntax, and is dynamically typed. Its interpreter is
+written in Java.
+
+The language has no native functions or methods, but instead works in
+processes. A process has no arguments, and does not contain any stack (in the
+case of recursive calls). There are two pre-defined processes, which will
+always be called by the interpreter, these are called \verb!init! and
+\verb!main!.
+
+\begin{listing}[H]
+\begin{minted}{java}
+include "console.iol"
+
+define PrintOutput {
+    println@Console(output)() // Prints 'OK'
+}
+
+init { a = 1 }
+
+main {
+    b = 2;
+    c = a + b; // c = 3
+    if (c == 3) {
+        output = "OK"
+    } else {
+        output = "Bad"
+    };
+    PrintOutput // Calls the defined process 'PrintOutput'
+}
+\end{minted}
+\caption{A very simple Jolie program}
+\label{lst:simple_jolie}
+\end{listing}
+
+Listing \ref{lst:simple_jolie} shows a very simple programming language, in
+what looks like what you might expect from a dynamic language with C-inspired
+syntax. However a few things may also strike you as odd.
+
+First of all there are typos on lines 12, 14 or 16, the semicolon is not needed
+here, in fact it would be a syntax error. The reason for this is that the
+semicolon isn't used strictly for parsing purposes, but it instead for having
+multiple statements in a process. The "semicolon" statement, also called a
+sequence statement, has a syntax of \verb!A ; B!, which should be read as:
+first perform statement \verb!A!, then perform \verb!B!. The sequence
+statement requires both of the operands to be present, hence the syntax error.
+Another similar statement is the parallel statement, which has a syntax of
+\verb!A | B!, which reads as: do \verb!A! and \verb!B! in parallel. Using
+these operators together allows the programmer to easily create a fork-join
+workflow. This is typically used in microservices when we want to collect
+data in parallel, and continue once all of the data has been retrieved.
+
+Secondly has slightly different rules for scoping. In Jolie everything not
+defined in the global scope goes into the same scope. This also persists
+through calls to defines. This is the reason that \verb!PrintOutput! can use
+the output variable.
+
+Several execution modes exists. The default execution mode, which was used in
+Listing \ref{lst:simple_jolie} is \verb!single!. This means that the
+\verb!main!  process is run just a single time. Two more modes exists, those
+being \verb!concurrent! and \verb!sequential!. TODO Some more stuff
+
+Ports are the primitive that Jolie uses for communication, two types of ports
+exists: input and output. Ports describe a running service, where it is located
+(\verb!Location!), and how to speak to it (\verb!Protocol!), and finally which
+operations it supports (\verb!Interfaces!)
+
+Ports, interfaces, types
+
+Embedded, aggregates, redirection
