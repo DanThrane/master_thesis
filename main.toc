@@ -2,35 +2,36 @@
 \contentsline {chapter}{\numberline {1}Introduction}{3}{chapter.1}
 \contentsline {chapter}{\numberline {2}Background}{4}{chapter.2}
 \contentsline {section}{\numberline {2.1}Microservices}{4}{section.2.1}
-\contentsline {section}{\numberline {2.2}Introduction to Jolie}{4}{section.2.2}
-\contentsline {section}{\numberline {2.3}The Jolie Interpreter}{6}{section.2.3}
-\contentsline {chapter}{\numberline {3}Jolie Modules}{7}{chapter.3}
-\contentsline {section}{\numberline {3.1}Modules}{7}{section.3.1}
-\contentsline {section}{\numberline {3.2}Configuration}{7}{section.3.2}
-\contentsline {chapter}{\numberline {4}Package Manager}{8}{chapter.4}
-\contentsline {section}{\numberline {4.1}Packages}{8}{section.4.1}
-\contentsline {section}{\numberline {4.2}Architecture}{9}{section.4.2}
-\contentsline {section}{\numberline {4.3}Registry}{10}{section.4.3}
-\contentsline {section}{\numberline {4.4}Authorization}{10}{section.4.4}
-\contentsline {section}{\numberline {4.5}The Command Line Interface}{10}{section.4.5}
-\contentsline {section}{\numberline {4.6}Integrity Checks}{11}{section.4.6}
-\contentsline {chapter}{\numberline {A}Appendix}{12}{appendix.A}
-\contentsline {section}{\numberline {A.1}Appendix A: JPM Manifest Specification}{12}{section.A.1}
-\contentsline {subsection}{\numberline {A.1.1}Purpose}{12}{subsection.A.1.1}
-\contentsline {subsection}{\numberline {A.1.2}Table of Contents}{12}{subsection.A.1.2}
-\contentsline {subsection}{\numberline {A.1.3}Format and Properties}{13}{subsection.A.1.3}
-\contentsline {subsubsection}{name}{13}{subsection.A.1.3}
-\contentsline {subsubsection}{version}{13}{subsection.A.1.3}
-\contentsline {subsubsection}{license}{13}{subsection.A.1.3}
-\contentsline {subsubsection}{authors}{14}{subsection.A.1.3}
-\contentsline {subsubsection}{private}{14}{subsection.A.1.3}
-\contentsline {subsubsection}{main}{14}{subsection.A.1.3}
-\contentsline {subsubsection}{dependencies}{15}{subsection.A.1.3}
-\contentsline {subsubsection}{dependency}{15}{subsection.A.1.3}
-\contentsline {paragraph}{name}{15}{subsection.A.1.3}
-\contentsline {paragraph}{version}{15}{subsection.A.1.3}
-\contentsline {paragraph}{registry}{16}{subsection.A.1.3}
-\contentsline {subsubsection}{registries}{16}{subsection.A.1.3}
-\contentsline {subsubsection}{registry}{16}{subsection.A.1.3}
-\contentsline {paragraph}{name}{16}{subsection.A.1.3}
-\contentsline {paragraph}{location}{17}{subsection.A.1.3}
+\contentsline {section}{\numberline {2.2}Package Managers}{4}{section.2.2}
+\contentsline {section}{\numberline {2.3}Introduction to Jolie}{4}{section.2.3}
+\contentsline {section}{\numberline {2.4}The Jolie Engine and Interpreter}{9}{section.2.4}
+\contentsline {chapter}{\numberline {3}Jolie Modules}{12}{chapter.3}
+\contentsline {section}{\numberline {3.1}Modules}{12}{section.3.1}
+\contentsline {section}{\numberline {3.2}Configuration}{12}{section.3.2}
+\contentsline {chapter}{\numberline {4}Package Manager}{13}{chapter.4}
+\contentsline {section}{\numberline {4.1}Packages}{13}{section.4.1}
+\contentsline {section}{\numberline {4.2}Architecture}{14}{section.4.2}
+\contentsline {section}{\numberline {4.3}Registry}{15}{section.4.3}
+\contentsline {section}{\numberline {4.4}Authorization}{15}{section.4.4}
+\contentsline {section}{\numberline {4.5}The Command Line Interface}{15}{section.4.5}
+\contentsline {section}{\numberline {4.6}Integrity Checks}{16}{section.4.6}
+\contentsline {chapter}{\numberline {A}Appendix}{17}{appendix.A}
+\contentsline {section}{\numberline {A.1}Appendix A: JPM Manifest Specification}{17}{section.A.1}
+\contentsline {subsection}{\numberline {A.1.1}Purpose}{17}{subsection.A.1.1}
+\contentsline {subsection}{\numberline {A.1.2}Table of Contents}{17}{subsection.A.1.2}
+\contentsline {subsection}{\numberline {A.1.3}Format and Properties}{18}{subsection.A.1.3}
+\contentsline {subsubsection}{name}{18}{subsection.A.1.3}
+\contentsline {subsubsection}{version}{18}{subsection.A.1.3}
+\contentsline {subsubsection}{license}{18}{subsection.A.1.3}
+\contentsline {subsubsection}{authors}{19}{subsection.A.1.3}
+\contentsline {subsubsection}{private}{19}{subsection.A.1.3}
+\contentsline {subsubsection}{main}{19}{subsection.A.1.3}
+\contentsline {subsubsection}{dependencies}{20}{subsection.A.1.3}
+\contentsline {subsubsection}{dependency}{20}{subsection.A.1.3}
+\contentsline {paragraph}{name}{20}{subsection.A.1.3}
+\contentsline {paragraph}{version}{20}{subsection.A.1.3}
+\contentsline {paragraph}{registry}{21}{subsection.A.1.3}
+\contentsline {subsubsection}{registries}{21}{subsection.A.1.3}
+\contentsline {subsubsection}{registry}{21}{subsection.A.1.3}
+\contentsline {paragraph}{name}{21}{subsection.A.1.3}
+\contentsline {paragraph}{location}{22}{subsection.A.1.3}
