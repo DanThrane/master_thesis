@@ -1,0 +1,216 @@
+\section{A Complete Application with Jolie}
+
+In this section we will describe a complete application written in Jolie. The
+application will contain several services, and will be written using best
+practices from before the module and package system.
+
+\subsection{Architecture}
+
+% TODO Things we wish to cover in this section:
+%
+%   - Includes and why they will be problematic
+%     + Can be resolved by using another service's interface and types
+%   - Configuring location of ports, both external and embedding of stuff
+%     + Show this by having a service be external, and another embedded
+%   - Project structure, and why this is a problem
+%     + Show the complete structure of a single service, with several deps
+%   - Parameter configuration
+%     + Show this by configuring a database
+
+The application we will be building is a very simple shop application. This
+\emph{shop} application will be able to look in inventory, and reserve a
+product, and arrange for \emph{shipping}, while charging \emph{payment} from
+the customer.
+
+The architecture of our application is shown in Figure \ref{fig:complete_arch}
+we see an illustration of the system's architecture. The \emph{shop} service
+will be contacted by the front-end service, which in this case is
+\emph{web-store}.
+
+The dashed region (TODO) displays services that should be running in the same
+Jolie engine. This is accomplished via embedding, which was introduced in a
+previous section.
+
+\begin{listing}[H]
+\begin{minted}{text}
++---------------+     +---------------+     +---------------+
+| web-store     | --> | shop          | --> | payment       |
++---------------+     +---------------+     +---------------+
+                              |        \
+                              |         \    +---------------+
+                              v          --> | shipping      |
+                      +---------------+      +---------------+
+                      | inventory     |
+                      +---------------+
+\end{minted}
+\caption{The Architecture of a Simple Microservice System}
+\label{fig:complete_arch}
+\end{listing}
+
+\subsection{Implementing the Shop Service}
+
+We will keep our focus on the \emph{shop} service, and it's interacting with
+peering services. Putting together the stuff learned from the previous
+sections, we can quickly setup an input port for the service, which has the
+appropriate interface. It is considered best practice to place the public
+interfaces that a service exposes in its own separate file. Files intended for
+other services to include typically have the file extension \verb!.iol! as
+opposed to \verb!.ol!. There is no technical difference between the two, but it
+allows for the developer to more easily express intent.
+
+Thus in order to implement our shop service we create two files, one for the
+service implementation (\verb!shop.ol!), and another which can be used by other
+services (\verb!shop.iol!).
+
+\begin{listing}[H]
+\begin{minted}{java}
+// shop.iol
+interface IShop {
+    RequestResponse:
+        checkout(CheckoutReq)(CheckoutRes),
+        browse(BrowseReq)(BrowseRes)
+}
+
+// shop.ol
+include "console.iol"
+main {
+    [checkout(request)(response) {
+        println@Console("Implementation goes here")()
+    }]
+
+    [browse(request)(response) {
+        println@Console("Implementation goes here")()
+    }]
+}
+\end{minted}
+\caption{TODO Caption}
+\label{lst:simple_start}
+\end{listing}
+
+The operations that the shop exposes, needs to collaborate with the shipping,
+payment, and inventory services. In order for us to speak to them they need
+output ports.
+
+First of all the output ports needs interfaces. Like we did with the shop
+service, the other services have exposed their interfaces in a special file
+intended for inclusion. As a result we will have to copy the
+\mintinline{text}{.iol} files of these services into our own.
+
+Secondly these output port needs to be reached. We can either embed the
+services, making it run inside of the same Jolie engine as our shop service,
+our we can provide external bindings to it. For output ports we may change this
+binding dynamically at runtime. Note that this is unlike input ports which must
+be ready at deployment time.
+
+Binding an output port to an external service is relatively easy. For example
+to let the \verb!Payment! port bind to a service using https, we might write
+\mintinline{java}{Location: "socket://paymentprocessor.com:443"} and
+\mintinline{java}{Protocol: https}. The input port at the payment processor
+would also have to match this, to ensure it runs on the correct port and speaks
+the correct protocol.
+
+It is a similar to bind an output port to an embedded service. However this is
+done by setting the \mintinline{java}{Location} or \mintinline{java}{Protocol}
+attributes. We must instead instruct the engine to embed the service, which
+most importantly requires us to point to some executable service. The Jolie
+engine supports several language for these embedded services, including Jolie,
+Java, and JavaScript. For our desired deployment, we wanted to embed the
+inventory service inside of the shop service. Assuming that the inventory
+service is written as a Jolie service, and its service is implemented in
+\mintinline{text}{inventory.ol}, then we may create an embedding as shown in
+Listing \ref{lst:simple_embedding}. Just like in the case of the external
+services, the input port of the receiving service \emph{must match}. In the
+case of embedded service there must be an input port listining on the
+\mintinline{java}{"local"} location.
+
+Quite often the location of an input port is considered a deployment problem.
+We see this quite clearly in the case of embedding a service. All current
+solutions in Jolie, require us to \emph{modify the source code of a service},
+simply to change where the service should listen. Best practices in Jolie
+attempt to make this less of a problem by including a configuration file which
+contains constants. The inventory service, might include a file called
+\verb!inventory_config.iol! with constants setting up the location and protocol
+of the service. An example of this is shown in Listing
+\ref{lst:include_as_conf}.
+
+\begin{listing}[H]
+\begin{minted}{java}
+// inventory_config.iol
+constants {
+    INVENTORY_LOCATION = "local"
+    INVENTORY_PROTOCOL = sodep
+}
+
+// inventory.ol
+include "inventory_config.iol"
+
+inputPort Inventory {
+    Location: INVENTORY_LOCATION
+    Protocol: INVENTORY_PROTOCOL
+}
+\end{minted}
+
+\caption{A common Jolie practice for solving configuration of a service, is to
+    include a file containing constants with the desired configuration.}
+
+\label{lst:include_as_conf}
+
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}{java}
+embedded {
+    Jolie:
+        "inventory.ol" in Inventory
+}
+\end{minted}
+
+\caption{Embedding the \mintinline{java}{inventory} service in the
+    \mintinline{java}{Inventory} output port}
+
+\label{lst:simple_embedding}
+
+\end{listing}
+
+With the code from Listing \ref{lst:simple_start} where the output port
+\mintinline{java}{Console} is defined. The output port points to an embedding
+of the console service, and is included directly in the \verb!console.iol!
+file. This is a fairly common pattern used in Jolie, especially for services
+that work in a library-like fashion (i.e. not intended as a stand-alone
+service). This pattern is used for almost every single service in the Jolie
+standard library.
+
+With the output ports correctly configured, we may now implement the actual
+business logic for our shop. For completeness sake this might look like shown
+in Listing \ref{lst:op_impl}.
+
+\begin{listing}[H]
+\begin{minted}{java}
+[checkout(request)(response) {
+    // Do some local calculations
+    checkForStock@Inventory(/* ... */)(hasStock);
+    if (!hasStock) throw(OutOfStockFault);
+    reserve@Inventory(/* ... */);
+    charge@Payment(/* ... */)();
+    send@Shipping(/* ... */)()
+}]
+\end{minted}
+\caption{Implementing the checkout operation}
+\label{lst:op_impl}
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}{text}
+.
++-- include
+|   +-- shop.iol
+|-- inventory.iol
+|-- inventory.ol
+|-- payment.iol
+|-- shipping.iol
++-- shop.ol
+\end{minted}
+\caption{File Structure of the Shop Service}
+\label{fig:file_structure}
+\end{listing}
+

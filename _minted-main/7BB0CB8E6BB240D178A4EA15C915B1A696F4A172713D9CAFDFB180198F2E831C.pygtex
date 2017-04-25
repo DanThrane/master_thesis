@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// shop.iol}
+\PYG{k+kd}{interface} \PYG{n+nc}{IShop} \PYG{o}{\PYGZob{}}
+    \PYG{n}{RequestResponse}\PYG{o}{:}
+        \PYG{n}{checkout}\PYG{o}{(}\PYG{n}{CheckoutReq}\PYG{o}{)(}\PYG{n}{CheckoutRes}\PYG{o}{),}
+        \PYG{n}{browse}\PYG{o}{(}\PYG{n}{BrowseReq}\PYG{o}{)(}\PYG{n}{BrowseRes}\PYG{o}{)}
+\PYG{o}{\PYGZcb{}}
+
+\PYG{c+c1}{// shop.ol}
+\PYG{n}{include} \PYG{l+s}{\PYGZdq{}console.iol\PYGZdq{}}
+\PYG{n}{main} \PYG{o}{\PYGZob{}}
+    \PYG{o}{[}\PYG{n}{checkout}\PYG{o}{(}\PYG{n}{request}\PYG{o}{)(}\PYG{n}{response}\PYG{o}{)} \PYG{o}{\PYGZob{}}
+        \PYG{n}{println}\PYG{n+nd}{@Console}\PYG{o}{(}\PYG{l+s}{\PYGZdq{}Implementation goes here\PYGZdq{}}\PYG{o}{)()}
+    \PYG{o}{\PYGZcb{}]}
+
+    \PYG{o}{[}\PYG{n}{browse}\PYG{o}{(}\PYG{n}{request}\PYG{o}{)(}\PYG{n}{response}\PYG{o}{)} \PYG{o}{\PYGZob{}}
+        \PYG{n}{println}\PYG{n+nd}{@Console}\PYG{o}{(}\PYG{l+s}{\PYGZdq{}Implementation goes here\PYGZdq{}}\PYG{o}{)()}
+    \PYG{o}{\PYGZcb{}]}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}

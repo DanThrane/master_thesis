@@ -1,0 +1,19 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{type} \PYG{n}{RequestType}\PYG{o}{:} \PYG{k+kt}{void} \PYG{o}{\PYGZob{}}
+    \PYG{o}{.}\PYG{n+na}{a}\PYG{o}{:} \PYG{k+kt}{int}
+    \PYG{o}{.}\PYG{n+na}{b}\PYG{o}{:} \PYG{n}{string}
+    \PYG{o}{.}\PYG{n+na}{c}\PYG{o}{:} \PYG{n}{bool}
+    \PYG{o}{.}\PYG{n+na}{d}\PYG{o}{:} \PYG{k+kt}{double}
+    \PYG{o}{.}\PYG{n+na}{e}\PYG{o}{:} \PYG{n}{any} \PYG{c+c1}{// any primitive type}
+\PYG{o}{\PYGZcb{}}
+
+\PYG{n}{type} \PYG{n}{ResponseType}\PYG{o}{:} \PYG{k+kt}{int} \PYG{o}{\PYGZob{}}
+    \PYG{o}{.}\PYG{n+na}{aFixedArray}\PYG{o}{[}\PYG{l+m+mi}{1}\PYG{o}{,} \PYG{l+m+mi}{3}\PYG{o}{]:} \PYG{n}{string}
+    \PYG{o}{.}\PYG{n+na}{aNonFixedArray}\PYG{o}{[}\PYG{l+m+mi}{0}\PYG{o}{,} \PYG{o}{*]:} \PYG{n}{string}
+    \PYG{o}{.}\PYG{n+na}{fieldWithChildren}\PYG{o}{:} \PYG{k+kt}{void} \PYG{o}{\PYGZob{}}
+        \PYG{o}{.}\PYG{n+na}{a}\PYG{o}{:} \PYG{k+kt}{void} \PYG{o}{\PYGZob{}}
+            \PYG{o}{.}\PYG{n+na}{b}\PYG{o}{:} \PYG{k+kt}{int}
+        \PYG{o}{\PYGZcb{}}
+    \PYG{o}{\PYGZcb{}}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}

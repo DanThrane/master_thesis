@@ -75,7 +75,10 @@ second phase, and is responsible for creating the Abstract Syntax Tree (AST)
 which represents the input program. The parser will produce only a single root
 node, namely the \verb!Program! node. As a consequence of this, any file which
 is included is semantically identical to copying and pasting the source code of
-that file into the original file, in place of the include statement.
+that file into the original file, in place of the include statement. It should
+also be noted that include paths are \emph{not} relative to the file that
+includes, but rather relative to the current working directory (i.e. where the
+engine was started).
 
 The third phase traverses the AST to make sure that it is semantically valid.
 This weeds out programs which are syntactically correct, but do not make sense.

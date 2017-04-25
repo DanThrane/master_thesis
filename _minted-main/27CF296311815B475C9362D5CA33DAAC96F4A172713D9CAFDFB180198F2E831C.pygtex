@@ -1,0 +1,16 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{n}{include} \PYG{l+s}{\PYGZdq{}paymentprocessor.iol\PYGZdq{}}
+
+\PYG{n}{inputPort} \PYG{n}{Shop} \PYG{o}{\PYGZob{}} \PYG{o}{...} \PYG{o}{\PYGZcb{}}
+\PYG{n}{outputPort} \PYG{n}{Warehouse} \PYG{o}{\PYGZob{}} \PYG{o}{...} \PYG{o}{\PYGZcb{}}
+\PYG{n}{outputPort} \PYG{n}{PaymentProcessor} \PYG{o}{\PYGZob{}}
+    \PYG{n}{Location}\PYG{o}{:} \PYG{l+s}{\PYGZdq{}socket://paymentprocessor.com:443\PYGZdq{}}
+    \PYG{n}{Protocol}\PYG{o}{:} \PYG{n}{https}
+    \PYG{n}{Interfaces}\PYG{o}{:} \PYG{n}{IPaymentProcessor} \PYG{o}{\PYGZcb{}}
+
+\PYG{n}{main} \PYG{o}{\PYGZob{}}
+    \PYG{n}{checkout}\PYG{o}{(}\PYG{n}{order}\PYG{o}{)(}\PYG{n}{response}\PYG{o}{)} \PYG{o}{\PYGZob{}}
+        \PYG{n}{charge}\PYG{n+nd}{@PaymentProcessor}\PYG{o}{(} \PYG{c+cm}{/* ... */} \PYG{o}{)()}
+    \PYG{o}{\PYGZcb{}}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}

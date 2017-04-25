@@ -1,0 +1,9 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{interface} \PYG{n+nc}{IExample} \PYG{o}{\PYGZob{}}
+    \PYG{n}{RequestResponse}\PYG{o}{:}
+        \PYG{n}{anOperation}\PYG{o}{(}\PYG{n}{RequestType}\PYG{o}{)(}\PYG{n}{ResponseType}\PYG{o}{)}
+
+\PYG{n+nl}{    OneWay:}
+        \PYG{n}{hello}\PYG{o}{(}\PYG{n}{HelloType}\PYG{o}{)}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}
