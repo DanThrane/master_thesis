@@ -1,0 +1,12 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// calculator.iol}
+\PYG{n}{type} \PYG{n}{Numbers}\PYG{o}{:} \PYG{k+kt}{void} \PYG{o}{\PYGZob{}}
+    \PYG{o}{.}\PYG{n+na}{numbers}\PYG{o}{[}\PYG{l+m+mi}{2}\PYG{o}{,} \PYG{o}{*]:} \PYG{k+kt}{int}
+\PYG{o}{\PYGZcb{}}
+
+\PYG{k+kd}{interface} \PYG{n+nc}{ICalculator} \PYG{o}{\PYGZob{}}
+    \PYG{n}{RequestResponse}\PYG{o}{:}
+        \PYG{n}{sum}\PYG{o}{(}\PYG{n}{Numbers}\PYG{o}{)(}\PYG{k+kt}{int}\PYG{o}{),}
+        \PYG{n}{product}\PYG{o}{(}\PYG{n}{Numbers}\PYG{o}{)(}\PYG{k+kt}{int}\PYG{o}{)}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}

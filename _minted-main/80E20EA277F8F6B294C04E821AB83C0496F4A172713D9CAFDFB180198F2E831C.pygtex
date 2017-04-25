@@ -1,0 +1,20 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// calculator.ol}
+\PYG{n}{include} \PYG{l+s}{\PYGZdq{}console.iol\PYGZdq{}}
+
+\PYG{n}{inputPort} \PYG{n}{Calculator} \PYG{o}{\PYGZob{}}
+    \PYG{n}{Location}\PYG{o}{:} \PYG{l+s}{\PYGZdq{}socket://localhost:12345\PYGZdq{}}
+    \PYG{n}{Protocol}\PYG{o}{:} \PYG{n}{sodep}
+    \PYG{n}{Interfaces}\PYG{o}{:} \PYG{n}{ICalculator}
+\PYG{o}{\PYGZcb{}}
+
+\PYG{n}{main} \PYG{o}{\PYGZob{}}
+    \PYG{o}{[}\PYG{n}{sum}\PYG{o}{(}\PYG{n}{request}\PYG{o}{)(}\PYG{n}{response}\PYG{o}{)} \PYG{o}{\PYGZob{}}
+        \PYG{n}{println}\PYG{n+nd}{@Console}\PYG{o}{(}\PYG{l+s}{\PYGZdq{}Implementation goes here\PYGZdq{}}\PYG{o}{)()}
+    \PYG{o}{\PYGZcb{}]}
+
+    \PYG{o}{[}\PYG{n}{product}\PYG{o}{(}\PYG{n}{request}\PYG{o}{)(}\PYG{n}{response}\PYG{o}{)} \PYG{o}{\PYGZob{}}
+        \PYG{n}{println}\PYG{n+nd}{@Console}\PYG{o}{(}\PYG{l+s}{\PYGZdq{}Implementation goes here\PYGZdq{}}\PYG{o}{)()}
+    \PYG{o}{\PYGZcb{}]}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}

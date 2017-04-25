@@ -1,0 +1,13 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{o}{[}\PYG{n}{sum}\PYG{o}{(}\PYG{n}{request}\PYG{o}{)(}\PYG{n}{response}\PYG{o}{)} \PYG{o}{\PYGZob{}}
+    \PYG{n}{total} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{o}{;}
+    \PYG{k}{for} \PYG{o}{(}\PYG{n}{i} \PYG{o}{=} \PYG{l+m+mi}{0}\PYG{o}{,} \PYG{n}{i} \PYG{o}{\PYGZlt{}} \PYG{err}{\PYGZsh{}}\PYG{n}{request}\PYG{o}{.}\PYG{n+na}{numbers}\PYG{o}{,} \PYG{n}{i}\PYG{o}{++)} \PYG{o}{\PYGZob{}}
+        \PYG{c+c1}{// Add current number with total, and store result in total}
+        \PYG{n}{add}\PYG{n+nd}{@Addition}\PYG{o}{(\PYGZob{}}
+            \PYG{o}{.}\PYG{n+na}{a} \PYG{o}{=} \PYG{n}{total}\PYG{o}{,}
+            \PYG{o}{.}\PYG{n+na}{b} \PYG{o}{=}  \PYG{n}{request}\PYG{o}{.}\PYG{n+na}{numbers}\PYG{o}{[}\PYG{n}{i}\PYG{o}{]}
+        \PYG{o}{\PYGZcb{})(}\PYG{n}{total}\PYG{o}{)}
+    \PYG{o}{\PYGZcb{};}
+    \PYG{n}{response} \PYG{o}{=} \PYG{n}{total}
+\PYG{o}{\PYGZcb{}]}
+\end{Verbatim}

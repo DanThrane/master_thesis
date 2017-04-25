@@ -22,7 +22,9 @@
 \usepackage{caption}
 \usepackage{chemfig}
 \usepackage{cleveref}
+\usepackage{multicol}
 \usepackage{minted}
+\usepackage{mdframed}
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -40,12 +42,14 @@
     }
 }
 
-%chemo macros
-\newcommand{\cheminl}[1]{$\mathrm{#1}$}
-
 % math envirs
-\newtheorem{defin}{Definition}
-\newtheorem{theo}{Theorem}
+\theoremstyle{definition}
+\newtheorem{defn}{Definition}
+\newtheorem{obsv}{Observation}
+
+\newenvironment{observation}
+    {\begin{framed}\begin{obsv}}
+    {\end{obsv}\end{framed}}
 
 % Chapter title formatting
 \definecolor{gray75}{gray}{0.75}

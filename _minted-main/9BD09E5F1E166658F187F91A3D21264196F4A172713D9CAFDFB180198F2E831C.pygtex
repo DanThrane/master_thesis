@@ -1,0 +1,7 @@
+\begin{Verbatim}[commandchars=\\\{\}]
+\PYG{c+c1}{// addition.iol}
+\PYG{n}{constants} \PYG{o}{\PYGZob{}}
+    \PYG{n}{ADDIITON\PYGZus{}LOCATION} \PYG{o}{=} \PYG{l+s}{\PYGZdq{}local\PYGZdq{}}
+    \PYG{n}{ADDIITON\PYGZus{}PROTOCOL} \PYG{o}{=} \PYG{n}{sodep}
+\PYG{o}{\PYGZcb{}}
+\end{Verbatim}
