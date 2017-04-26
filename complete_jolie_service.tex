@@ -9,16 +9,12 @@ will serve as the core motivation for our solution.
 
 \subsection{Architecture}
 
-% TODO Things we wish to cover in this section:
+% Things we wish to cover in this section:
 %
 %   - Includes and why they will be problematic
-%     + Can be resolved by using another service's interface and types
 %   - Configuring location of ports, both external and embedding of stuff
-%     + Show this by having a service be external, and another embedded
 %   - Project structure, and why this is a problem
-%     + Show the complete structure of a single service, with several deps
 %   - Parameter configuration
-%     + Show this by configuring a database
 
 The application we will be building is a very simple calculator system. The
 architecture of our application is shown in Figure \ref{fig:complete_arch} we
@@ -110,8 +106,13 @@ interface ICalculator {
 \end{listing}
 
 \begin{observation}
-    TODO Keep interfaces and types in their own file, to make it easier to
-    import.
+    The interfaces and types of a service are typically separated into their
+    own files. This files typically has the extension \verb!.iol! to indicate
+    that it does not contain a service implementation, but is rather intended
+    for inclusion by a service which requires it.
+
+    This file is typically put in the \verb!include! directory. This directory
+    is always added to the search path natively by the Jolie engine.
 \end{observation}
 
 The operations that the calculator exposes, needs to collaborate with the other
@@ -146,7 +147,7 @@ service is written as a Jolie service, and its service is implemented in
 \mintinline{text}{addition.ol}, then we may create an embedding as shown in
 Listing \ref{lst:simple_embedding}. Just like in the case of the external
 services, the input port of the receiving service \emph{must match}. In the
-case of embedded service there must be an input port listining on the
+case of embedded service there must be an input port listening on the
 \mintinline{java}{"local"} location.
 
 Quite often the location of an input port is considered a deployment problem.
@@ -192,7 +193,13 @@ constants {
 \end{listing}
 
 \begin{observation}
-    TODO Include source as configuration (via constants)
+    Most configuration of Jolie services are done via constants. Jolie
+    constants, different from most other languages, can be simple literal
+    types, or they may even contain identifiers. This makes them rather
+    versatile in what they may configure.
+
+    The constants are placed in a separate source file, which is included by
+    the service requiring the configuration.
 \end{observation}
 
 \begin{listing}[H]
@@ -219,8 +226,14 @@ service). This pattern is used for almost every single service in the Jolie
 standard library.
 
 \begin{observation}
-    TODO Some services can only be used embedded and use includes to setup
-    their embedding
+    Services intended to be used as libraries are often contained in a single
+    \verb!.iol! file. This file contain everything required to set it up,
+    included interfaces, types and an embedded output port.
+
+    This makes it very easy to use the service, however it also makes it
+    impossible to bind to this service externally, without first getting an
+    embedding. This isn't possible since we cannot include the interfaces and
+    types by themselves.
 \end{observation}
 
 With the output ports correctly configured, we may now implement the actual
@@ -245,7 +258,7 @@ shown in Listing \ref{lst:op_impl}.
 \label{lst:op_impl}
 \end{listing}
 
-Finally we want to reflcet slightly on the file structure that this service
+Finally we want to reflect slightly on the file structure that this service
 ended up having. In order to use external services, we had to include files
 which contain these interfaces. This version is worse when an embedding is
 desired, since the entire service with its implementation is suddenly required.
@@ -259,7 +272,7 @@ includes in the source code would have to be updated. A common result of this
 is that every single file gets dumped into the project level root. When all
 files are stored in the same directory, we also get a much larger chance of
 having name conflicts. As a result names tend to become rather large, to make
-it less likely that a conflict occours.
+it less likely that a conflict occurs.
 
 The final file structure of the calculator service is shown in Listing
 \ref{lst:file_structure}.
@@ -278,7 +291,16 @@ The final file structure of the calculator service is shown in Listing
 \label{lst:file_structure}
 \end{listing}
 
-
 \begin{observation}
-    TODO File inclusion, littering of namespace. Causes very defensive naming
+
+    In order to collaborate with other services, it is often needed to manually
+    copy files into the service. The files required depend on if an embedding
+    is required, when an embedding is required we will need the entire service
+    (and any services it may depend on itself). If we just need to interface
+    with it, we can simply include the files required for its interface files.
+
+    Structuring the files is problematic, due to \verb!include! statements not
+    being relative to file performing inclusion.
+
 \end{observation}
+
