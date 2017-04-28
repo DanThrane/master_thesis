@@ -1,5 +1,7 @@
 \section{Configuration}
 
+% TODO Define configuration and which constructs we want to be configurable
+
 \subsection{Motivation}
 
 From observation 2 we saw that most configuration was done via the inclusion of
@@ -23,53 +25,63 @@ We also saw that a lot of issues, that should have been purely deployment,
 became a code problem.
 
 This gives us plenty of reason to explore the need for a configuration format.
-Most other systems, typically frameworks, would most likely go for a system
-defined in code, as opposed to natively in the language. Such as a system would
-most likely read configuration files from some external format, such as XML.
-Once these files are parsed, the system may perform some actions based on this,
-and then finally the server could start. This sort of system is illustrated in
-Figure \ref{fig:normal_conf}.
+Most other systems would most likely go for a system defined in user code, as
+opposed to natively in the language. An example of such framework, could be
+Vert.x, it is a tool-kit for building reactive applications on the JVM.
+Examples of such ``reactive applications'' are microservices. The configuration
+workflow is shown in Figure \ref{fig:normal_conf}. The system will retrieve,
+and read external configuration files, directed by the user code and apply the
+configuration as needed.
+
+% Most other systems can do this at run time
+% For example Vert.x does this by reading external configuration files
+% Once configuration is done, we can start up the server
 
 \begin{listing}[H]
 \begin{minted}{text}
 +------------------+     +-------------------+     +--------------------+
-| executable start | --> | read conf files   | --> | init based on conf |
+| executable start | --> | retrieve conf     | --> | read conf files    |
 +------------------+     +-------------------+     +--------------------+
                                                              |
-                                                             v
-                                                   +--------------------+
-                                                   | server start       |
-                                                   +--------------------+
+                            +-----+                          |
+                            |     | reconfigure              |
+                            |     v                          v
+                         +-------------------+     +--------------------+
+                         | server running    | <-- | perform conf       |
+                         +-------------------+     +--------------------+
 \end{minted}
-\caption{Typical configuration system TODO Replace with concrete example}
+\caption{Simplified workflow for configuration of Vert.x applications}
 \label{fig:normal_conf}
 \end{listing}
 
-% TODO For real, this needs a concrete example. This might work:
 % http://vertx.io/blog/vert-x-application-configuration/
+% http://vertx.io/docs/vertx-config/kotlin/
 
 However implementing such as a system in Jolie has its problems, most of these
-come from the difference between the underlying programming languages. 
+come from the difference between general-purpose programming languages and
+specialized programming languages.
 
-In the case of most microservices frameworks, they are written in general
-purpose languages. These languages are not made to support native constructs
-needed for microservices, but rather made to support a more wide range of
-applications.  This means that any such construct made to support a
-microservice architecture are created entirely in code. As a result,
-configuring these can easily be done, since the framework has complete control
-over the components the system is made up of.
+In general-purpose languages, the constructs (such as the server's socket) for
+the microservice architecture are created in user code. As a result they are
+entirely accessible from user code. This make it feasible to change their
+behaviour, since we can run code before deployment occurs.
 
-However in a specialized programming language, like Jolie, the constructs
-making up the system are managed by the language. As a result user code does
-not have complete control over these constructs, only the language has this.
-For example, user code in Jolie has limited control over how networking is
-performed, it may guide the Jolie engine on what messages should be send, but
-it is entirely up to the engine how it should be done. In a similar fashion,
-Jolie constraints certain constructs to be ready at deployment time. This makes
-it impossible to perform configuration from user code, since this wouldn't
-happen until run time. Concrete examples of this includes the input ports,
-which needs to be ready at deployment time. Thus without native support for
-configuration of these, it would not be possible to change the input port.
+% In Jolie the constructs are managed directly by Jolie. For example ... Some
+% constructs needs to be ready at deployment time, we cannot have code run
+% before deployment time, even init runs after this. Concrete example of what
+% we need.
+
+In Jolie the constructs are managed directly by Jolie. Doing this has multiple
+advantages, such as less complexity in user code, but it also means that user
+code is capable of doing less. Jolie code can for example not control
+networking directly, but is instead forced to use the abstractions provided by
+Jolie (sending messages). The language puts constraints on certain
+constructs being fully prepared directly in the source code. This is analogous
+to a programming language requiring the types of a struct's field to be present
+at compile time. As a result, not all constructs can be changed at run time.
+Concrete examples of this includes the input ports, which needs to be ready at
+deployment time. Thus without native support for configuration of these, it
+would not be possible to change the input port.
 
 \subsection{Configuration Profiles}
 
