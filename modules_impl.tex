@@ -1,9 +1,64 @@
 \section{Modules}
 
-\begin{itemize}
-\item Probably need to cover some problems with the current solution, to give
-some context to the actual solution
-\item Present the actual solution of modules
-\item Cover the implementation.
-\end{itemize}
+A module in Jolie is defined as a project root directory, and optionally an
+entry-point. Modules are uniquely identified by a name.
 
+The Jolie engine needs to know about these modules. The engine is informed
+about these modules from the intent as options which starts the engine
+(command-line arguments). This information is collected in the ``intent
+parsing'' phase, and is made available to any later phase that might need it.
+This intent is passed as an option, recall that options are shared among all
+interpreter instances inside of an engine. As a result any embedded service
+will also be aware of the same modules.
+
+As an example, we may inform the engine about a module called ``foo'', which
+has its source code placed in \verb!/packages/foo!  with an entry-point in
+\verb!/packages/foo/main.ol! we would write: \mintinline{text}{--mod
+foo,/packages/foo,main.ol}. This implementation technique is very close to
+how, for example, you would add a JAR file to the classpath of a Java program.
+% TODO Very informal argument
+
+The result of this decision is that quite a lot of additional options may need
+to be passed to the engine. However this choice was purposely chosen, it
+is left for another tool to make this job easier. In this case a package
+manager is expected to take the heavy lifting, and figure out which modules
+exists. Requiring complete knowledge to be passed to the engine, allows
+for more freedom in how these tools are implemented, and another implementation
+strategy, than the one provided in the package manager, could be created
+without any changes to the language infrastructure. See Section TODO about how
+the package manager passes this information to the engine.
+
+To allow for better organization, a new type of include has been added to the
+language. These include allows the developer to include from a particular
+package. The syntax of this include is shown in Listing \ref{lst:mod_include}.
+When a package include is used, the search path will be altered, such that the
+project root is changed to that of the package (as opposed to where the engine
+was started). Any file included from within this package should perform its
+includes relative to its own root, rather than the project root.
+
+TODO Example
+
+The new include syntax, along with native support for modules, allows for the
+code to properly organized. With this a module may be placed inside of its own
+directory, without any of the code having to be changed.
+
+\begin{listing}[H]
+\begin{minted}{java}
+include "<file>" from "<module>"
+\end{minted}
+\caption{Extension to the include statement, made for module imports}
+\label{lst:mod_include}
+\end{listing}
+
+\subsection{Include Algorithm for Jolie}
+
+TODO To this date I still don't understand how the include algorithm works. Ask
+Fabrizio about this.
+
+\subsection{Module Include Algorithm}
+
+TODO Module includes modify the search path. This also means the injection of
+the include directory, which is used as a convention. This helps maintain
+expected behaviour.
+
+TODO In order to implement the root switching we use a stack.

@@ -1,6 +1,196 @@
 \section{Configuration}
 
-\begin{itemize}
-\item Introduce why we need it
-\item Configuration format, profiles, modules
-\end{itemize}
+\subsection{Motivation}
+
+From observation 2 we saw that most configuration was done via the inclusion of
+source code. This source code would expose constants (read: literal values
+\emph{and} identifiers). The included source code, however, can do anything
+that Jolie source normally can, and isn't limited to just the desired
+configuration. As a result, a service developer cannot be certain that the
+configurator (entity who provides configuration) doesn't start messing with
+other details of the program. Deploying defensive
+programming\footnote{Defensive programming techniques are usually employed for
+systems that require high availability, or where safety and security is
+required.} techniques against this becomes significantly more problematic,
+since no guarantees about the configuration source file can really be made.
+
+Distributing re-useable packages is also problematic with this approach.
+Several features of package management namely requires that the package remains
+read-only. Features that typically need this aspect could be updating, without
+this we would need source-code merges, or integrity checks of packages.
+
+We also saw that a lot of issues, that should have been purely deployment,
+became a code problem.
+
+This gives us plenty of reason to explore the need for a configuration format.
+Most other systems, typically frameworks, would most likely go for a system
+defined in code, as opposed to natively in the language. Such as a system would
+most likely read configuration files from some external format, such as XML.
+Once these files are parsed, the system may perform some actions based on this,
+and then finally the server could start. This sort of system is illustrated in
+Figure \ref{fig:normal_conf}.
+
+\begin{listing}[H]
+\begin{minted}{text}
++------------------+     +-------------------+     +--------------------+
+| executable start | --> | read conf files   | --> | init based on conf |
++------------------+     +-------------------+     +--------------------+
+                                                             |
+                                                             v
+                                                   +--------------------+
+                                                   | server start       |
+                                                   +--------------------+
+\end{minted}
+\caption{Typical configuration system TODO Replace with concrete example}
+\label{fig:normal_conf}
+\end{listing}
+
+% TODO For real, this needs a concrete example. This might work:
+% http://vertx.io/blog/vert-x-application-configuration/
+
+However implementing such as a system in Jolie has its problems, most of these
+come from the difference between the underlying programming languages. 
+
+In the case of most microservices frameworks, they are written in general
+purpose languages. These languages are not made to support native constructs
+needed for microservices, but rather made to support a more wide range of
+applications.  This means that any such construct made to support a
+microservice architecture are created entirely in code. As a result,
+configuring these can easily be done, since the framework has complete control
+over the components the system is made up of.
+
+However in a specialized programming language, like Jolie, the constructs
+making up the system are managed by the language. As a result user code does
+not have complete control over these constructs, only the language has this.
+For example, user code in Jolie has limited control over how networking is
+performed, it may guide the Jolie engine on what messages should be send, but
+it is entirely up to the engine how it should be done. In a similar fashion,
+Jolie constraints certain constructs to be ready at deployment time. This makes
+it impossible to perform configuration from user code, since this wouldn't
+happen until run time. Concrete examples of this includes the input ports,
+which needs to be ready at deployment time. Thus without native support for
+configuration of these, it would not be possible to change the input port.
+
+\subsection{Configuration Profiles}
+
+\subsection{Configuration File Format}
+
+\subsection{Changes to Core Language}
+
+\subsection{Example}
+
+TODO This is just copy pasted from some markdown document. Might be able to
+find a better example. Syntax is most likely also outdated.
+
+\includegraphics[width=\textwidth]{prototypes.png}
+
+(The dashed region corresponds to which services that are embedded together)
+
+This use-case is intended to show how we can easily go from a prototype where
+we embed everything (this is easier to run locally) to hosting each service by
+itself.
+
+\begin{minted}{java}
+// A.ol
+
+ext outputPort A {
+    Interfaces: AIface
+}
+
+ext outputPutPort B {
+    Interfaces: BIface
+}
+
+constants {
+    FOO: int
+}
+\end{minted}
+
+\begin{minted}{java}
+// A.col
+
+include "B.col" // The includes work just like they do in Jolie
+include "C.col"
+
+// Previously called namespace. Configures makes it more explicit that we're
+// talking about a specific package and not an arbitrary name
+configures "A" {
+    // Like always we just put the definitions here
+    FOO = 42
+
+    // We alter the syntax slightly for output ports being embedded
+    outputPort B embeds B
+    // The second B refers to the profile B (if no profile is specified it gets
+    // the same name as the package it configures). This means that this
+    // configures block also has name "A". It could also have been written as:
+    // `profile "A" configures "A"`
+
+    outputPort C embeds C
+}
+\end{minted}
+
+Note: The previous proposal did not allow for embedding of services directly
+from the configuration. This is however needed since packages by themselves
+should be considered read-only. Thus if we want to configure a package to embed
+its dependencies, then this must be done from external configuration, we cannot
+do this in source.
+
+\begin{minted}{java}
+// B.col
+
+configures "B" {
+    inputPort B {
+        Location: "local"
+    }
+}
+\end{minted}
+
+\begin{minted}{java}
+// C.col
+
+configures "C" {
+    inputPort C {
+        Location: "local"
+    }
+}
+\end{minted}
+
+In order to use an external B we need to update "A.col":
+
+\begin{minted}{java}
+// A.col
+include "C.col"
+
+configures "A" {
+    outputPort B {
+        Location: "socket://b.example.org:8000"
+        Protocol: sodep
+    }
+    outputPort C embeds C
+}
+\end{minted}
+
+In order to update the deployment file of B we simply need to update the
+input port to no longer be local.
+
+\begin{minted}{java}
+// B.col
+configures "B" {
+    inputPort B {
+        Location: "socket://localhost:8000"
+        Protocol: sodep
+    }
+}
+\end{minted}
+
+In most cases however this would be unnecessary since the default
+configuration file for "B" could already include a default input port.
+
+In that case we could simply deploy directly from the default configuration.
+The restriction on configuration units to only configure a single package helps
+a lot. This restriction means that we cannot from any node configure any other
+node which isn't a direct child of it. Without this we wouldn't be able to
+easily swap out one configuration unit for another.
+
+\subsection{Changes to the Interpreter's Pipeline}
+
