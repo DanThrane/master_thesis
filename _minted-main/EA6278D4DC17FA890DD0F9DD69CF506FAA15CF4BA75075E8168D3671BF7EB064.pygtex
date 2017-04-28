@@ -1,9 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-.
-+\PYGZhy{}\PYGZhy{} include
-|   +\PYGZhy{}\PYGZhy{} calculator.iol
-|\PYGZhy{}\PYGZhy{} addition.iol
-|\PYGZhy{}\PYGZhy{} addition.ol
-|\PYGZhy{}\PYGZhy{} multiplication.iol
-+\PYGZhy{}\PYGZhy{} calculator.ol
-\end{Verbatim}

@@ -1,7 +1,0 @@
-\begin{Verbatim}[commandchars=\\\{\}]
-\PYG{n}{outputPort} \PYG{n}{Example} \PYG{o}{\PYGZob{}}
-    \PYG{n}{Location}\PYG{o}{:} \PYG{l+s}{\PYGZdq{}socket://example.com:42000\PYGZdq{}}
-    \PYG{n}{Protocol}\PYG{o}{:} \PYG{n}{http}
-    \PYG{n}{Interfaces}\PYG{o}{:} \PYG{n}{IExample}
-\PYG{o}{\PYGZcb{}}
-\end{Verbatim}
