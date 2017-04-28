@@ -66,11 +66,6 @@ the microservice architecture are created in user code. As a result they are
 entirely accessible from user code. This make it feasible to change their
 behaviour, since we can run code before deployment occurs.
 
-% In Jolie the constructs are managed directly by Jolie. For example ... Some
-% constructs needs to be ready at deployment time, we cannot have code run
-% before deployment time, even init runs after this. Concrete example of what
-% we need.
-
 In Jolie the constructs are managed directly by Jolie. Doing this has multiple
 advantages, such as less complexity in user code, but it also means that user
 code is capable of doing less. Jolie code can for example not control
@@ -83,11 +78,143 @@ Concrete examples of this includes the input ports, which needs to be ready at
 deployment time. Thus without native support for configuration of these, it
 would not be possible to change the input port.
 
-\subsection{Configuration Profiles}
+\subsection{Configuration Units}
 
-\subsection{Configuration File Format}
+A configuration unit is the basic entity, which encapsulates the configuration
+of a single Jolie module. A configuration unit is known by its name (known as
+its ``profile''), the module it configures. Having multiple profiles for the
+same module can be useful for a variety of use-cases. A common use-case, could
+for example be to have separate profiles for development and production.
 
-\subsection{Changes to Core Language}
+The units hold configuration for every possible type of configurable construct
+in Jolie. The ones supported are:
+
+\begin{enumerate}
+    \item Input and output ports
+        \begin{itemize}
+            \item Location
+            \item Protocol and protocol parameters
+            \item Embedding of other services (output ports only)
+        \end{itemize}
+    \item General purpose parameters
+    \item Interface rebinding
+\end{enumerate}
+
+In the coming sections we'll mostly focus on the first two, in Section TODO
+we'll cover interface rebinding.
+
+% TODO Do we allow for inclusion of other files?
+Configuration units are defined in configuration files, which may contain
+several units. These files may even include other files, to pull in more
+configuration units. Jolie supports a single syntax for these configuration
+file. This format is custom, and made to mimic the syntax of Jolie. Listing
+\ref{lst:simple_conf} shows a very simple configuration unit. This units sets
+the location and protocol for the output port \mintinline{java}{A}, the
+location of the input port \mintinline{java}{ModuleInput}, and a parameter.
+
+\begin{listing}[H]
+\begin{minted}{java}
+profile "hello-world" configures "my-module" {
+    outputPort A {
+        Location: "socket://a.example.com:3000"
+        Protocol: sodep { .keepAlive = true }
+    },
+
+    inputPort ModuleInput {
+        Location: "socket://localhost:80"
+    },
+
+    myParameter = 42,
+    myParameter.subProperty = "hello"
+}
+\end{minted}
+
+\caption{A simple configuration unit named \mintinline{java}{hello-world}
+    configuring the module \mintinline{java}{my-module}}
+
+\label{lst:simple_conf}
+
+\end{listing}
+
+Embedding of output ports can be performed from within a configuration unit.
+This moves the embedding from being a code problem, to what it should have
+been, a deployment problem. Listing \ref{lst:conf_embedding} shows the
+embedding of output port \mintinline{java}{A}. Note that we need to make a
+reference to the module, since the profile names are placed under a namespace
+for each module. This way multiple services can share the same name, a
+situation which is likely to occur with common profile names, such as
+``development'' and ``production''.
+
+\begin{listing}[H]
+\begin{minted}{java}
+profile "hello-world" configures "my-module" {
+    outputPort A embeds "a-module" with "a-profile"
+}
+
+profile "a-profile" configures "a-module" {
+    // configuration of a-module goes here.
+}
+\end{minted}
+\caption{Embeddings make reference to other configuration units}
+\label{lst:conf_embedding}
+\end{listing}
+
+As we can see from the examples, it is not necessary to provide all the values
+of a port. It isn't necessary for two reasons. The first reason is that certain
+values may be provided by the underlying module, which uses this unit. If a
+module provides a value, then the configuration unit cannot override it. The
+second reason is that configuration profiles may extend other profiles.
+
+Configuration units may extend another unit, which configures the same module.
+The tree of inheritance may be of an arbitrary depth, but each unit may only
+extend a single unit, and they must configure the same module. The child is
+also wins when it comes to configuration. This means that if unit ``B'' extends
+``A'', and they both configure the same value, then the values found in B is
+the one that is correct. Listing \ref{lst:conf_extends} shows an example of
+extension with units.
+
+\begin{listing}[H]
+\begin{minted}{java}
+profile "a" configures "a-module" {
+    aValue = 42,
+    aValue.sub = "hello",
+
+    outputPort ExternalService {
+        Location: "socket://external.example.com:42000"
+    }
+}
+
+profile "b" configures "a-module" extends "a" {
+    aValue = 100
+    // aValue.sub = "hello"
+    // ExternalService.location = "socket://external.example.com:42000"
+}
+\end{minted}
+\caption{Configuration units may extend other units}
+\label{lst:conf_extends}
+\end{listing}
+
+The module developer is often aware of what the defaults should be. For this
+reason default configuration profiles may be shipped along the modules, which
+are implicitly imported into every configuration file. The Jolie engine will
+look for any \mintinline{text}{.col} file\footnote{The file extension of the
+configuration file} in the \mintinline{text}{conf} folder. This folder
+should be placed relative to the module's root. For example, if module "a" has
+a file called \mintinline{text}{conf/my-defaults.col}, which contains a unit
+called "default". Then we may either write a user configuration which extends
+this, simply by writing \mintinline{java}{profile "something" configures "a"
+extends "default"}, or we can use the default directly. There is no need
+for any inclusion of this file.
+
+It should be noted that no single unit is required to provide all
+configuration. The system doesn't have any ``abstract''\footnote{As in abstract
+classes, a concept often used in object oriented programming} configuration
+units. However it is required that the configuration file provides all the
+necessary configuration, as declared by the module. We'll learn more about
+how a module declares configuration in Section \ref{sec:ol_conf}.
+
+\subsection{Configuration and the Core Language}
+\label{sec:ol_conf}
 
 \subsection{Example}
 
