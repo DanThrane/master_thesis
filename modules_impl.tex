@@ -4,12 +4,12 @@ A module in Jolie is defined as a project root directory, and optionally an
 entry-point. Modules are uniquely identified by a name.
 
 The Jolie engine needs to know about these modules. The engine is informed
-about these modules from the intent as options which starts the engine
-(command-line arguments). This information is collected in the ``intent
-parsing'' phase, and is made available to any later phase that might need it.
-This intent is passed as an option, recall that options are shared among all
-interpreter instances inside of an engine. As a result any embedded service
-will also be aware of the same modules.
+about these modules from the intent, passed as options, which starts the
+engine. This information is collected in the ``intent parsing'' phase, and is
+made available to any later phase that might need it.  Since the intent is
+passed as an option, all interpreter instances inside the engine will know
+about each module.  As a result any embedded service will also be aware of the
+same modules.
 
 As an example, we may inform the engine about a module called ``foo'', which
 has its source code placed in \verb!/packages/foo!  with an entry-point in
@@ -19,14 +19,13 @@ how, for example, you would add a JAR file to the classpath of a Java program.
 % TODO Very informal argument
 
 The result of this decision is that quite a lot of additional options may need
-to be passed to the engine. However this choice was purposely chosen, it
-is left for another tool to make this job easier. In this case a package
-manager is expected to take the heavy lifting, and figure out which modules
-exists. Requiring complete knowledge to be passed to the engine, allows
-for more freedom in how these tools are implemented, and another implementation
-strategy, than the one provided in the package manager, could be created
-without any changes to the language infrastructure. See Section TODO about how
-the package manager passes this information to the engine.
+to be passed to the engine. However this choice was purposely chosen, it is
+left for another tool to make this job easier. In this case a package manager
+is expected to take the heavy lifting, and figure out which modules exists.
+This allows for more freedom in how these tools are implemented, and another
+implementation strategy, than the one provided in the package manager, could be
+created without any changes to the language infrastructure. See Section TODO
+about how the package manager passes this information to the engine.
 
 To allow for better organization, a new type of include has been added to the
 language. These include allows the developer to include from a particular

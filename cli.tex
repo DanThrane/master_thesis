@@ -2,12 +2,145 @@
 
 \section{The Command Line Interface}
 
-We need to cover:
+% We need to cover:
+%
+% \begin{itemize}
+% \item Basic introduction of how to use the tool (we need this)
+% \item Internal organization (commands)
+% \item Technical architecture, and deployment
+% \item Kind of wrap up how the entire thing works here
+% \end{itemize}
 
-\begin{itemize}
-\item Basic introduction of how to use the tool (we need this)
-\item Internal organization (commands)
-\item Technical architecture, and deployment
-\item Kind of wrap up how the entire thing works here
-\end{itemize}
+\subsection{Introduction}
 
+The command line application serves as the user interface to JPM. The
+application is, perhaps not unsurprisingly, named \mintinline{text}{jpm}. The
+tool will be used in several examples.
+
+The command line application is responsible for displaying a more user friendly
+interface to inner workings of JPM. The tool will perform almost not work by
+itself, but will instead delegate this to the back end (See Section TODO).
+
+When first running the tool, the user will be welcomed with the following
+message:
+
+\begin{minted}{text}
+JPM - The Jolie Package Manager
+Version 1.0.0
+
+Usage: jpm <COMMAND> <COMMAND-ARGUMENTS>
+
+Command specific help: jpm help <COMMAND>
+
+Available commands:
+-------------------
+init           Initializes a repository
+search         Searches repositories for a package
+install        Install dependencies
+publish        Publish this package
+start          Start this package.
+
+[ Remaining commands removed from snippet ]
+\end{minted}
+
+As clearly visible form this snippet, for the tool to do any work we must first
+give it something to do via a command. The commands that JPM understands almost
+directly mirror the functionality provided by the back end. To use JPM to
+create a new package, the user must simply use the \mintinline{text}{init}
+command. This will display a prompt, guiding the user through the mandatory
+field, and automatically create a package with the required structure. This
+is shown in Listing \ref{lst:jpm_init}.
+
+\begin{listing}[H]
+\begin{minted}{text}
+$ jpm init
+Package name
+------------
+> my-package
+
+Package description
+-------------------
+> This is my package
+
+Author: [Format: name <email> (homepage)]
+-----------------------------------------
+> Dan Sebastian Thrane <dthrane@gmail.com> (github.com/DanThrane)
+
+Private package? [Y/n]
+----------------------
+> n
+
+$ cat my-package/package.json | json name
+my-package
+\end{minted}
+
+\caption{The \mintinline{text}{jpm} tool provides a user interface for common
+    tasks. In this example, creating a new package.}
+
+\label{lst:jpm_init}
+
+\end{listing}
+
+
+\subsection{Internal Organization and Deployment}
+
+The command line tool delegates most of the work to the back end service (here
+called jpm). Figure \ref{fig:cli_arch} shows the architecture from the CLI's
+point of view. Most noteably is the callback server, this server is responsible
+for receiving information about events that occur in the back end. These are
+primarily used to communicate progress, this is especially useful for long
+running processes, such as downloading dependencies. The back end will in these
+cases these events to a callback server, which can then choose to display
+information about this event. The need for a separate service comes mostly from
+a limitation in Jolie. In Jolie all communication follows either a one-way, or
+request-response communication pattern. As a result of this, it isn't possible
+for JPM to send back information while a request is being processed. To handle
+this the front end (in this case \mintinline{text}{jpm-cli}) will inform the
+back end of where it should send events.
+
+\begin{listing}[H]
+\begin{minted}{text}
+                 +-------------------------------------+
+                 | terminal (user)                     |
+                 +-------------------------------------+
+                                   |
+                                   v
+                 +-------------------------------------+
++------------+   |            embeds                   |
+| console-ui |<--| jpm-cli ----------------+           |
++------------+   |                         |           |
++------------+   |                         v           |
+| arg-parser |<--|                   +----------------+|
++------------+   |                   | callback       ||
+                 |                   +----------------+|
+                 +--------------------------^----------+
+                                   |        |
+                                   |        |
+                                   v        |
+                 +-------------------------------------+
+                 |                jpm                  |
+                 +-------------------------------------+
+                     |         |         |         |
+                     v         v         v         v
+                 +-------+ +-------+ +-------+ +-------+
+                 | reg-a | | reg-b | | reg-c | | reg-d |
+                 +-------+ +-------+ +-------+ +-------+
+\end{minted}
+\caption{The system architecture from the CLI's point of view}
+\label{fig:cli_arch}
+\end{listing}
+
+Quite a lot of services exists on the client side, notable
+\mintinline{text}{jpm-cli} and \mintinline{text}{jpm}. From a usability
+perspective this is less optimal. For this reason the \mintinline{text}{jpm}
+binary, which ships with the package manager, will use a deployment which
+embeds all of the core services together. Future versions of the package
+manager, may wish to optionally spin up the required services, and run them as
+daemons\footnote{A daemon is a background process running on a computer}. This
+will remove quite a bit of the overhead associated with spinning up the JVM
+(required for the Jolie engine) and every embedded service. Such a practice is
+done by similar tools, as an example the JVM based build tool Gradle provides
+such a
+daemon\footnote{\url{https://docs.gradle.org/current/userguide/gradle_daemon.html}}.
+This conversion would be relatively straight forward, since the server
+architecture required by the daemon is already implemented.

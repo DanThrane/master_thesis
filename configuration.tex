@@ -17,20 +17,20 @@ required.} techniques against this becomes significantly more problematic,
 since no guarantees about the configuration source file can really be made.
 
 Distributing re-useable packages is also problematic with this approach.
-Several features of package management namely requires that the package remains
-read-only. Features that typically need this aspect could be updating, without
-this we would need source-code merges, or integrity checks of packages.
+Several features of package management requires that the package remains
+read-only. For example, updating of packages require this, without it
+source-code merges would be required.
 
-We also saw that a lot of issues, that should have been purely deployment,
-became a code problem.
+We also saw that a lot of issues, that should have been a deployment issue,
+became a code issue.
 
-This gives us plenty of reason to explore the need for a configuration format.
-Most other systems would most likely go for a system defined in user code, as
-opposed to natively in the language. An example of such framework, could be
-Vert.x, it is a tool-kit for building reactive applications on the JVM.
-Examples of such ``reactive applications'' are microservices. The configuration
-workflow is shown in Figure \ref{fig:normal_conf}. The system will retrieve,
-and read external configuration files, directed by the user code and apply the
+This gives us plenty of reason to explore the need for a native configuration
+format.  Most other systems would most likely go for a system defined in user
+code, as opposed to natively. An example of such framework, could be Vert.x, it
+is a tool-kit for building reactive applications on the JVM.  Examples of such
+``reactive applications'' are microservices. The configuration workflow is
+shown in Figure \ref{fig:normal_conf}. The system will retrieve, and read
+external configuration files, directed by the user code, and apply the
 configuration as needed.
 
 % Most other systems can do this at run time
@@ -57,18 +57,20 @@ configuration as needed.
 % http://vertx.io/blog/vert-x-application-configuration/
 % http://vertx.io/docs/vertx-config/kotlin/
 
+TODO Defined deployment time somewhere
+
 However implementing such as a system in Jolie has its problems, most of these
 come from the difference between general-purpose programming languages and
 specialized programming languages.
 
-In general-purpose languages, the constructs (such as the server's socket) for
+In general-purpose languages, the constructs (such as a server's socket) for
 the microservice architecture are created in user code. As a result they are
 entirely accessible from user code. This make it feasible to change their
-behaviour, since we can run code before deployment occurs.
+behaviour, since code can run before deployment occurs.
 
 In Jolie the constructs are managed directly by Jolie. Doing this has multiple
 advantages, such as less complexity in user code, but it also means that user
-code is capable of doing less. Jolie code can for example not control
+code is capable of doing less. Jolie user code can for example not control
 networking directly, but is instead forced to use the abstractions provided by
 Jolie (sending messages). The language puts constraints on certain
 constructs being fully prepared directly in the source code. This is analogous
@@ -79,12 +81,14 @@ deployment time. Thus without native support for configuration of these, it
 would not be possible to change the input port.
 
 \subsection{Configuration Units}
+\label{sec:conf_units}
 
 A configuration unit is the basic entity, which encapsulates the configuration
 of a single Jolie module. A configuration unit is known by its name (known as
-its ``profile''), the module it configures. Having multiple profiles for the
-same module can be useful for a variety of use-cases. A common use-case, could
-for example be to have separate profiles for development and production.
+its ``profile''), along with which module it configures. Having multiple profiles
+for the same module can be useful for a variety of use-cases. A common
+use-case, could for example be to have separate profiles for development and
+production.
 
 The units hold configuration for every possible type of configurable construct
 in Jolie. The ones supported are:
@@ -106,11 +110,13 @@ we'll cover interface rebinding.
 % TODO Do we allow for inclusion of other files?
 Configuration units are defined in configuration files, which may contain
 several units. These files may even include other files, to pull in more
-configuration units. Jolie supports a single syntax for these configuration
-file. This format is custom, and made to mimic the syntax of Jolie. Listing
-\ref{lst:simple_conf} shows a very simple configuration unit. This units sets
-the location and protocol for the output port \mintinline{java}{A}, the
-location of the input port \mintinline{java}{ModuleInput}, and a parameter.
+configuration units.
+
+Jolie provides a new configuration file format. This format is custom, and made
+to mimic the syntax of Jolie. Listing \ref{lst:simple_conf} shows a very
+simple configuration unit. This units sets the location and protocol for the
+output port \mintinline{java}{A}, the location of the input port
+\mintinline{java}{ModuleInput}, and a parameter.
 
 \begin{listing}[H]
 \begin{minted}{java}
@@ -137,7 +143,7 @@ profile "hello-world" configures "my-module" {
 \end{listing}
 
 Embedding of output ports can be performed from within a configuration unit.
-This moves the embedding from being a code problem, to what it should have
+This moves the embedding from being a code problem to, what it should have
 been, a deployment problem. Listing \ref{lst:conf_embedding} shows the
 embedding of output port \mintinline{java}{A}. Note that we need to make a
 reference to the module, since the profile names are placed under a namespace
@@ -201,10 +207,10 @@ look for any \mintinline{text}{.col} file\footnote{The file extension of the
 configuration file} in the \mintinline{text}{conf} folder. This folder
 should be placed relative to the module's root. For example, if module "a" has
 a file called \mintinline{text}{conf/my-defaults.col}, which contains a unit
-called "default". Then we may either write a user configuration which extends
-this, simply by writing \mintinline{java}{profile "something" configures "a"
-extends "default"}, or we can use the default directly. There is no need
-for any inclusion of this file.
+called "default". Then the user of the package may either write a configuration
+unit which extends this, simply by writing \mintinline{java}{profile
+"something" configures "a" extends "default"}, or the default
+directly. There is no need for any inclusion of this file.
 
 It should be noted that no single unit is required to provide all
 configuration. The system doesn't have any ``abstract''\footnote{As in abstract
@@ -215,6 +221,77 @@ how a module declares configuration in Section \ref{sec:ol_conf}.
 
 \subsection{Configuration and the Core Language}
 \label{sec:ol_conf}
+
+In section \ref{sec:conf_units} we learned about the configuration files, but
+never actually saw the corresponding Jolie modules. In this section we'll
+discover how the language has changed to accommodate this configuration
+feature.
+
+The configuration system provides the ability to configure any type of port,
+and additional provide the module with ``parameters''. Ports were covered in
+section TODO. Most importantly it should be noted that output ports do not
+require any values at deployment time, and can be changed at run time, while
+input ports require all their values at deployment time, and cannot be changed
+at run time. % TODO Do we want to cover why it is hard to change input ports at
+% run time?
+
+\begin{listing}[H]
+\begin{multicols}{2}
+\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+outputPort Service {
+    Location: "socket://service.example.com:443"
+    Protocol: https {
+        .debug = true,
+        .debug.showContent = false
+    }
+    Interfaces: IService
+}
+\end{minted}
+
+\columnbreak
+
+\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+outputPort Service {
+    Interfaces: IService
+}
+\end{minted}
+
+\end{multicols}
+
+\caption{
+    Two valid output ports.
+    (Left) A fully configured output port.
+    (Right) A minimal output port.
+}
+
+\label{lst:basic_output}
+\end{listing}
+
+Listing \ref{lst:basic_output} shows a two different output ports, both
+perfectly valid.
+
+TODO
+
+When should we configure? Go through a few different approaches, always
+override source, always let code win, do we let everything be configurable?
+Should configuration stay final, or should we allow changing it later?  How do
+we distinguish between accidentally leaving something out and wanting it to be
+configurable?
+
+Output ports
+
+Input ports, and why they are harder.
+
+The \mintinline{java}{dynamic} keyword has been introduced to deal with which
+ports that should allow configuration, any port which does not have the dynamic
+keyword is static. Only ports which are static should be configurable. TODO Why
+is this a good idea.
+
+Parameters
+
+\subsection{Implementing the Configuration Format}
+
+Implementation, and fixing the AST
 
 \subsection{Example}
 
@@ -330,6 +407,4 @@ The restriction on configuration units to only configure a single package helps
 a lot. This restriction means that we cannot from any node configure any other
 node which isn't a direct child of it. Without this we wouldn't be able to
 easily swap out one configuration unit for another.
-
-\subsection{Changes to the Interpreter's Pipeline}
 
