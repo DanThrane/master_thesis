@@ -21,7 +21,11 @@
 \contentsline {subsection}{\numberline {3.3.5}Example}{25}{subsection.3.3.5}
 \contentsline {chapter}{\numberline {4}Jolie Packages}{28}{chapter.4}
 \contentsline {section}{\numberline {4.1}Introduction}{28}{section.4.1}
-\contentsline {section}{\numberline {4.2}Integrity Checks}{29}{section.4.2}
+\contentsline {section}{\numberline {4.2}Package Format}{30}{section.4.2}
+\contentsline {section}{\numberline {4.3}Dependencies}{30}{section.4.3}
+\contentsline {section}{\numberline {4.4}Lock Files}{30}{section.4.4}
+\contentsline {section}{\numberline {4.5}The {\tt .pkg} Format}{30}{section.4.5}
+\contentsline {section}{\numberline {4.6}Integrity Checks}{30}{section.4.6}
 \contentsline {chapter}{\numberline {5}Package Manager}{31}{chapter.5}
 \contentsline {section}{\numberline {5.1}Architecture}{31}{section.5.1}
 \contentsline {section}{\numberline {5.2}Registry}{31}{section.5.2}
