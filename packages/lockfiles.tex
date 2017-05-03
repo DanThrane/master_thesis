@@ -1,1 +1,118 @@
 \section{Lock Files}
+
+% https://www.martinfowler.com/articles/continuousIntegration.html
+% https://en.wikipedia.org/wiki/Continuous_integration#cite_note-2
+
+Lock files are a feature designed to solve some of the drawbacks associated
+with allowing SemVer expressions in the version field of dependencies. To see
+how SemVer expressions pose a problem, we must first inspect the typical
+engineering process in which it is used. This feature is by no means original,
+prior work includes, for example, Cargo, and Yarn. % TODO Ref
+
+Continuous integration (CI) is a software development process. This process is
+used to avoid the so called ``integration hell'', in which the time taken to
+integrate, or merge, the changes from multiple developers into a single track.
+The process works by, multiple times a day, integrating all these changes, this
+way failure in integration is found much earlier. We'll quickly summarize one
+possible implementation of CI here. This is not the only way to do it, but
+summarizes the most important parts, which we'll use to highlight potential
+problems with SemVer expressions.
+
+For this process to work efficiently it frequently uses automated tests and
+builds, in order to perform this integration. The automated tests and builds
+are then performed by a dedicated server. The server will most likely pull the
+source code from a single repository, which represents the most up-to-date
+track of development.
+
+When new features are developed, the developer will pull the most up-to-date
+source code, and develop the feature locally with this. This includes
+performing all of the builds and tests. Thus when the feature is pushed back
+onto the source control all of these tests should still pass. The role of the
+CI server is then to verify that the process is correctly followed.
+
+How the build and testing is performed obviously depend on which technologies
+are used. A typical JPM based project might perform the following steps:
+
+\begin{enumerate}
+\item Pull source code from version control
+\item Perform the build
+    \begin{enumerate}
+        \item Download JPM dependencies (i.e. \verb!jpm install!)
+        \item Potentially build other necessary artifacts (such as Java
+                libraries)
+    \end{enumerate}
+\item Run tests
+\end{enumerate}
+
+It is in step 2(a) the need for lock files arises, the problem is most easily
+demonstrated by an example.
+
+Consider the following scenario: a developer wishes to develop a new feature
+which uses package X of at least version 2.1.0. For this reason the developer
+adds the following line to the dependencies section: \mintinline{json}{{
+"name": "X", "version": ">=2.1.0" }}. Afterwards the developer performs an
+install of this package, at the moment this dependency to version 2.1.3. At
+this point the developer continuous with developing the feature, without
+having to perform any additional installs of the package. Once the feature
+is developed, the developer performs all of the tests, and see that they
+pass.
+
+At this point the code is pushed onto the source control system, where it is
+picked up by the CI server for testing. The CI server will then perform all of
+the steps listed above, including installing the dependencies anew. However,
+since the initial install by the developer had been performed a new version
+has been released, say version 2.3.0. This version still fulfills the
+expression listed in the dependency, and is hence chosen, since this is the
+best fitting package for this dependency. Remember the CI server has no way
+of knowing which package was originally installed, it only has the package
+manifest to work with.
+
+Installing a different version of the package may however lead to the tests no
+longer working! As a result, we cannot guarantee what works on a developers
+machine, necessarily works on any other machines that might try to run it.
+As a result, some might choose to never use SemVer expressions, to avoid this
+pitfall.
+
+Lock files offer a compromise between these two extremes. A lock file contains
+the exact versions that every dependency was resolved to. This file should be
+put into source control, thus when another machine attempts to perform the
+build the package manager will know which exact version should be used for the
+build.
+
+The convenience factor of SemVer expressions is even still left in. When we
+perform the initial install, we might not care so which version to use, and the
+package manager will still be able to just pick the best version for us.
+Additionally the package manager can provide upgrade scripts, which uses these
+expressions as guidelines.
+
+The lock files is placed in the package directory, and is called
+\verb!jpm_lock.json!. Listing \ref{lst:lock_file} shows the lock file, which
+would have been generated for the scenario above.
+
+It should however be noted that fresh lock files are generated for every
+package. This means that the lock files are \emph{not} used by a client
+package. As a result library developers should still be careful not specifying
+too wide expressions. This feature is only intended to guarantee that a package
+will have the same dependencies regardless of which machine it runs on. It is
+not intended as a replacement for specifying exact versions. If a package
+requires a specific version, then that should be reflected in the package
+manifest.
+
+\begin{listing}[H]
+\begin{minted}{json}
+{
+    "_note": "Auto-generated file notice",
+    "locked": {
+        "X@>=2.1.0/RegistryName": {
+            "resolved": "2.1.3",
+            "checksum": "..."
+        }
+    }
+}
+\end{minted}
+
+\caption{A lock file showing that the dependency for package X of at least
+    version 2.1.0 has been resolved to version 2.1.3}
+
+\label{lst:lock_file}
+\end{listing}
