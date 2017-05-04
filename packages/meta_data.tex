@@ -1,2 +1,162 @@
 \section{Package Format}
 
+In this section we'll cover, in details, the format of Jolie packages. The
+complete specification for the package manifest can be found in Appendix A.
+However in this section we'll also cover some of the reasoning behind the
+choices found in Appendix A.
+
+Like we saw in the introduction of this chapter, a Jolie packages is an
+extension of Jolie modules. A Jolie package is primarily defined by its package
+manifest.
+
+\subsection{The {\tt name} Attribute}
+
+The \mintinline{text}{name} attribute uniquely identifies a package. We'll
+start this discussion by looking at the constraints imposed on it, from
+Appendix A:
+
+\begin{enumerate}
+\item
+    The name of a package is \emph{not} case-sensitive
+\item
+    The length of a name is less than 255 characters
+\item
+    Names may only contain unreserved URI characters (see section 2.3 of
+    \href{https://www.ietf.org/rfc/rfc3986.txt}{RFC 3986})
+\item
+    Names are US-ASCII
+\item
+    Every registry must only contains a single package with a given name.
+\end{enumerate}
+
+Points 1 through 4 all contribute towards a common goal: packages should be
+displayable in URLs. This will allow us to more easily create, for example,
+a web application where a developer can browse through packages.
+
+Putting some constraints on the package name is also helpful in multiple places
+of the package manager. Consider for example a system that might store packages
+organized by their name (say for example a caching mechanism). If one package
+would be named ``../foo'', then that might accidentally override the contents
+of the package named ``foo''. Of course these name constraints are not a
+general solution for these types of injection attacks, but it does allow for
+several services working with packages to not worry as badly about the package
+names.
+
+It should also be noted that the package names are not compatible with the
+rules of identifiers. This has affected the design of the Jolie module system.
+This is, for example, the reason that strings are used in both configuration
+files and module includes, when making references to other modules.
+
+Rule 4 states that package names are unique within a single registry. But this
+constraint actually goes even further, since these packages directly extend
+from the modules, we cannot have a system containing two packages named the
+same thing, even if they reside in two different registries. Generally we make
+no assumptions that registries communicate with each other, for this reason it
+is perfectly allowed that two distinct registries may contain name clashes, but
+any single package must not have a dependency which clashes either with another
+dependency, or the package who has the dependency itself.
+
+\subsection{The Meta Data Attributes ({\tt license, authors, description})}
+
+These attributes are mostly used for search results. They allow for a developer
+seeking information about a package, to quickly gather the most important
+information.
+
+License identifiers are validated against a pre-existing list of license
+identifiers. This is done to ensure that typos are not made in license names.
+The identifiers used are from the SPDX license list, which contains a list of
+commonly found licenses. Currently only the license identifiers are supported,
+this could be extended to use SPDX License Expression Syntax, which allows for
+references to custom licenses.
+
+\subsection{The {\tt version} Attribute}
+
+% source: Semantic Versioning 2.0.0 - Tom Preston-Werner - http://semver.org/
+
+The \mintinline{text}{version} attribute used by packages declare which version
+of the source code the manifest describes. This field uses the Semantic
+Versioning (SemVer) specification for version numbers. Using this standard
+allows for several other features, which will be covered in a moment.
+
+SemVer version numbers consists of three fields, all integers, those being the
+\emph{major}, \emph{minor}, and \emph{patch} version numbers. Additionally a
+version may have a pre-release label or additional meta data. Labels and build
+meta-data won't be covered, as they are not that important for our use-case.
+The (simplified) syntax of SemVer version number is shown in Listing
+\ref{lst:semver_syntax}.
+
+\begin{listing}[H]
+\begin{minted}{text}
+<major>.<minor>.<patch>[-<label>][+<meta-data>]
+\end{minted}
+\caption{Simplified syntax of a SemVer version number}
+\label{lst:semver_syntax}
+\end{listing}
+
+Precedence of version numbers are determined by comparing each unit numerically
+in the order of major, minor, and finally patch. The first differentiating
+units determine the precedence. Thus, for example: 1.0.0 $<$ 1.0.1 $<$ 1.1.0
+$<$ 1.10.0 $<$ 2.0.0.
+
+Semantic Versioning dictates rules for how version numbers should change,
+depending on how the public API changes. The rules can be summarized as:
+
+\begin{enumerate}
+
+    \item The patch version number \emph{must} be incremented, if only
+        backwards compatible bug fixes are introduced.
+
+    \item The minor version number \emph{must} be incremented, if backwards
+        compatible functionality is introduced.
+
+    \item The major version number \emph{must} be incremented, if incompatible
+        changes are introduced.
+
+\end{enumerate}
+
+Having a major version of 0, indicates that the product is not yet stable. At
+this point normal rules for incrementing version numbers do not apply. As a
+result version 1.0.0 indicates the first public API.
+
+Semantic Versioning has become a commonly used standard across many different
+package managers, examples include TODO.
+
+TODO Highlight benefits of using semantic versioning.
+
+% source: https://docs.npmjs.com/misc/semver
+
+For dependencies the version field allows for a bit more flexibility using
+SemVer expressions, also known as SemVer ranges. These expressions allows the
+developer more freedom in which version to use. In short the expressions allows
+the developer to both whitelist certain ranges for use, and blacklist certain
+ranges for use.
+
+This provides both a convenience factor, i.e. the developer can express that
+she doesn't care which specific version is used, as long as it has feature X
+(released in some known version).
+
+This feature also provides benefits for when the dependency tree is to be
+calculated. Consider, for example, two dependencies A and B which both depend
+on C with the same level of functionality, which was released in version 1.2.0.
+Assuming that expressions were not allowed, these two services would have to
+describe their dependency in an exact version. Service A might have been
+written at a time when 1.2.3 of service C was the newest, while B was written a
+bit later and is thus depending on version 1.2.6. The problem is now that the
+client depending on A, and B, cannot do so, because A and B have conflicting
+requirements, despite the fact that they both require the same level
+functionality. With SemVer expressions these services may more accurately
+describe what they actually depend on, service A might state that it depends on
+">=1.2.0", while B is a bit more conservative and wants exactly version 1.2.6.
+In this case the package manager will be able to choose version 1.2.6, since
+this version fulfills the requirements of all dependencies.
+
+Allowing for SemVer expressions to be used, is however not without its
+drawbacks. In Section \ref{sec:lockfiles} we cover one of these problems, and
+its solution.
+
+\subsection{The {\tt events} Attribute}
+
+TODO Find a title which combines this with main as well. We need these for
+describing how the package manager should treat the package in some cases.
+
+See these section for how these are used.

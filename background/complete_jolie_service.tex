@@ -66,7 +66,7 @@ interfaces are shown in Listing \ref{lst:simple_start}.
 \begin{listing}[H]
 \begin{multicols}{2}
 
-\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
 // calculator.ol
 include "console.iol"
 
@@ -89,7 +89,7 @@ main {
 
 \columnbreak
 
-\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
 // calculator.iol
 type Numbers: void {
     .numbers[2, *]: int
@@ -132,13 +132,13 @@ ports which must be ready at deployment time.
 
 Binding an output port to an external service is relatively easy. For example
 to let the \verb!multiplication! port bind to a service using https, we might
-write \mintinline{java}{Location: "socket://mult.example.com:443"} and
-\mintinline{java}{Protocol: https}. The input port at the multiplication processor
+write \mintinline{jolie}{Location: "socket://mult.example.com:443"} and
+\mintinline{jolie}{Protocol: https}. The input port at the multiplication processor
 would also have to match this, to ensure it runs on the correct port and speaks
 the correct protocol.
 
 It is a similar to bind an output port to an embedded service. However this is
-done by setting the \mintinline{java}{Location} or \mintinline{java}{Protocol}
+done by setting the \mintinline{jolie}{Location} or \mintinline{jolie}{Protocol}
 attributes. We must instead instruct the engine to embed the service, which
 most importantly requires us to point to some executable service. The Jolie
 engine supports several language for these embedded services, including Jolie,
@@ -149,7 +149,7 @@ service is written as a Jolie service, and its service is implemented in
 Listing \ref{lst:simple_embedding}. Just like in the case of the external
 services, the input port of the receiving service \emph{must match}. In the
 case of embedded service there must be an input port listening on the
-\mintinline{java}{"local"} location.
+\mintinline{jolie}{"local"} location.
 
 Quite often the location of an input port is considered a deployment problem.
 We see this quite clearly in the case of embedding a service. All current
@@ -164,7 +164,7 @@ of the service. An example of this is shown in Listing
 \begin{listing}[H]
 \begin{multicols}{2}
 
-\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
 // addition.ol
 include "addition.iol"
 
@@ -176,7 +176,7 @@ inputPort Addition {
 
 \columnbreak
 
-\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
 // addition.iol
 constants {
     ADDIITON_LOCATION = "local"
@@ -204,22 +204,22 @@ constants {
 \end{observation}
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 embedded {
     Jolie:
         "addition.ol" in Addition
 }
 \end{minted}
 
-\caption{Embedding the \mintinline{java}{addition} service in the
-    \mintinline{java}{Addition} output port}
+\caption{Embedding the \mintinline{jolie}{addition} service in the
+    \mintinline{jolie}{Addition} output port}
 
 \label{lst:simple_embedding}
 
 \end{listing}
 
 With the code from Listing \ref{lst:simple_start} where the output port
-\mintinline{java}{Console} is defined. The output port points to an embedding
+\mintinline{jolie}{Console} is defined. The output port points to an embedding
 of the console service, and is included directly in the \verb!console.iol!
 file. This is a fairly common pattern used in Jolie, especially for services
 that work in a library-like fashion (i.e. not intended as a stand-alone
@@ -242,7 +242,7 @@ business logic for our calculator. For completeness sake this might look like
 shown in Listing \ref{lst:op_impl}.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 [sum(request)(response) {
     total = 0;
     for (i = 0, i < #request.numbers, i++) {

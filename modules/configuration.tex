@@ -115,11 +115,11 @@ configuration units.
 Jolie provides a new configuration file format. This format is custom, and made
 to mimic the syntax of Jolie. Listing \ref{lst:simple_conf} shows a very
 simple configuration unit. This units sets the location and protocol for the
-output port \mintinline{java}{A}, the location of the input port
-\mintinline{java}{ModuleInput}, and a parameter.
+output port \mintinline{jolie}{A}, the location of the input port
+\mintinline{jolie}{ModuleInput}, and a parameter.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 profile "hello-world" configures "my-module" {
     outputPort A {
         Location: "socket://a.example.com:3000"
@@ -135,8 +135,8 @@ profile "hello-world" configures "my-module" {
 }
 \end{minted}
 
-\caption{A simple configuration unit named \mintinline{java}{hello-world}
-    configuring the module \mintinline{java}{my-module}}
+\caption{A simple configuration unit named \mintinline{jolie}{hello-world}
+    configuring the module \mintinline{jolie}{my-module}}
 
 \label{lst:simple_conf}
 
@@ -145,14 +145,14 @@ profile "hello-world" configures "my-module" {
 Embedding of output ports can be performed from within a configuration unit.
 This moves the embedding from being a code problem to, what it should have
 been, a deployment problem. Listing \ref{lst:conf_embedding} shows the
-embedding of output port \mintinline{java}{A}. Note that we need to make a
+embedding of output port \mintinline{jolie}{A}. Note that we need to make a
 reference to the module, since the profile names are placed under a namespace
 for each module. This way multiple services can share the same name, a
 situation which is likely to occur with common profile names, such as
 ``development'' and ``production''.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 profile "hello-world" configures "my-module" {
     outputPort A embeds "a-module" with "a-profile"
 }
@@ -180,7 +180,7 @@ the one that is correct. Listing \ref{lst:conf_extends} shows an example of
 extension with units.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 profile "a" configures "a-module" {
     aValue = 42,
     aValue.sub = "hello",
@@ -208,7 +208,7 @@ configuration file} in the \mintinline{text}{conf} folder. This folder
 should be placed relative to the module's root. For example, if module "a" has
 a file called \mintinline{text}{conf/my-defaults.col}, which contains a unit
 called "default". Then the user of the package may either write a configuration
-unit which extends this, simply by writing \mintinline{java}{profile
+unit which extends this, simply by writing \mintinline{jolie}{profile
 "something" configures "a" extends "default"}, or the default
 directly. There is no need for any inclusion of this file.
 
@@ -237,7 +237,7 @@ at run time. % TODO Do we want to cover why it is hard to change input ports at
 
 \begin{listing}[H]
 \begin{multicols}{2}
-\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
 outputPort Service {
     Location: "socket://service.example.com:443"
     Protocol: https {
@@ -250,7 +250,7 @@ outputPort Service {
 
 \columnbreak
 
-\begin{minted}[breaklines,fontsize=\footnotesize]{java}
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
 outputPort Service {
     Interfaces: IService
 }
@@ -282,7 +282,7 @@ Output ports
 
 Input ports, and why they are harder.
 
-The \mintinline{java}{dynamic} keyword has been introduced to deal with which
+The \mintinline{jolie}{dynamic} keyword has been introduced to deal with which
 ports that should allow configuration, any port which does not have the dynamic
 keyword is static. Only ports which are static should be configurable. TODO Why
 is this a good idea.
@@ -306,7 +306,7 @@ This use-case is intended to show how we can easily go from a prototype where
 we embed everything (this is easier to run locally) to hosting each service by
 itself.
 
-\begin{minted}{java}
+\begin{minted}{jolie}
 // A.ol
 
 ext outputPort A {
@@ -322,7 +322,7 @@ constants {
 }
 \end{minted}
 
-\begin{minted}{java}
+\begin{minted}{jolie}
 // A.col
 
 include "B.col" // The includes work just like they do in Jolie
@@ -351,7 +351,7 @@ should be considered read-only. Thus if we want to configure a package to embed
 its dependencies, then this must be done from external configuration, we cannot
 do this in source.
 
-\begin{minted}{java}
+\begin{minted}{jolie}
 // B.col
 
 configures "B" {
@@ -361,7 +361,7 @@ configures "B" {
 }
 \end{minted}
 
-\begin{minted}{java}
+\begin{minted}{jolie}
 // C.col
 
 configures "C" {
@@ -373,7 +373,7 @@ configures "C" {
 
 In order to use an external B we need to update "A.col":
 
-\begin{minted}{java}
+\begin{minted}{jolie}
 // A.col
 include "C.col"
 
@@ -389,7 +389,7 @@ configures "A" {
 In order to update the deployment file of B we simply need to update the
 input port to no longer be local.
 
-\begin{minted}{java}
+\begin{minted}{jolie}
 // B.col
 configures "B" {
     inputPort B {

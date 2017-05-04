@@ -16,7 +16,7 @@ always be called by the interpreter, these are called \verb!init! and
 \verb!main!.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 include "console.iol"
 
 define PrintOutput {
@@ -78,7 +78,7 @@ protocol being used for communication. As a result it is easy to change a
 service from communicating using one protocol to another.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 outputPort Example {
     Location: "socket://example.com:42000"
     Protocol: http
@@ -97,7 +97,7 @@ returns a response, the other simply receives a request, and produces no
 response.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 interface IExample {
     RequestResponse:
         anOperation(RequestType)(ResponseType)
@@ -117,7 +117,7 @@ attempt to process an incorrect request. Listing \ref{lst:simple_types} show
 the request and response type of \verb!anOperation!.
 
 \begin{listing}[H]
-\begin{minted}{java}
+\begin{minted}{jolie}
 type RequestType: void {
     .a: int
     .b: string
