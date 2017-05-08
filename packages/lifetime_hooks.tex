@@ -1,0 +1,66 @@
+\section{Lifetime Hooks}
+
+A lifetime hook is a script that ``hooks'' onto certain lifetime events that
+occur during normal use of the package manager. These scripts allows the
+package developer to augment the package manager, and potentially affect the
+work it performs.
+
+This is a feature which is available in many other types of software, for
+example the popular version control system
+Git\footnote{\url{https://git-scm.com/book/en/v2/Customizing-Git-Git-Hooks}}
+provides such a feature.
+
+All hooks are performed on the client-side, and never on the server side (i.e.
+registries). Only the hooks of the current package will be run, the
+hooks of a dependency will not be executed. Hooks that run before a certain
+action, denoted by a \verb!pre-! prefix, may stop the corresponding command
+from being executed.  These scripts may do so by returning a non-zero exit
+code.
+
+These features become useful for augmenting the workflow with in-house
+conventions. This may for example include ensuring that, for example, tests
+pass before publishing a new version. Using a simple process interface allows
+for the user to write these scripts in whichever technology they choose.
+
+The hooks are defined in the ``events'' section of the package manifest.
+Listing \ref{lst:hook} shows an example hook, which runs before publishing
+which ensure that all tests pass.
+
+\begin{listing}[H]
+\begin{minted}{javascript}
+{
+    // ...
+    "events": {
+        "pre-publish": "./run_tests.sh"
+    }
+}
+\end{minted}
+
+\caption{Defining a lifetime hook, which runs the script
+    \mintinline{text}{run_tests.sh} before publishing the package to the
+        registry}
+
+\label{lst:hook}
+
+\end{listing}
+
+The following are the hooks that JPM supports:
+
+\begin{itemize}
+
+\item \verb!pre-start!: Script is run right before the \verb!start! command is
+    invoked on a service.
+
+\item \verb!post-start!: Run right before the \verb!start! command
+    terminates. There is no guarantee that this script is run (i.e. if the
+    service was forcefully terminated).
+
+\item \verb!pre-install!: Runs before the \verb!install! command is invoked.
+
+\item \verb!post-install!: Runs after the \verb!install! command has finished.
+
+\item \verb!pre-publish!: Runs before the \verb!publish! command is invoked.
+
+\item \verb!post-publish!: Runs after the \verb!publish! command has finished.
+
+\end{itemize}

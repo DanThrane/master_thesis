@@ -1,13 +1,9 @@
-\section{Package Format}
+\section{Package Manifest}
 
-In this section we'll cover, in details, the format of Jolie packages. The
+In this section we'll cover, in details, the format of Jolie manifests. The
 complete specification for the package manifest can be found in Appendix A.
 However in this section we'll also cover some of the reasoning behind the
 choices found in Appendix A.
-
-Like we saw in the introduction of this chapter, a Jolie packages is an
-extension of Jolie modules. A Jolie package is primarily defined by its package
-manifest.
 
 \subsection{The {\tt name} Attribute}
 
@@ -75,7 +71,9 @@ references to custom licenses.
 
 The \mintinline{text}{version} attribute used by packages declare which version
 of the source code the manifest describes. This field uses the Semantic
-Versioning (SemVer) specification for version numbers. Using this standard
+Versioning (SemVer) specification for version numbers. It is a requirement to
+use SemVer versions, if a version is specified, which is not a valid SemVer
+version, then validation of the manifest will fail. Enforcing this standard
 allows for several other features, which will be covered in a moment.
 
 SemVer version numbers consists of three fields, all integers, those being the
@@ -119,7 +117,9 @@ this point normal rules for incrementing version numbers do not apply. As a
 result version 1.0.0 indicates the first public API.
 
 Semantic Versioning has become a commonly used standard across many different
-package managers, examples include TODO.
+package managers, examples include
+Cargo\footnote{\url{http://doc.crates.io/manifest.html}} and
+NPM\footnote{\url{https://docs.npmjs.com/getting-started/using-a-package.json}}.
 
 TODO Highlight benefits of using semantic versioning.
 
@@ -154,9 +154,55 @@ Allowing for SemVer expressions to be used, is however not without its
 drawbacks. In Section \ref{sec:lockfiles} we cover one of these problems, and
 its solution.
 
-\subsection{The {\tt events} Attribute}
+\subsection{The TODO Name Attributes ({\tt events}, {\tt main})}
 
-TODO Find a title which combines this with main as well. We need these for
-describing how the package manager should treat the package in some cases.
+These attributes control aspects of the package related to the execution of
+scripts, by the package manager, related to the package.
 
-See these section for how these are used.
+The \mintinline{text}{main} attribute controls the entry-point of the module.
+This is used both in informing the Jolie Engine where the entry-point is
+located (Section TODO). The attribute is also used for starting the package, we
+discuss this in Section TODO.
+
+The \mintinline{text}{events} attribute defines a series of lifetime hooks,
+which are scripts that are run when specific lifetime events occur, this is
+described in Section TODO.
+
+\subsection{The {\tt registries} Attribute}
+
+The package manager may communicate with one or more registries, when
+performing its work. This may either be to install dependencies, or it could be
+to perform some of the more organizational commands, such as creating an
+account.
+
+For this the package manager will need to know about the different registries.
+This is what the \mintinline{text}{registries} attribute describes, it is an
+array containing definitions for all known registries (known to the package).
+
+A registry is defined by a unique (within the package) name, and a location (a
+URI following the same rules that Jolie does for its port locations). Listing
+\ref{lst:registry_definition} shows an example.
+
+\begin{listing}[H]
+
+\begin{minted}{json}
+{
+    "name": "my-registry",
+    "location": "socket://registry.example.com:9999"
+}
+\end{minted}
+
+\caption{A registry named \mintinline{text}{my-registry} being hosted at
+    \mintinline{text}{registry.example.com} running on port 9999}
+
+\label{lst:registry_definition}
+
+\end{listing}
+
+Every package manifest has an implicit entry which is named ``public''. This
+entry points to the public registry. Every command which needs to use a
+registry, will optionally receive a registry name. If this name is specified,
+it will look within the \mintinline{text}{registries} attribute. If no name is
+specified, the ``public'' entry will be used.
+
+TODO Should we talk about why it is good to have multiple registries here?
