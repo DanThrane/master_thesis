@@ -1,10 +1,13 @@
-% Status: Draft
-
 \section{Architecture}
 
 % At this point we have covered the responsibilities of JPM. Here we will be
 % discussing the actual technical details of JPM. As well as taking a deeper
 % look into features provided, and why they are useful.
+
+Before continuing with the packages we'll take a quick de-tour to look at the
+overall architecture of JPM. This should help the reader understand in which
+context the packages exist. The details of this architecture will be covered in
+Chapter \ref{cha:pkg_mngr}.
 
 The entirety of the ecosystem around JPM is written in Jolie, using the
 features that the Jolie Module System provides, along with the features that
@@ -27,7 +30,6 @@ to perform the actual work.
 
 \end{enumerate}
 
-% TODO Replace with non-ascii
 \begin{listing}[H]
 \begin{minted}{text}
                 +-----------+     +-------+     +------------+

@@ -14,6 +14,7 @@
 \usepackage{lastpage}
 \usepackage{fancyhdr}
 \usepackage[explicit]{titlesec}
+\usepackage[style=alphabetic]{biblatex}
 \usepackage{color}
 \usepackage{amsthm}
 \usepackage{todo}
@@ -128,6 +129,8 @@
 \title{Building a Package Manager for Jolie}
 \author{Dan Sebastian Thrane}
 
+\addbibresource{biblio.bib}
+
 \begin{document}
 \include{title}
 \tableofcontents
@@ -149,12 +152,12 @@
 \input{packages/main}
 
 \chapter{Package Manager}
+\label{cha:pkg_mngr}
 \input{package_manager/main}
 
 \appendix
 \chapter{Appendix}
 \input{appendix/main}
 
-\bibliography{biblio}{}
-\bibliographystyle{plain}
+\printbibliography
 \end{document}
