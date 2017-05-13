@@ -115,6 +115,16 @@
 %   title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
 % }
 
+\newcommand{\joliel}[1]{\mintinline{jolie}{#1}}
+\newcommand{\txtl}[1]{\mintinline{text}{#1}}
+
+% Macros for component references
+\newcommand{\cache}{\txtl{cache} }
+\newcommand{\registry}{\txtl{registry} }
+\newcommand{\regdb}{\txtl{registry-db} }
+\newcommand{\security}{\txtl{security} }
+\newcommand{\bcrypt}{\txtl{bcrypt} }
+
 \title{Building a Package Manager for Jolie}
 \author{Dan Sebastian Thrane}
 
@@ -145,4 +155,6 @@
 \chapter{Appendix}
 \input{appendix/main}
 
+\bibliography{biblio}{}
+\bibliographystyle{plain}
 \end{document}

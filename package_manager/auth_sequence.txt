@@ -1,0 +1,25 @@
+@startuml
+database "security-db"
+actor client
+
+== Initial request ==
+client -> security: authenticate(req)
+security -> "security-db": findUserByName(req.user)
+"security-db" --> security: user object
+security -> bcrypt: checkpw(req.pw, user.pw)
+bcrypt --> security: ok
+security -> security: generate session
+security -> "security-db": insertSession(session)
+security --> client: session.token
+
+== Subsequent requests ==
+client -> security: validate(token)
+security -> "security-db": findSessionByToken(token)
+"security-db" --> security: session
+security --> client: ok
+...at timeout or logout...
+client -> security: invalidate(token)
+security --> client: ok
+client -> security: validate(token)
+security --> client: invalid
+@enduml

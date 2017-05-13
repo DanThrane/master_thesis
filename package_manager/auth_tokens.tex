@@ -1,0 +1,46 @@
+\section{Authentication Tokens}
+
+In Section \ref{sec:authorization} we covered the authorization framework that
+JPM uses. When a user successfully authenticates the authorization framework
+will provide an authentication token proving the user's identity.
+
+For user convenience the JPM system does not require a valid username and
+password combination for every privileged operation. To avoid this, JPM will
+store the authentication token returned by the \registry. These are stored in a
+file on the file-system.
+
+TODO I can't write smart things right now. Words no good :-(
+
+The authentication token (or session token) is saved instead of the username
+and password.  Since if an attacker were to gain access to both the username
+and password, she would be able to gain full control over the user, this
+includes being able to generate new authentication tokens.
+
+If an attacker instead were to gain only the authentication token, the damage
+is not as bad. The attacker would still be able to pose as the user, but only
+while the authentication token is valid.
+
+Several steps are taken to mitigate the damage that can be done in case of
+session hi-jacking. TODO I just called a session, without defining it.
+
+% TODO Not sure if this needs to be implemented, but be careful when
+% discussing. Don't make it sound like something is implemented if it isn't.
+% Should make clear if something is used or not.
+
+% We partially do this. It is possible, but needs to be implemented on the
+% registry side of things. Would be an easy change.
+
+Session timeout
+
+% We do this
+
+Manual session invalidation (logging out)
+
+% We support this. Haven't defined any actions to be critical though.
+
+Re-authentication before critical actions
+
+
+\url{https://www.owasp.org/index.php/Authentication_Cheat_Sheet}
+
+\url{https://www.owasp.org/images/0/08/OWASP_SCP_Quick_Reference_Guide_v2.pdf}

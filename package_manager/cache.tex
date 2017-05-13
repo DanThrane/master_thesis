@@ -1,0 +1,65 @@
+\section{The JPM Cache}
+
+The \cache of JPM is responsible for downloading packages, and maintaining the
+packages in a local cache.
+
+The local cache acts as a database of known packages. This database contains
+both the information needed to know about the database, as well as the binary
+containing the package data.
+
+The local cache consists of previously downloaded packages, along with a
+locally kept database which matches the type that the \registry uses. The
+database kept also track the origin \registry, since the \cache will
+potentially download from multiple. The key used for this is the location URI
+of each \registry. The name cannot be used, since these differ between each
+package.
+
+The primary operation that the \cache exposes is the \txtl{installDependency}
+operation. This operation will install a dependency directly into a package.
+JPM assumes that dependencies are installed under
+\txtl{<pkgRoot>/jpm_packages/<depName>}. Having packages stored under a common
+folder makes it easy to locate. This is, for example, useful when needing to
+filter out the packages. Common places for this would be version control, or
+from JPM when publishing a package.
+
+The \cache will first attempt to retrieve the package from its local database,
+if not found it will forward the request to the registry. In order to
+forward the request, the operation is fed both the registry and
+authentication token.
+
+When a new package is received from a \registry, two parts will be returned:
+the binary itself, along with the checksum that the \registry believes the
+package to have. Checksums are both checked when initially receiving the
+package, but also at every install from the cache. This helps prevent initial
+corruption and further protects from the cache itself being corrupted. A more
+thorough discussion of this feature can be found in Section
+\ref{sec:integrity_check}.
+
+The \cache will maintain a \regdb just like the \registry component does. When
+new entries are loaded into the \cache, it will updated the \regdb in a similar
+fashion. As a result the \cache is technically capable of performing the exact
+same responsibilities as the \registry. This could for example allow for fully
+offline downloads assuming the data is already loaded into the cache.
+
+%\begin{listing}[H]
+%\begin{minted}{text}
+%+---------------+   +----------------+
+%| packages      |   | checksum       |
+%+---------------+   +----------------+
+%       ^                    ^
+%       |                    |
+%       |    +---------------+
+%       |    |
+%+---------------+   +----------------+
+%| cache         |-->| registry       |
+%+---------------+   +----------------+
+%       |
+%       | (local db)
+%       v
+%+---------------+
+%| registry-db   |
+%+---------------+
+%\end{minted}
+%\caption{}
+%\label{lst:}
+%\end{listing}
