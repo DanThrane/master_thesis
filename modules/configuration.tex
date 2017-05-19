@@ -574,4 +574,257 @@ receive the intent to use a certain configuration unit. From the parsing phase
 we obviously get the AST.
 
 The configuration phase works by modifying the AST to insert the configuration
-gathered from the configuration unit.
+gathered from the configuration unit. The processed AST is handed to the later
+phases, and the remainder of the pipeline works mostly like it has before.
+% TODO Something about how only modifying the AST increases the likelihood of
+% everything being okay, since for the remainder of the engine the
+% configuration phase might as well not exist.
+
+\subsubsection*{Processing of Configuration Files}
+
+TODO Does it make sense to give a formal grammar for the configuration files?
+
+% Introduction
+
+The first step of the configurator is to gather a fully processed configuration
+unit. This process starts by looking for the configuration file which was
+passed from the intent. The intent passes the configuration file using
+\txtl{--conf <unitName> <fileName>}.
+
+% File resolving
+
+The configurator searches for the configuration file in TODO (parent services,
+and example for this is needed).
+
+% Parsing
+
+With the configuration file resolved, it is passed to the configuration parser
+along with a list of known modules. The parser follows the conventions
+established by the existing Jolie code parser. The parser is a hand-written
+recursive descent parser with one token lookahead.
+
+The parser directly outputs the AST. At the top level the AST consists of
+\javal{Region}s which directly map to the configuration unit abstraction. Each
+\javal{Region} are namespaced under the module that they configure. Internally
+each namespace maps the name of the \javal{Region} to the actual
+\javal{Region}. The top-level node of the AST contains a dictionary mapping
+between the name of modules and their namespaces. The Java type for this
+mapping ends up being \javal{Map<String, Map<String, Region>>}, this allows for
+easy access of \javal{Region}s when they are needed. This does however also
+mean that duplicates must be caught during parsing, since they would otherwise
+just silently override previous entries. This would typically have been
+performed in a later stage to keep the parser ``pure''. In this case some
+purity was sacrificed for some efficiency and ease of use.
+
+The grammar of the configuration format closely follows the grammar of Jolie
+code. As a result the configuration format also re-uses AST nodes where
+possible. As we will see later, this proved helpful when outputting a
+configured AST. The configuration grammar only supports a subset of the
+features that Jolie code does.
+
+Recall from Section \ref{sec:conf_units} that each module may publish default
+configuration units, which can be used by user-level configuration units. For
+this reason the parser will make special note of references to other
+configuration units. Such references currently only appear in output port
+embeddings (e.g. \\\joliel{outputPort Foo embeds "foo" with "a-foo-unit"}).
+
+Once the initial file has been parsed, every single configuration file placed
+in the ``conf'' directory of referenced modules are parsed and placed in the
+same AST. Configuration files parsed during this phase may itself have
+references to other modules, in that case these will be pulled in as well.  A
+set of parsed defaults is kept to avoid parsing the same file multiple times,
+or potentially infinite loops.
+
+% Merging
+
+With the entire configuration tree in place, merging is performed to create a
+single \javal{Region} which represents the actual configuration. The merging
+occurs between a \txtl{child} and its \txtl{parent} region (i.e. the one it
+extends, if any) and results in a \txtl{merged} region. The \txtl{parent} is
+always merged (via a recursive call) first. The first \txtl{child} selected is
+the \txtl{Region} matching the profile name and package given by the intent.
+
+For ports, the merging algorithm works by inserting all the ports of the
+\txtl{child} into the \txtl{merged} region. The ports of the \txtl{parent} are
+then merged with the preliminary output of the \txtl{merged} region. The
+process of merging a \txtl{port} of the \txtl{parent} against the \txtl{merged}
+region is shown, in pseudo code, in Listing \ref{lst:merge_ports}. In short the
+merging will favor the \txtl{child}, and the \txtl{parent} will only provide
+values if the \txtl{child} doesn't.
+
+TODO Define what a partial configuration is
+
+\begin{listing}[H]
+\begin{minted}[linenos=true]{text}
+procedure merge(port: Port, merged: ConfigTree): Region {
+    if (!merged.contains(port)) return port
+    existing = merged.getExisting(port)
+
+    if (existing.isComplete) return existing
+    // The existing port cannot be an embedding, since those cannot
+    // be partial.
+
+    for (property in Port.properties) {
+        if (existing[property] == null) {
+            existing[property] = merged[property]
+        }
+    }
+    return existing
+}
+\end{minted}
+
+\caption{Pseudo code for merging a \txtl{parent}'s \txtl{port} into a
+    \txtl{merged} configuration tree}
+
+\label{lst:merge_ports}
+
+\end{listing}
+
+For parameters the same idea applies. However each parameter definition node in
+the AST potentially only provides a partial value. For example the node
+\joliel{foo.bar = 42}, where the type of \joliel{foo} is \joliel{string { .bar:
+int }}, only provides a partial definition of \joliel{foo}. For this
+reason the parameter nodes are first added from the \txtl{parent} and then by
+the \txtl{child}. This allows the definitions of the \txtl{child} to override
+those of the \txtl{parent}.
+
+\subsubsection*{Applying Configuration to the AST}
+
+The \txtl{merged} region from the previous section is then used along
+with the AST corresponding to the Jolie program being run. The last phase of
+the configurator will process the entire AST and output a new AST, which is
+fully configured. This process works by running a \txtl{process} function on
+every single top-level node. The \txtl{process} function will inspect the node,
+and depending on the node return a list of replacement nodes.
+
+Throughout this process the configurator will also verify that no configuration
+is performed on nodes which aren't configurable. This includes dynamic ports
+and non-empty interface definitions.
+
+\paragraph{Ports}
+
+When a port node is encountered in the AST, the \txtl{merged} region is
+searched for an output port matching its name. If none is found, the AST node
+is returned as it is, no modifications are made to it. Otherwise the
+configuration proceeds. For input ports and non-embedding output ports the
+process is the same. The properties of the AST port and the port represented in
+the configuration region are compared one-by-one. If any property is defined by
+both, an error is returned pointing to the AST node and the place that the
+configuration took place. At the end, if no errors are returned, a new port is
+returned with their properties merged together.
+
+For output ports which embed another module the process is slightly different.
+The configurator will first verify the existence of the configuration unit by
+looking it up in the configuration tree. If it is not found an error will be
+returned. Otherwise the configurator will output a new embedding node. The
+embedding node will contain a reference back to the same configuration file the
+current \txtl{Region} comes from. When the embedding is performed, the
+configurator of the embedded service will lookup the correct configuration unit
+from the same file. This will however cause an addition parsing of the same
+file, but a caching layer at the configuration parser could take care of this.
+The embedding process is demonstrated in Listing \ref{lst:embedding_output}.
+
+\begin{listing}[H]
+\begin{multicols}{2}
+
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
+embedded {
+    Jolie:
+        "--conf foo-profile <inputConfigFile> foo.mod" in Foo
+}
+\end{minted}
+
+\columnbreak
+
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
+outputPort Foo embeds "foo" with "foo-profile"
+\end{minted}
+
+\end{multicols}
+
+\caption{AST nodes generated, shown as code (left), by configuration (right)
+    for an output port containing an embedding}
+
+\label{lst:embedding_output}
+
+\end{listing}
+
+\paragraph{Interface Rebinding}
+
+Just like ports, when an interface definition is found the \txtl{merged} region
+is searched for a matching interface definition. Assuming no errors, the
+configurator must now replace the dummy interface definition with the real
+interface definition as the configuration specifies.
+
+Quickly recapping interface rebinding in the configuration is shown in Listing
+\ref{lst:interface_rebinding_recap}. Note that the only information the
+configurator has for locating the replacement is the name of the interface and
+its module.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+interface Dummy = Concrete from "my-module"
+\end{minted}
+
+\caption{Rebinding the interface \txtl{Dummy} to match the interface
+    \txtl{Concrete} from the module \txtl{my-module}}
+
+\label{lst:interface_rebinding_recap}
+
+\end{listing}
+
+The interface will be found by parsing the module's entry point. Its AST will
+then be searched for an interface matching the replacement. Simply replacing
+the dummy with its replacement, however, isn't enough. Consider, for example,
+the scenario shown in Listing \ref{lst:interface_rebinding_types}. In this
+scenario, the processed AST will no longer be valid due to the missing types
+(\txtl{FooRequest} and \txtl{FooResponse}).
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+type FooRequest: void {
+    .child: string
+}
+
+type FooResponse: int
+
+interface Concrete {
+    RequestResponse:
+        foo(FooRequest)(FooResponse)
+}
+\end{minted}
+
+\caption{Simply copying the interface definition is not enough, the types must
+    also be copied}
+
+\label{lst:interface_rebinding_types}
+\end{listing}
+
+The relevant type definitions are found by iterating through every operation of
+the replacement interface. If the types listed in the operations are type links
+those are followed. This leads to a recursive algorithm, which looks through
+every type looking for type links, which will cause more types to be copied
+over. In order to avoid infinite loops a set of already visited types is kept.
+If a type has been seen before then its children will not be visited.
+
+In the end, the original interface definition will be replaced, and all
+necessary type definitions will also be added to the program.
+
+\paragraph{Parameters}
+
+TODO This hasn't been implemented yet.
+
+\subsection{Additions to the Semantic Verifier}
+
+TODO
+
+This pretty much just includes the stuff that surrounds new additions to the
+language. Such as making sure that interfaces aren't empty, dynamic output
+ports cannot be changed etc.
+
+\subsection{Late Verification}
+
+TODO
+
+This will pretty much cover (when implemented) why we need to do it, and how we
+actually do it. This stuff should be fairly simple.
