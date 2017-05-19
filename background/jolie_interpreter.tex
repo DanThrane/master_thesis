@@ -24,34 +24,19 @@ A simplified view of the Jolie interpreter's pipeline can be seen in Figure
 
 \begin{listing}[H]
 \begin{minted}{text}
-                    +--------------------------+
-                    |  Intent parsing          |
-                    +--------------------------+
-                                  |
-                                  v
-                    +--------------------------+
-                    |  Jolie code parsing      |
-                    +--------------------------+
-                                  |
-                                  v
-                    +--------------------------+
-                    |  Semantic verifier       |
-                    +--------------------------+
-                                  |
-                                  v
-                    +--------------------------+
-                    |  Interpretation tree     |
-                    +--------------------------+
-                                  |
-                                  v
-                    +--------------------------+
-                    |  Init process            |
-                    +--------------------------+
-                                  |
-                                  v
-                    +--------------------------+
-                    |  Main process            |
-                    +--------------------------+
++--------------------------+     +--------------------------+
+|  Intent parsing          | --> |  Jolie code parsing      |
++--------------------------+     +--------------------------+
+                                            |
+                                            v
++--------------------------+     +--------------------------+
+|  Interpretation tree     | <-- |  Semantic verifier       |
++--------------------------+     +--------------------------+
+          |
+          v
++--------------------------+     +--------------------------+
+|  CommCore init           | --> |  Init & main process     |
++--------------------------+     +--------------------------+
 \end{minted}
 \caption{A simplified view of the Jolie interpreter pipeline}
 \label{fig:jolie_pipeline}

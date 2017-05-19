@@ -101,7 +101,8 @@ in Jolie. The ones supported are:
             \item Protocol and protocol parameters
             \item Embedding of other services (output ports only)
         \end{itemize}
-    \item General purpose parameters
+    \item General purpose parameters (constant values accessible from
+            Jolie programs)
     \item Interface rebinding
 \end{enumerate}
 
@@ -116,8 +117,8 @@ configuration units.
 Jolie provides a new configuration file format. This format is custom, and made
 to mimic the syntax of Jolie. Listing \ref{lst:simple_conf} shows a very
 simple configuration unit. This units sets the location and protocol for the
-output port \mintinline{jolie}{A}, the location of the input port
-\mintinline{jolie}{ModuleInput}, and a parameter.
+output port \joliel{A}, the location of the input port
+\joliel{ModuleInput}, and a parameter.
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -136,8 +137,8 @@ profile "hello-world" configures "my-module" {
 }
 \end{minted}
 
-\caption{A simple configuration unit named \mintinline{jolie}{hello-world}
-    configuring the module \mintinline{jolie}{my-module}}
+\caption{A simple configuration unit named \joliel{hello-world}
+    configuring the module \joliel{my-module}}
 
 \label{lst:simple_conf}
 
@@ -146,7 +147,7 @@ profile "hello-world" configures "my-module" {
 Embedding of output ports can be performed from within a configuration unit.
 This moves the embedding from being a code problem to, what it should have
 been, a deployment problem. Listing \ref{lst:conf_embedding} shows the
-embedding of output port \mintinline{jolie}{A}. Note that we need to make a
+embedding of output port \joliel{A}. Note that we need to make a
 reference to the module, since the profile names are placed under a namespace
 for each module. This way multiple services can share the same name, a
 situation which is likely to occur with common profile names, such as
@@ -204,12 +205,12 @@ profile "b" configures "a-module" extends "a" {
 The module developer is often aware of what the defaults should be. For this
 reason default configuration profiles may be shipped along the modules, which
 are implicitly imported into every configuration file. The Jolie engine will
-look for any \mintinline{text}{.col} file\footnote{The file extension of the
-configuration file} in the \mintinline{text}{conf} folder. This folder
+look for any \txtl{.col} file\footnote{The file extension of the
+configuration file} in the \txtl{conf} folder. This folder
 should be placed relative to the module's root. For example, if module "a" has
-a file called \mintinline{text}{conf/my-defaults.col}, which contains a unit
+a file called \txtl{conf/my-defaults.col}, which contains a unit
 called "default". Then the user of the package may either write a configuration
-unit which extends this, simply by writing \mintinline{jolie}{profile
+unit which extends this, simply by writing \joliel{profile
 "something" configures "a" extends "default"}, or the default
 directly. There is no need for any inclusion of this file.
 
@@ -228,71 +229,207 @@ never actually saw the corresponding Jolie modules. In this section we'll
 discover how the language has changed to accommodate this configuration
 feature.
 
-The configuration system provides the ability to configure any type of port,
-and additional provide the module with ``parameters''. Ports were covered in
-section TODO. Most importantly it should be noted that output ports do not
-require any values at deployment time, and can be changed at run time, while
-input ports require all their values at deployment time, and cannot be changed
-at run time. % TODO Do we want to cover why it is hard to change input ports at
-% run time?
+TODO The overall goals of the configuration system is:
+
+\begin{itemize}
+\item Easily identify the configuration possibilities of a module
+\end{itemize}
+
+\subsubsection*{Input and Output Ports}
+
+% TODO Need to clean this up.
+%
+% 1. Present solution
+% 2. Discuss problems
+
+Input and output ports, both existing constructs, are defined just like before
+in the Jolie code. To understand how the configuration system works with Jolie
+code, it is important to first understand the subtleties of the pre-existing
+system. TODO Input ports require that all fields are defined at deployment
+time. Output ports require only the interfaces to be pre-defined, both the
+location and protocol can be rebound and run-time.
+
+In order to make a port externally configurable you simply define the port like
+you normally would, and leave out the fields that should be configurable.
+Listing \ref{lst:configurable_input} shows a configurable input port. Only
+fields which are not already listed become configurable. This is particularly
+useful when building a service which needs to make assumptions about its input
+ports. For example if a developer is building a generic web-server, it is
+useful to allow the developer to change the location, but the protocol should
+be fixed.
+
+One typical assumption that Jolie services make about their input ports come
+from aliases that are made in the protocol configuration, an example is shown
+in line 4 of Listing \ref{lst:configurable_input}. The pointer statement takes
+two variable paths, and makes the one on the left link to the one on the right.
+The result of this pointer alias is that any operation running from that input
+port will be able to set the variable \txtl{statusCode} and the status code of
+the HTTP request will be set appropriately. It should also be noted that the
+configuration units \emph{do not} support aliases, and there are no other ways
+of accessing variables hidden in the protocol configuration. As a result any
+service which needs to do something special with its protocol configuration,
+like aliasing, must do it in source code. Since the aliased variable now also
+takes on a new semantic meaning, it also makes sense that it must be named
+directly in source code, and not left to configuration, where it could take
+any arbitrary name.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+inputPort MyWebServer {
+    Protocol: http {
+        .keepAlive = true;
+        .statusCode -> statusCode;
+    }
+    Interfaces: MyWebServerInterface
+}
+\end{minted}
+\caption{A bare-bones configurable input port for a web-server}
+\label{lst:configurable_input}
+\end{listing}
+
+If instead, all values could be overwritten of a port then the underlying
+service would not be able to make assumptions about the additional features
+provided by, for example, its protocol. For this reason only values not
+specified can be overwritten.
+
+\subsubsection*{Parameters}
+
+Parameters are read-only values which are provided to a Jolie program at
+deployment time. A parameter is type-checked at deployment time, to ensure that
+its type matches what the underlying service expects. Listing \ref{lst:params}
+shows a parameter definition and its use.
+
+The type-checking feature functions both as a mean of documentation and
+ensuring that the supplied configuration is valid. Like any other type-checked
+feature of Jolie, it is possible to opt-out simply be setting the type to be
+\txtl{undefined}.
 
 \begin{listing}[H]
 \begin{multicols}{2}
 \begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
-outputPort Service {
-    Location: "socket://service.example.com:443"
-    Protocol: https {
-        .debug = true,
-        .debug.showContent = false
+// service.ol
+parameters {
+    myParameter: string {
+       .foo: int
+       .bar: bool
     }
-    Interfaces: IService
+}
+
+main {
+    println@Console(myParameter)(); // "Root"
+    println@Console(myParameter.foo)(); // 42
+    println@Console(myParameter.bar)() // false
 }
 \end{minted}
 
 \columnbreak
 
 \begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
-outputPort Service {
-    Interfaces: IService
+// service.col
+profile "my-profile" configures "service" {
+    myParameter = "Root",
+    myParameter.foo = 42,
+    myParameter.bar = false
+}
+\end{minted}
+
+\end{multicols}
+\caption{A parameter definition and its use}
+\label{lst:params}
+\end{listing}
+
+From a high-level point of view, parameters are very similar to constants.
+However parameters weren't implemented as an extension of constants due to
+their technical implementation. Namely constants aren't implemented using the
+``Value'' system, which is used by all variables and messages in Jolie, but
+rather implemented at the parser level.
+
+When the Jolie parser encounters a constant definition, it will save the token
+from the assignment and associate it with the identifier on the left hand side.
+Only identifier tokens and simple value tokens are allowed. The constant
+definitions are limited to only a single token. As a result it isn't possible
+to define more advanced tree-like values, which parameters such as
+\joliel{myParameter} from Listing \ref{lst:params} would require.
+
+Whenever the parser reaches a places where a constant would be allowed, it will
+look at the next token, check if it is an identifier, and try to replace the
+current token with the token defined by the constant. This produces some rather
+surprising results and has limitations, which isn't commonly found in other
+programming languages.  Listing \ref{lst:jolie_constants} illustrates how the
+Jolie parser processes constants.
+
+\begin{listing}[H]
+\begin{multicols}{2}
+
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
+constants {
+    FOO = 42
+    BAR = ActualInterface
+}
+
+init {
+    println@Console(FOO)()
+}
+
+courier Foo {
+    [interface BAR(req)(res) {
+        /* ... */
+    }]
+}
+\end{minted}
+
+\columnbreak
+
+\begin{minted}[breaklines,fontsize=\footnotesize]{jolie}
+init {
+    println@Console(42)()
+}
+
+courier Foo {
+    [interface ActualInterface(req)(res) {
+        /* ... */
+    }]
 }
 \end{minted}
 
 \end{multicols}
 
-\caption{
-    Two valid output ports.
-    (Left) A fully configured output port.
-    (Right) A minimal output port.
-}
+\caption{Constants in Jolie works by replacing tokens at the parser level. Left:
+    The input program. Right: The program which the parser ends up seeing}
 
-\label{lst:basic_output}
+\label{lst:jolie_constants}
+
 \end{listing}
 
-Listing \ref{lst:basic_output} shows a two different output ports, both
-perfectly valid.
+While it would have been possible to extend the value system to support values
+it was ultimately decided against. Adding both optional type-checking of
+constants and expanding to values was seen as too big a departure from the
+original intent of constants. For backward compatibility reasons constants
+would also still not have been pure values, but rather either an identifier or
+a value.
+
+The new parameters block is an addition to the AST of Jolie programs. This
+addition currently only works in collaboration with the configuration and
+module system. The block is simply not valid to use without. If any parameter
+is not defined by configuration or has the wrong type the checking scripts of
+Jolie will throw an error.
+
+Even though the parameters block is added to the AST it will not be visible in
+the final interpretation tree. We'll learn more about this in Section
+\ref{sec:col_impl}.
+
+\subsubsection*{Syntax Considerations}
 
 TODO
 
-When should we configure? Go through a few different approaches, always
-override source, always let code win, do we let everything be configurable?
-Should configuration stay final, or should we allow changing it later?  How do
-we distinguish between accidentally leaving something out and wanting it to be
-configurable?
+This problem is however not without its problem, again consider Listing
+\ref{lst:configurable_input}. Previously this code would have resulted in an
+error from the semantic verification, specifically pointing out that an input
+port must have its \joliel{Location} property set. This leads to the question
+of how do we differentiate between code that is intended to be configurable and
+code which is simply invalid.
 
-Output ports
-
-Input ports, and why they are harder.
-
-The \mintinline{jolie}{dynamic} keyword has been introduced to deal with which
-ports that should allow configuration, any port which does not have the dynamic
-keyword is static. Only ports which are static should be configurable. TODO Why
-is this a good idea.
-
-Parameters
-
-\subsection{Implementing the Configuration Format}
-
-Implementation, and fixing the AST
+TODO Discuss approaches to marking these
 
 \subsection{Example}
 
@@ -409,3 +546,32 @@ a lot. This restriction means that we cannot from any node configure any other
 node which isn't a direct child of it. Without this we wouldn't be able to
 easily swap out one configuration unit for another.
 
+\section{Implementing the Configuration Format}
+\label{sec:col_impl}
+
+The new interpreter pipeline is as follows, new phases marked in bold text:
+
+\begin{enumerate}
+\item Intent parsing
+\item Jolie code parsing
+\item \textbf{Configurator}
+\item Semantic verifier
+\item Interpretation tree builder
+\item \textbf{Late verification}
+\item Communication core init
+\item Init \& main process
+\end{enumerate}
+
+The primary work occurs in the configurator service, but some of the
+verification work, namely the parameters, are postponed until after the
+interpretation tree has been build.
+
+\subsection{The Configuration Phase}
+
+The configuration phase builds upon the result of the intent and parsing phase.
+From the intent phase we receive information about modules and potentially
+receive the intent to use a certain configuration unit. From the parsing phase
+we obviously get the AST.
+
+The configuration phase works by modifying the AST to insert the configuration
+gathered from the configuration unit.
