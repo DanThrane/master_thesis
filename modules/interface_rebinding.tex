@@ -1,8 +1,79 @@
 \section{Interface Rebinding}
 \label{sec:interface_rebinding}
 
-Words
+TODO Copy pasted from the paper, needs some introduction and re-wording (for
+example it talks directly about circuit breakers)
 
-\subsection{Example: Writing a Generic Circuit Breaker}
+Packaging proxy services like circuit breakers raises a particular problem.
+Intuitively, the proxy should only accept calls for operations that are
+declared in the interface of the target service. However, this interface is
+known only at deployment time, since we may want to reuse the same circuit
+breaker package to protect different services.
+% In order to allow the creation of packable generic services, that use the
+% aggregation and courier features, we have introduced parametric interfaces.
+Proxy services are thus inherently \emph{parametric} on the interfaces of the
+target services that we choose at deployment time. To address this problem, we
+introduce the notion of configurable interface to Jolie.
 
-TODO Write what on Earth a circuit breaker is.
+\joliel{#ext interface ITarget}
+
+In Listing \ref{lst:ext_interfaces} we define an externally configurable
+interface. A concrete interface is bound to it at deployment time by reading
+the configuration, giving the service, in this case \lstinline|CircuitBreaker|,
+the information needed to correctly proxy operations. Observe that since we
+want Jolie services to be type-checkable without knowing their configuration
+(since configuration may change in different deployment setups), this means
+that the behaviour of the service is necessarily defined as polymorphic, i.e.,
+it cannot assume any specific operation in the configurable interfaces (this is
+obtained through aggregation in Jolie, see~\cite{MGZ14}).
+
+\subsection{Example: Writing a Generic Circuit BReaker}
+
+TODO Copy pasted from the paper, expand on this.
+
+% Jolie has a native construct for ``aggregating'' services, a generalisation
+% of network proxies.
+
+Proxy services delegate the computation of replies for their requests to other
+services. A notable example is circuit breaker~\cite{N07}.
+%
+We summarise this pattern in the following
+(see~\cite{DBLP:journals/corr/MontesiW16} for a thorough discussion in Jolie).
+
+Circuit breakers attempt to protect against some of the problems that occur
+when using remote calls, such as connection problems, timeouts, and critical
+faults.
+%
+During normal operation, a \lstinline|CircuitBreaker| functions like a normal
+proxy between a \lstinline|Client| and a \lstinline|TargetService|.  Monitoring
+code inside of the \lstinline|CircuitBreaker| attempts to detect problems. If
+enough problems are detected, the \lstinline|CircuitBreaker| will start failing
+immediately without attempting to proxy the call. After a period of time it
+will start allowing some calls through, and eventually transition back to the
+normal state and allow all calls through.
+
+To create a circuit breaker running in a client, we would embed the circuit
+breaker locally and have it bound to our external payment processor, this is
+shown in Listing \ref{lst:cb_col}.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+profile "shop-production" configures "Shop" {
+    outputPort PaymentProcessor embeds "cb-pp"
+}
+profile "cb-pp" configures "CircuitBreaker" {
+    interface ITarget = PaymentProcessIface from "PaymentProcessor"
+    outputPort TargetSrv { ... }
+}
+\end{minted}
+
+\caption{cb.col: Shop configuration with client-side circuit breaker for
+    \txtl{PaymentProcessor}}
+
+\label{lst:cb_col}
+
+\end{listing}
+
+We can just as easily create a circuit breaker that operates server-side
+(intercepting incoming calls), or as a proxy in the network, by adopting
+different deployment files for \lstinline|"cb-pp"|.

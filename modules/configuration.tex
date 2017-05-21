@@ -812,19 +812,80 @@ necessary type definitions will also be added to the program.
 
 \paragraph{Parameters}
 
-TODO This hasn't been implemented yet.
+Parameters being a new concept in Jolie simply outputs new nodes for every
+single parameter assignment. This along with the definitions gathered from
+ordinary Jolie code parsing are processed in interpretation building phase.
 
 \subsection{Additions to the Semantic Verifier}
 
-TODO
+As discussed in Section \ref{sec:ol_conf} several syntax changes were also made
+to the core languages. These modifications to the syntax also slightly changed
+which programs were legal. As an example interfaces are now allowed to be empty
+at a syntactical level, to signal that they should be replaced by
+configuration. However having an empty interface not being replaced should
+still cause an error.
 
-This pretty much just includes the stuff that surrounds new additions to the
-language. Such as making sure that interfaces aren't empty, dynamic output
-ports cannot be changed etc.
+This means that additional checking must not be performed to ensure that
+programs are semantically valid. Such a phase already exists in the compiler,
+the semantic verifier.
 
-\subsection{Late Verification}
+The semantic verifier works by performing an AST traversal and validate the
+semantics of each node.
 
-TODO
+The verifier has been updated to not allow empty interfaces, this was
+previously enforced at a syntax level. Since the configurator runs before this
+phase and updates the AST, this will only cause errors for non-configured
+trees.
 
-This will pretty much cover (when implemented) why we need to do it, and how we
-actually do it. This stuff should be fairly simple.
+Non-dynamic ports are ensured to be constant by using features already
+implemented by the semantic verifier.
+
+The semantic verifier is the last phase of the Jolie interpreter when run with
+the \txtl{--check} flag. As we will discuss in the coming section, it is not
+practical to perform type-checking of parameters at this point.
+
+TODO Shouldn't the semantic verifier ensure that parameters are constant?
+
+\subsection{Additions to the Interpretation Tree Builder and Late Verification}
+
+Interpretation tree building was expanded to support parameters. All other
+features required no changes to AST structure, and could simply reuse existing
+features.
+
+The Interpretation Tree Builder (ITB) is the last step before a Jolie program
+is ready to be executed. The ITB works by traversing the AST. The ITB will
+collect information from the AST in the form of definitions and inform the AST
+about their presence. These definitions include ports, interfaces, types, and
+code procedures.
+
+Within code procedures the ITB will produce processes from the AST nodes which
+are runnable. It is from processes the meat of code execution is implemented.
+For example it is from processes everything from addition to operation calls
+are implemented.
+
+In this phase the ITB will be gathering complete information about types. Type
+building is for the most part a fairly trivial one-to-one translation from the
+AST nodes into the internal type representation. The most important job of the
+ITB with respect to type building is resolving of type references. This turns
+references to a type name into an actual reference to a concrete internal type.
+Because types aren't build until this phase is what makes type-checking during
+semantic verification problematic. The semantic verifier would essentially have
+to duplicate the work of the ITB in order to perform type-checking earlier.
+
+The ITB will need to initialize the system with certain values. For example,
+the ITB will initialize the \joliel{location} and \joliel{protocol} variables
+of output ports. These variables are local only to a single request. At this
+point, however, the state of the Jolie program has not yet been initialized. 
+
+In Jolie, state is associated with the current thread of execution. Jolie uses
+a separate thread of execution for handling every message. As a result every
+single request gets its own fresh state. 
+
+The state of every new request is copied from the initialization execution
+thread. This thread performs all initialization, including running the
+user-defined main procedure. 
+
+The ITB receives two new node types from the configurator and code parser:
+parameter assignments, and parameter definitions.
+
+TODO Finish this.

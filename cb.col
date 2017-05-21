@@ -1,0 +1,7 @@
+profile "shop-production" configures "Shop" {
+    outputPort PaymentProcessor embeds "cb-pp"
+}
+profile "cb-pp" configures "CircuitBreaker" {
+    interface ITarget = PaymentProcessIface from "PaymentProcessor"
+    outputPort TargetSrv { ... }
+}

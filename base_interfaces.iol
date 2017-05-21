@@ -1,0 +1,1 @@
+#ext interface ITarget
