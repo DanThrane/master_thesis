@@ -1,0 +1,48 @@
+\section{Appendix B: COL Grammar}\label{package-specification}
+
+Presented as an ABNF-like syntax. All literals are case sensitive.
+
+\begin{minted}{abnf}
+configuration-tree = *include *region
+
+include = "include" qstring
+
+region = region-header "{" region-body "}"
+region-header = [ "profile" qstring ] "configures" qstring [ "extends" qstring ]
+region-body = *definition
+definition = port | interface | parameter
+
+port = input-port | output-port
+input-port = "inputPort" identifier "{" port-body "}"
+output-port = embedded-output-port | external-output-port
+external-output-port = "outputPort" identifier "{" port-body "}"
+embedded-output-port = "outputPort" identifier "embeds" qstring "with" qstring
+port-body = *port-property
+port-property = location-property | protocol-property
+location-property = "Location" ":" qstring
+protocol-property = "Protocol" ":" identifier [ protocol-config ]
+protocol-config = inline-tree
+
+interface = "interface" identifier "=" identifier "from" qstring
+
+parameter = variable-path "=" value
+variable-path = var-id *var-node
+var-id = ( "(" qstring ")" ) | identifier
+var-node = "." var-id [ "[" unsigned-int "]"  ]
+value = ( primitive [ inline-tree ] ) | inline-tree
+inline-tree = "{" *(tree-child ",") tree-child "}"
+tree-child = "." variable-path "=" value
+primitive = qstring | int | long | double | bool
+
+letter = <any Unicode code point recognized by Java via Character#isLetter>
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+bool = "true" | "false"
+int = unsigned-int | "-" unsigned-int
+long = int ( "l" | "L" )
+unsigned-int = 1*digit ; Jolie discards leading 0s
+double = 1*digit "." 1*digit [ double-exp ] | 1*digit double-exp
+double-exp = ( "e" | "E" ) [ "-" | "+" ] 1*digit
+qstring  = ( <"> *(qdtext | quoted-pair ) <"> )
+quoted-pair = "\" ( "\" | "n" | "t" | "r" | <"> | "u" )
+qdtext = <any TEXT except <">>
+\end{minted}

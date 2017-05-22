@@ -1,33 +1,125 @@
 \section{Interface Rebinding}
 \label{sec:interface_rebinding}
 
-TODO Copy pasted from the paper, needs some introduction and re-wording (for
-example it talks directly about circuit breakers)
+TODO Need to be more explicit about which features are new, and which are
+existing features.
 
-Packaging proxy services like circuit breakers raises a particular problem.
-Intuitively, the proxy should only accept calls for operations that are
-declared in the interface of the target service. However, this interface is
-known only at deployment time, since we may want to reuse the same circuit
-breaker package to protect different services.
-% In order to allow the creation of packable generic services, that use the
-% aggregation and courier features, we have introduced parametric interfaces.
-Proxy services are thus inherently \emph{parametric} on the interfaces of the
-target services that we choose at deployment time. To address this problem, we
-introduce the notion of configurable interface to Jolie.
+In this section we will first more closely inspect the existing aggregation,
+   and courier features of Jolie. This leads to the introduction of interface
+   rebinding which is explained following that.
 
-\joliel{#ext interface ITarget}
+Jolie provides the ``aggregation'' feature. We first introduced aggregation in
+the background material for Jolie. In short the feature is a generalisation of
+proxies. The aggregation feature simply forwards requests from one service to
+another. A simple proxy to the calculator service is shown in Listing
+\ref{lst:aggregation_example}.
 
-In Listing \ref{lst:ext_interfaces} we define an externally configurable
-interface. A concrete interface is bound to it at deployment time by reading
-the configuration, giving the service, in this case \lstinline|CircuitBreaker|,
-the information needed to correctly proxy operations. Observe that since we
-want Jolie services to be type-checkable without knowing their configuration
-(since configuration may change in different deployment setups), this means
-that the behaviour of the service is necessarily defined as polymorphic, i.e.,
-it cannot assume any specific operation in the configurable interfaces (this is
-obtained through aggregation in Jolie, see~\cite{MGZ14}).
+\begin{listing}[H]
+\begin{minted}{jolie}
+include "calculator.iol" from "calculator"
 
-\subsection{Example: Writing a Generic Circuit BReaker}
+inputPort Self {
+    Location: "socket://localhost:12345"
+    Protocol: sodep
+    Aggregates: Calculator
+}
+
+outputPort Calculator {
+    Location: "socket://calc.example.com:12345"
+    Protocol: jsonrpc
+    Interfaces: ICalculator
+}
+\end{minted}
+
+\caption{A calculator proxy: This service will proxy any call to the calculator
+    service bound in the output port \joliel{Calculator}}
+
+\label{lst:aggregation_example}
+
+\end{listing}
+
+Aggregation can be extended by using couriers, which allows for the service to
+run code associated with requests that are proxied. Couriers may work either
+for an entire interface, or any particular operation. A courier may even
+decide not to forward a particular call. Listing \ref{lst:simple_courier} shows
+an extension for the calculator proxy with a courier.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+courier Self { // The name of a courier matches its input port
+
+    // Couriers can match an entire interface
+    [interface ICalculator(request)(response) {
+        println@Console("Received call for calculator!")();
+        forward(request)(response)
+    }]
+
+    // Or just a particular operation
+    [sum(request)(response)] {
+        // The courier may choose to forward a request, or answer the
+        // request itself
+        if (#request.numbers > 2) { forward(request)(response) }
+        else { response = request.numbers[0] + request.numbers[1] }
+    }
+}
+\end{minted}
+
+\caption{A courier allows additional code to run alongside a potential
+    forwarding}
+
+\label{lst:simple_courier}
+
+\end{listing}
+
+Additionally Jolie supports ``interface extenders''. These can, like the name
+suggests, extend the types of operations (in interfaces) with additional
+fields. These may add additional fields for every operation, or specific
+operations. These can also add faults to the type signature of an operation.
+
+Like with any other output port, the service relies entirely on the interface
+listed in the output port to be correct. There is no communication with the
+target service about the correct interface. If the interface doesn't match, it
+will simply fail when attempting to invoke the operation.
+
+\emph{A consequence of this is that it isn't possible to create entirely generic
+proxies without knowing the interface.}
+
+The aggregates and courier features allow for Jolie to implement many different
+common proxy-like patterns. These patterns mostly deal with their target
+service in a generic fashion, making very few, if any, assumptions about the
+target service. However because the aggregations feature needs the interface it
+would be impossible to write a fully generic proxy service.
+
+The interface rebinding feature fixes this problem, by allowing configuration
+files to redefine an interface at deployment time. This way the generic service
+may write ordinary code, making no assumptions about the underlying service,
+and only at deployment time it will know which interface the target service
+has.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+interface ITarget
+\end{minted}
+\caption{Configurable interfaces are defined by leaving the body empty}
+\label{lst:ext_interfaces}
+\end{listing}
+
+The interface is bound from the configuration file, in a similar fashion to
+other configurable units, as shown in Listing \ref{lst:reconf_interface}.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+interface ITarget = ICalculator from "calculator"
+\end{minted}
+
+\caption{Rebinding the \joliel{ITarget} interface to the \joliel{ICalculator}
+    interface from the calculator module}
+
+\label{lst:reconf_interface}
+\end{listing}
+
+
+\subsection{Example: Writing a Generic Circuit Breaker}
 
 TODO Copy pasted from the paper, expand on this.
 

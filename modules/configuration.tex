@@ -566,6 +566,72 @@ The primary work occurs in the configurator service, but some of the
 verification work, namely the parameters, are postponed until after the
 interpretation tree has been build.
 
+\subsection{Syntax of the Configuration Format (COL)}
+
+In this section the formal grammar of the configuration format is presented.
+The grammar is presented in a ABNF-like syntax. Complete syntax is presented in
+Appendix B.
+
+All literals are case sensitive.
+
+TODO is ABNF okay considering it is mostly used for communication protocols?
+
+A configuration file starts by a list of includes, followed by a list of
+regions.
+
+\begin{minted}{abnf}
+configuration-tree = *include *region
+
+include = "include" qstring
+
+region = region-header "{" region-body "}"
+region-header = [ "profile" qstring ] "configures" qstring [ "extends" qstring ]
+region-body = *definition
+definition = port | interface | parameter
+\end{minted}
+
+The definitions inside of a region correspond to the different configurable
+units. The syntax is made to closely mimic the syntax of existing Jolie code.
+
+\begin{minted}{abnf}
+port = input-port | output-port
+input-port = "inputPort" identifier "{" port-body "}"
+output-port = embedded-output-port | external-output-port
+external-output-port = "outputPort" identifier "{" port-body "}"
+embedded-output-port = "outputPort" identifier "embeds" qstring "with" qstring
+port-body = *port-property
+port-property = location-property | protocol-property
+location-property = "Location" ":" qstring
+protocol-property = "Protocol" ":" identifier [ protocol-config ]
+protocol-config = inline-tree
+
+interface = "interface" identifier "=" identifier "from" qstring
+
+parameter = variable-path "=" value
+variable-path = var-id *var-node
+var-id = ( "(" qstring ")" ) | identifier
+var-node = "." var-id [ "[" unsigned-int "]"  ]
+value = ( primitive [ inline-tree ] ) | inline-tree
+inline-tree = "{" *(tree-child ",") tree-child "}"
+tree-child = "." variable-path "=" value
+primitive = qstring | int | long | double | bool
+\end{minted}
+
+The values very closely resemble what Jolie allows, primarily just removing
+variables from the syntax. Variable identifiers can be strings, like in Jolie,
+to allow for special variable names which would otherwise not be
+valid identifiers. This is primarily useful for building dictionary like
+structures with arbitrary string keys.
+
+Additional configuration file supports C-style comments, these are allowed
+anywhere and are simply ignored.
+
+\begin{minted}{abnf}
+comment = single-line-comment | multi-line-comment
+single-line-comment = "//" <any text except line breaks>
+multi-line-comment = "/*" <any text except "*/"> "*/"
+\end{minted}
+
 \subsection{The Configuration Phase}
 
 The configuration phase builds upon the result of the intent and parsing phase.
@@ -581,8 +647,6 @@ phases, and the remainder of the pipeline works mostly like it has before.
 % configuration phase might as well not exist.
 
 \subsubsection*{Processing of Configuration Files}
-
-TODO Does it make sense to give a formal grammar for the configuration files?
 
 % Introduction
 
@@ -848,9 +912,17 @@ TODO Shouldn't the semantic verifier ensure that parameters are constant?
 
 \subsection{Additions to the Interpretation Tree Builder and Late Verification}
 
+% Introduction
+
 Interpretation tree building was expanded to support parameters. All other
 features required no changes to AST structure, and could simply reuse existing
 features.
+
+This section will discuss the technical of how the Interpretation Tree Builder
+(ITB) works. It will cover issues that are quite technical, and very specific
+to this particular implementation of the Jolie engine.
+
+% What is the ITB and what does it do?
 
 The Interpretation Tree Builder (ITB) is the last step before a Jolie program
 is ready to be executed. The ITB works by traversing the AST. The ITB will
@@ -858,10 +930,14 @@ collect information from the AST in the form of definitions and inform the AST
 about their presence. These definitions include ports, interfaces, types, and
 code procedures.
 
+% Processes
+
 Within code procedures the ITB will produce processes from the AST nodes which
 are runnable. It is from processes the meat of code execution is implemented.
 For example it is from processes everything from addition to operation calls
 are implemented.
+
+% When are types ready?
 
 In this phase the ITB will be gathering complete information about types. Type
 building is for the most part a fairly trivial one-to-one translation from the
@@ -871,21 +947,55 @@ references to a type name into an actual reference to a concrete internal type.
 Because types aren't build until this phase is what makes type-checking during
 semantic verification problematic. The semantic verifier would essentially have
 to duplicate the work of the ITB in order to perform type-checking earlier.
+This also means that type-checking cannot be performed until the ITB is
+finished.
+
+% State, and how the ITB changes initial state.
 
 The ITB will need to initialize the system with certain values. For example,
 the ITB will initialize the \joliel{location} and \joliel{protocol} variables
 of output ports. These variables are local only to a single request. At this
-point, however, the state of the Jolie program has not yet been initialized. 
+point, however, the state of the Jolie program has not yet been initialized.
 
 In Jolie, state is associated with the current thread of execution. Jolie uses
 a separate thread of execution for handling every message. As a result every
-single request gets its own fresh state. 
+single request gets its own fresh state. All state is copied from the
+initialization execution thread. This thread performs work requested by the ITB
+followed by the \joliel{init} procedure. Thus right after the ITB is done, and
+the initialization execution thread is started, code execution starts. This
+includes both user code in form of Jolie, but also loading of any embedded
+services.
 
-The state of every new request is copied from the initialization execution
-thread. This thread performs all initialization, including running the
-user-defined main procedure. 
+It should be noted that any process which works with state must be run on an
+execution thread, since it depends on the state being present on the thread.
+
+% Handling of parameter definitions and assignments inside the ITB
 
 The ITB receives two new node types from the configurator and code parser:
 parameter assignments, and parameter definitions.
 
-TODO Finish this.
+For parameter definitions the ITB will resolve the types. Ensuring that all
+links are properly resolved. This will output a ``processed'' parameter
+definition which the ITB will inform the interpreter about.
+
+In a similar fashion, the ITB will process parameter assignments and inform the
+interpreter. Type-checking cannot be performed at this point, due to types not
+being ready before the ITB finishes. Simply outputting processes for
+configuration will make it impossible to perform type-checking before code
+execution starts, due to their dependency on state.
+
+The processed assignments contains an ordinarily processed LHS, which contains
+the variable path. The RHS has been processed into an expression, which can be
+evaluated into a native Jolie value on which type-checking can be performed.
+
+% Introduction of new phase and working around lack of state
+
+Because of these constraints a new ``late-checking phase'' has been created.
+This phase runs right after the ITB, but before code execution starts. In this
+phase it is not possible to directly touch the init state. It is however
+possible to both create values, and evaluate expression. This phase creates a
+synthetic state by creating a new value, which will act as the state.
+Expression are evaluated against this root and later type-checked. The result
+of evaluating the parameter assignments are then copied into the init state,
+   assuming, of course, that type-checking was successful.
+
