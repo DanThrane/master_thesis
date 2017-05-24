@@ -1,4 +1,4 @@
-\section{Interface Rebinding}
+\subsection{Interface Rebinding}
 \label{sec:interface_rebinding}
 
 TODO Need to be more explicit about which features are new, and which are
@@ -118,54 +118,3 @@ interface ITarget = ICalculator from "calculator"
 \label{lst:reconf_interface}
 \end{listing}
 
-
-\subsection{Example: Writing a Generic Circuit Breaker}
-
-TODO Copy pasted from the paper, expand on this.
-
-% Jolie has a native construct for ``aggregating'' services, a generalisation
-% of network proxies.
-
-Proxy services delegate the computation of replies for their requests to other
-services. A notable example is circuit breaker~\cite{N07}.
-%
-We summarise this pattern in the following
-(see~\cite{DBLP:journals/corr/MontesiW16} for a thorough discussion in Jolie).
-
-Circuit breakers attempt to protect against some of the problems that occur
-when using remote calls, such as connection problems, timeouts, and critical
-faults.
-%
-During normal operation, a \lstinline|CircuitBreaker| functions like a normal
-proxy between a \lstinline|Client| and a \lstinline|TargetService|.  Monitoring
-code inside of the \lstinline|CircuitBreaker| attempts to detect problems. If
-enough problems are detected, the \lstinline|CircuitBreaker| will start failing
-immediately without attempting to proxy the call. After a period of time it
-will start allowing some calls through, and eventually transition back to the
-normal state and allow all calls through.
-
-To create a circuit breaker running in a client, we would embed the circuit
-breaker locally and have it bound to our external payment processor, this is
-shown in Listing \ref{lst:cb_col}.
-
-\begin{listing}[H]
-\begin{minted}{jolie}
-profile "shop-production" configures "Shop" {
-    outputPort PaymentProcessor embeds "cb-pp"
-}
-profile "cb-pp" configures "CircuitBreaker" {
-    interface ITarget = PaymentProcessIface from "PaymentProcessor"
-    outputPort TargetSrv { ... }
-}
-\end{minted}
-
-\caption{cb.col: Shop configuration with client-side circuit breaker for
-    \txtl{PaymentProcessor}}
-
-\label{lst:cb_col}
-
-\end{listing}
-
-We can just as easily create a circuit breaker that operates server-side
-(intercepting incoming calls), or as a proxy in the network, by adopting
-different deployment files for \lstinline|"cb-pp"|.
