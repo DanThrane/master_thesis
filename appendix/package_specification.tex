@@ -1,74 +1,8 @@
-\section{Appendix A: JPM Manifest Specification}\label{package-specification}
-
-This document covers the specification of the file which defines a
-package. The format used for this document will be JSON, but the format
-and whether or not to allow for several documents is still up for
-discussion. For now we should avoid using any features which the generic
-Jolie value cannot support.
-
-\subsection{Purpose}\label{purpose}
-
-The purpose of the package document is to define what a package is.
-Every Jolie package will contain such a document, and it describes
-several important properties about the package. These properties are
-described in the section ``Format and Properties''.
-
-\subsection{Table of Contents}\label{table-of-contents}
-
-\begin{itemize}
-\tightlist
-\item
-  \protect\hyperlink{format-and-properties}{Format and Properties}
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \protect\hyperlink{name}{name}
-  \item
-    \protect\hyperlink{version}{version}
-  \item
-    \protect\hyperlink{license}{license}
-  \item
-    \protect\hyperlink{authors}{authors}
-  \item
-    \protect\hyperlink{private}{private}
-  \item
-    \protect\hyperlink{main}{main}
-  \item
-    \protect\hyperlink{dependencies}{dependencies}
-  \item
-    \protect\hyperlink{dependency}{dependency}
-
-    \begin{itemize}
-    \tightlist
-    \item
-      \protect\hyperlink{name-1}{name}
-    \item
-      \protect\hyperlink{version-1}{version}
-    \item
-      \protect\hyperlink{registry}{registry}
-    \end{itemize}
-  \item
-    \protect\hyperlink{registries}{registries}
-  \item
-    \protect\hyperlink{registry-1}{registry}
-
-    \begin{itemize}
-    \tightlist
-    \item
-      \protect\hyperlink{name-2}{name}
-    \item
-      \protect\hyperlink{location}{location}
-    \end{itemize}
-  \end{itemize}
-\end{itemize}
-
-\hypertarget{format-and-properties}{\subsection{Format and
-Properties}\label{format-and-properties}}
+\section{JPM Manifest Specification}\label{package-specification}
 
 \hypertarget{name}{\subsubsection{name}\label{name}}
 
-\textbf{Name:} \texttt{name}
+\textbf{Field name:} \texttt{name}
 
 \textbf{Optional:} false
 
@@ -99,7 +33,7 @@ such package.
 
 \hypertarget{version}{\subsubsection{version}\label{version}}
 
-\textbf{Name:} \texttt{version}
+\textbf{Field name:} \texttt{version}
 
 \textbf{Optional:} false
 
@@ -119,7 +53,7 @@ this package.
 
 \hypertarget{license}{\subsubsection{license}\label{license}}
 
-\textbf{Name:} \texttt{property\_name}
+\textbf{Field name:} \texttt{property\_name}
 
 \textbf{Optional:} false
 
@@ -137,7 +71,7 @@ this package.
 
 \hypertarget{authors}{\subsubsection{authors}\label{authors}}
 
-\textbf{Name:} \texttt{authors}
+\textbf{Field name:} \texttt{authors}
 
 \textbf{Optional:} false
 
@@ -162,7 +96,7 @@ name ["<" email ">"] ["(" homepage ")"]
 
 \hypertarget{private}{\subsubsection{private}\label{private}}
 
-\textbf{Name:} \texttt{private}
+\textbf{Field name:} \texttt{private}
 
 \textbf{Optional:} true
 
@@ -183,7 +117,7 @@ private. If a package is private it cannot be published to the
 
 \hypertarget{main}{\subsubsection{main}\label{main}}
 
-\textbf{Name:} \texttt{main}
+\textbf{Field name:} \texttt{main}
 
 \textbf{Optional:} true
 
@@ -202,7 +136,7 @@ private. If a package is private it cannot be published to the
 
 \hypertarget{dependencies}{\subsubsection{dependencies}\label{dependencies}}
 
-\textbf{Name:} \texttt{dependencies}
+\textbf{Field name:} \texttt{dependencies}
 
 \textbf{Optional:} true
 
@@ -228,9 +162,9 @@ private. If a package is private it cannot be published to the
 package. This points to a package at a specific point on a specific
 registry.
 
-\hypertarget{name-1}{\paragraph{name}\label{name-1}}
+\hypertarget{name-1}{\paragraph{dependency.name}\label{name-1}}
 
-\textbf{Name:} \texttt{name}
+\textbf{Field name:} \texttt{name}
 
 \textbf{Optional:} false
 
@@ -242,9 +176,9 @@ to the package name, as defined earlier.
 \textbf{Rules:} A dependency name follows the exact same rules as a
 package name.
 
-\hypertarget{version-1}{\paragraph{version}\label{version-1}}
+\hypertarget{version-1}{\paragraph{dependency.version}\label{version-1}}
 
-\textbf{Name:} \texttt{version}
+\textbf{Field name:} \texttt{version}
 
 \textbf{Optional:} false
 
@@ -262,9 +196,9 @@ package name.
   (This property follows the same rules as the package version does)
 \end{itemize}
 
-\hypertarget{registry}{\paragraph{registry}\label{registry}}
+\hypertarget{registry}{\paragraph{dependency.registry}\label{registry}}
 
-\textbf{Name:} \texttt{registry}
+\textbf{Field name:} \texttt{registry}
 
 \textbf{Optional:} true
 
@@ -284,7 +218,7 @@ registry is listed the ``public'' registry will be used.
 
 \hypertarget{registries}{\subsubsection{registries}\label{registries}}
 
-\textbf{Name:} \texttt{registries}
+\textbf{Field name:} \texttt{registries}
 
 \textbf{Optional:} true
 
@@ -310,9 +244,9 @@ registry sub-section for more details.
 registry is where the package manager can locate a package, and also
 request a specific version of a package.
 
-\hypertarget{name-2}{\paragraph{name}\label{name-2}}
+\hypertarget{name-2}{\paragraph{registry.name}\label{name-2}}
 
-\textbf{Name:} \texttt{name}
+\textbf{Field name:} \texttt{name}
 
 \textbf{Optional:} false
 
@@ -332,20 +266,9 @@ request a specific version of a package.
   No two registries may have the same name
 \end{itemize}
 
-\textbf{TODO:}
+\hypertarget{location}{\paragraph{registry.location}\label{location}}
 
-\begin{itemize}
-\tightlist
-\item
-  Encoding of name
-\item
-  Should the length limit be dropped? There is no technical reason for
-  the limit
-\end{itemize}
-
-\hypertarget{location}{\paragraph{location}\label{location}}
-
-\textbf{Name:} \texttt{location}
+\textbf{Field name:} \texttt{location}
 
 \textbf{Optional:} false
 

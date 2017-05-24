@@ -1,0 +1,38 @@
+\section{Scripts from Lifetime Hooks Example}
+
+File: \txtl{build}
+
+\begin{minted}{bash}
+#!/usr/bin/env bash
+cd java-service
+gradle jar
+cd ..
+mkdir -p lib
+cp java-service/build/libs/*.jar lib
+\end{minted}
+
+File: \txtl{java-service/build.gradle}
+
+\begin{minted}[breaklines]{groovy}
+group 'dk.thrane.jolie'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile files("/usr/lib/jolie/jolie.jar")
+}
+
+jar {
+    from {
+        configurations.compile.findAll { it.name != "jolie.jar" }.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+\end{minted}

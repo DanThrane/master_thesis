@@ -1,15 +1,15 @@
 \section{Package Manifest}
 
 In this section we'll cover, in details, the format of Jolie manifests. The
-complete specification for the package manifest can be found in Appendix A.
+complete specification for the package manifest can be found in Appendix 1.
 However in this section we'll also cover some of the reasoning behind the
-choices found in Appendix A.
+choices found in Appendix 1.
 
 \subsection{The {\tt name} Attribute}
 
 The \mintinline{text}{name} attribute uniquely identifies a package. We'll
 start this discussion by looking at the constraints imposed on it, from
-Appendix A:
+Appendix 1:
 
 \begin{enumerate}
 \item
@@ -17,9 +17,8 @@ Appendix A:
 \item
     The length of a name is less than 255 characters
 \item
-    Names may only contain unreserved URI characters (Section 2.3 of 
+    Names may only contain unreserved URI characters (Section 2.3 of
             \autocite{rfc3986})
-    %\href{https://www.ietf.org/rfc/rfc3986.txt}{RFC 3986})
 \item
     Names are US-ASCII
 \item
@@ -155,19 +154,19 @@ Allowing for SemVer expressions to be used, is however not without its
 drawbacks. In Section \ref{sec:lockfiles} we cover one of these problems, and
 its solution.
 
-\subsection{The TODO Name Attributes ({\tt events}, {\tt main})}
+\subsection{The Lifetime Attributes ({\tt events}, {\tt main})}
 
 These attributes control aspects of the package related to the execution of
 scripts, by the package manager, related to the package.
 
 The \mintinline{text}{main} attribute controls the entry-point of the module.
 This is used both in informing the Jolie Engine where the entry-point is
-located (Section TODO). The attribute is also used for starting the package, we
-discuss this in Section TODO.
+located. The attribute is also used for starting the package, we discuss this
+in Section TODO.
 
 The \mintinline{text}{events} attribute defines a series of lifetime hooks,
 which are scripts that are run when specific lifetime events occur, this is
-described in Section TODO.
+described in Section \ref{sec:lifetime_hooks}.
 
 \subsection{The {\tt registries} Attribute}
 

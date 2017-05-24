@@ -12,24 +12,23 @@ to easily identify a package. The JSON format was chosen as it plain-text, and
 easy to both read and write for both humans and machines.
 
 In listing \ref{lst:simple_manifest} we show a simple package manifest. This
-manifest showcases the most important features of the manifest.A complete
-specification of the package manifest format can be seen in Appendix A. The
+manifest showcases the most important features of the manifest. A complete
+specification of the package manifest format can be seen in Appendix 1. The
 service that this manifest describes is shown in figure \ref{fig:simple_calc}.
 
 \begin{listing}[H]
 \begin{minted}{json}
 {
     "name": "calculator",
-    "main": "calc.ol",
+    "main": "main.ol",
     "description": "A simple calculator service",
     "authors": ["Dan Sebastian Thrane <dathr12@student.sdu.dk>"],
     "license" "MIT",
-    "interfaceDependencies": [
-        { "name": "math", "version": "1.0.0" }
-    ],
+    "version": "1.0.0",
     "dependencies": [
-        { "name": "sum", "version": "1.2.X" },
+        { "name": "addition", "version": "1.2.X" },
         { "name": "multiplication", "version": "2.1.0" }
+        { "name": "numbers", "version": "1.0.0" }
     ]
 }
 \end{minted}
@@ -37,52 +36,11 @@ service that this manifest describes is shown in figure \ref{fig:simple_calc}.
 \label{lst:simple_manifest}
 \end{listing}
 
-\begin{listing}[H]
-\begin{minted}[linenos=false]{text}
-                +--------------+     +-------+
-                |              | ==> |  sum  |
-                |              |     +-------+
-                |  calculator  |
-                |              |     +------------------+
-                |              | ==> |  multiplication  |
-                +--------------+     +------------------+
-\end{minted}
-\caption{A Calculator Service}
-\label{fig:simple_calc}
-\end{listing}
-
+This manifest configures the ongoing example of the calculator system.
 Lines 2-3 take care of the module definition. The remaining attributes,
 however, are entirely unique to packages. Some attributes included in the
 manifest are there for indexing and discoverability purposes, examples of such
-attributes are shown in lines 4-6. The rest of the document describes the
+attributes are shown in lines 4-6. The rest of the manifest describes the
 dependencies of this package.
 
-A JPM dependency is defined as a ``code dependency''. What this means is that
-the dependencies listed, should only be packages that we depend on for code.
-This might be different from the typical definition in microservices. For
-example, one might state that the calculator also has a dependency on the
-client who speaks to it. In JPM however, we will not need to list the client,
-as we do not depend on any code that the client has (in fact we know nothing
-about how the client works).
-
-JPM deals with two different types of dependencies: interface dependencies, and
-ordinary dependencies. These two serve similar, but slightly different
-purposes, and all depends on how the dependency is to be used.
-
-An ordinary dependency should be used if we wish to use the code of some other
-service, and want to option of embedding it. This will tell JPM to download
-both ordinary dependencies, as well as interface dependencies.
-
-Interface dependencies are instead dependencies that are only required to
-interface with the package itself, and dependencies we need to interface with
-others. An interface dependency will only cause us to download the interface
-dependencies of each sub-dependency.
-
-% TODO Need an example and algorithm for this stuff!
-
-The interface dependency type isn't common in other package managers, but
-having multiple types of dependencies is fairy common.  For example, a package
-manager might provide dependencies which are only used during testing, we see
-this in Maven, or it might provide dependencies only used during development,
-seen in NPM.
 

@@ -437,14 +437,12 @@ the final interpretation tree. We'll learn more about this in Section
 
 In this section the formal grammar of the configuration format is presented.
 The grammar is presented in a ABNF-like syntax. Complete syntax is presented in
-Appendix B.
+Appendix 2.
 
 All literals are case sensitive.
 
-TODO is ABNF okay considering it is mostly used for communication protocols?
-
 A configuration file starts by a list of includes, followed by a list of
-regions.
+regions, as shown in start rule \mintinline{abnf}{configuration-tree}.
 
 \begin{minted}{abnf}
 configuration-tree = *include *region

@@ -1,0 +1,370 @@
+\section{Examples}
+\label{sec:module_examples}
+
+In this section we will introduce two examples, which will showcase different
+aspects of the Jolie module, and configuration system. These examples will be
+revisited again in Section TODO, where they will be shown in the context of
+packages.
+
+\subsection{Example A TODO Name}
+
+In this example we will look at the calculator example shown in the
+introductory chapters. The calculator system will be updated to work under the
+new Jolie module system. We will also show how what was previous problems that
+required code changes, can now be performed entirely in independent
+configuration files.
+
+Quickly recapping from previous chapters.  Figure \ref{fig:simple_calc} shows
+the system architecture for the calculator system. The system contains three
+services. The main-point of contact for a client is the \txtl{calculator}
+service. This service will delegate the ``hard'' work to the other two
+services, that is \txtl{addition} and \txtl{multiplication}.
+
+\begin{listing}[H]
+\begin{minted}{text}
++----------------+     +--------------+     +----------------+
+| multiplication | <-- | calculator   | --> | addition       |
++----------------+     +--------------+     +----------------+
+      |
+      v
++--------------+
+| numbers      |
++--------------+
+\end{minted}
+\caption{System architecture for the ``calculator system''}
+\label{fig:simple_calc}
+\end{listing}
+
+The file structure of our services contained a lot of duplication. The file
+structure is shown in Listing \ref{lst:start_file_structure}. As we can see
+from this there is quite a bit of duplication of files, and we cannot simply
+copy the directories of our dependencies, as this would place the files in the
+wrong places. We also resort to code files for distributing default
+configuration profiles. Switching between embedding a service and binding to it
+externally will also require significant changes.
+
+TODO This uses the updated example from e-mail. The introduction needs to be
+updated to use the same example.
+
+\begin{listing}[H]
+
+\begin{multicols}{3}
+
+\begin{minted}[breaklines,fontsize=\footnotesize,frame=none]{text}
+// multiplication
+.
+|-- multiplication.ol
+|-- include
+|   |-- mult_config.iol
+|   `-- multiplication.iol
+`-- numbers.iol
+
+// numbers
+.
+|-- include
+|   `-- numbers.iol
+`-- main.ol
+\end{minted}
+
+\columnbreak
+
+\begin{minted}[breaklines,fontsize=\footnotesize,frame=none]{text}
+// calculator
+.
+|-- addition_config.iol
+|-- addition.iol
+|-- addition.ol
+|-- calculator.ol
+|-- include
+|   `-- calculator.iol
+|-- mult_config.iol
+|-- multiplication.iol
+|-- multiplication.ol
+|-- numbers.iol
+`-- numbers.ol
+\end{minted}
+
+\columnbreak
+
+\begin{minted}[breaklines,fontsize=\footnotesize,frame=none]{text}
+// addition
+.
+|-- include
+|   |-- addition_config.iol
+|   `-- addition.iol
+`-- addition.ol
+\end{minted}
+
+\end{multicols}
+
+\caption{Initial file structure of the calculator system}
+\label{lst:start_file_structure}
+\end{listing}
+
+The first step is to update all includes which require files from other
+modules, to use the new module includes. For example, \txtl{multiplication.iol}
+depend on types from the utility module \txtl{numbers} from the file
+\txtl{numbers.iol}. Their includes change from the old \joliel{include
+"numbers.iol"} to the new module include \\\joliel{include "numbers.iol" from
+"numbers"}.
+
+Using module includes also provides a certain level of namespacing of file
+names. This system will allow for two files to be named the same thing, without
+causing problems. This allows us to give files better names, and allow many
+rather useless prefixes. For example the file \txtl{addition.iol} can be
+renamed to a more meaningful name such as \txtl{types.iol}. Causing includes to
+say \joliel{include "interface.iol" from "addition"}.
+
+The next step is to convert the legacy configuration into the new configuration
+format. The contents \txtl{mult_config.iol} previously contained constants for
+configuring the input port and parameters of the service. Legacy configuration
+is shown in Listing \ref{lst:mult_config_legacy}.
+
+In order to convert port, we must first decide which ports need to be
+configured, and which fields should be configurable. In this case we should
+only configure our input port. Since the module makes no assumptions about this
+service's input port, we can simply allow it all to be configurable.
+
+For parameters we must determine the actual type each parameter can take. This
+must be put in the \joliel{parameters} block. The complete transformation is
+shown in Listing \ref{lst:mult_config_updated}.
+
+\begin{listing}[H]
+
+\begin{minted}{jolie}
+constants {
+    MULT_INPUT_LOCATION = "socket://localhost:12345",
+    MULT_INPUT_PROTOCOL = sodep,
+    MULT_MAX_INPUT = 1000,
+    MULT_MIN_INPUT = 0,
+    MULT_DEBUG = false
+}
+\end{minted}
+
+\caption{Legacy configuration file for the \txtl{multiplication} module}
+
+\label{lst:mult_config_legacy}
+
+\end{listing}
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+inputPort Multiplication {
+    Interfaces: IMultiplication
+}
+
+parameters {
+    minInput: int,
+    maxInput: int,
+    debug: bool
+}
+\end{minted}
+\caption{Updated configuration for the \txtl{multiplication} module}
+\label{lst:mult_config_updated}
+\end{listing}
+
+Although we're not quite finished yet with the configuration. The original
+service provided default configuration. A new directory named \txtl{conf} is
+created. Inside which we can make as many defaults as we wish. For now we can
+create a file named \txtl{default.col}. In Listing
+\ref{lst:mult_default_config} we show some default configuration.  The
+inheritance feature allows us to easily create profiles for various deployment
+configurations which a user of the module might wish to use. The
+\joliel{"self-hosted"} profile would be ideal for hosting the service
+standalone, while the \joliel{"embedded"} and \joliel{"debug"} profiles would
+be ideal for development.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+profile "default" configures "multiplication" {
+    minInput = 0,
+    maxInput = 1000,
+    debug = false
+}
+
+profile "self-hosted" configures "multiplication" extends "default" {
+    inputPort Multiplication {
+        Location: "socket://localhost:12345"
+        Protocol: sodep
+    }
+
+    outputPort Numbers {
+        Location: "socket://numbers.example.com:22000"
+        Protocol: sodep
+    }
+}
+
+profile "embedded" configures "multiplication" extends "default" {
+    inputPort Multiplication {
+        Location: "local"
+        Protocol: sodep
+    },
+
+    outputPort Numbers embeds "numbers" with "default"
+}
+
+profile "debug" configures "multiplication" extends "embedded" {
+    debug = true
+}
+\end{minted}
+
+\caption{Providing defaults for a Jolie module. Using inheritance we can create
+suitable profiles for various typical deployment configurations.}
+
+\label{lst:mult_default_config}
+
+\end{listing}
+
+At this point we can now clean-up in the directories of each module. The Jolie
+module system technical allows for any organization of modules, but for now we
+will simply put the source code of each module inside a directory called
+\txtl{modules}. In this directory we will place a directory named the same as
+the module, containing the complete source code of the modules.
+
+After doing this, and renaming files to give them more meaningful names, we end
+up with the file structure shown in listing \ref{lst:final_file_structure}.
+
+\begin{listing}[H]
+
+\begin{multicols}{3}
+
+\begin{minted}[breaklines,fontsize=\footnotesize,frame=none]{text}
+// multiplication
+.
+|-- conf
+|   `-- default.col
+|-- include
+|   `-- interface.iol
+|-- main.ol
+`-- modules
+    `-- numbers
+
+
+// numbers
+.
+|-- include
+|   `-- interface.iol
+`-- main.ol
+\end{minted}
+
+\columnbreak
+
+\begin{minted}[breaklines,fontsize=\footnotesize,frame=none]{text}
+// calculator
+.
+|-- include
+|   `-- interface.iol
+|-- main.ol
+`-- modules
+    |-- addition
+    |-- multiplication
+    `-- numbers
+\end{minted}
+
+\columnbreak
+
+\begin{minted}[breaklines,fontsize=\footnotesize,frame=none]{text}
+// addition
+.
+|-- conf
+|   `-- default.col
+|-- include
+|   `-- interface.iol
+`-- main.ol
+\end{minted}
+
+\end{multicols}
+
+\caption{Final file structure of the three services for the calculator system}
+\label{lst:final_file_structure}
+\end{listing}
+
+This file structure, as we shall also discuss later, is much better for
+potential package managers. The overhead which is associated with actually
+launching the service now is bigger. Currently in order to launch this program
+the following would be needed:
+
+\begin{minted}{text}
+dan@host:/calculator $ jolie                            \
+    --mod addition,modules/addition,main.ol             \
+    --mod multiplication,modules/multiplication,main.ol \
+    --mod numbers,modules/numbers,main.ol               \
+    --mod calculator,.,main.ol                          \
+    calculator.mod
+\end{minted}
+
+In contrast this is quite a bit more than previously:
+
+\begin{minted}{text}
+dan@host:/calculator $ jolie calculator.ol
+\end{minted}
+
+However, most of this disappears when using a package manager or similar tool.
+In fact it will be as simple as:
+
+\begin{minted}{text}
+dan@host:/calculator $ jpm start
+\end{minted}
+
+This is also similar to how, for example, the Java ecosystem ordinarily does
+its additions of libraries. From the CLI this will require manually listing
+every JAR dependency. However such projects are usually managed through more
+advanced build tools, such as: Maven, Gradle or Ant.
+
+The configuration system also helps significantly with changing between various
+different deployment configuration, which switch between embedding services and
+having them be external.
+
+Before the difference between embedding a service, and not embedding a service
+would require drastically different work. The first step here would be to make
+sure that all files were included in the directory. Since there were no module
+system, these files would have to live in the same directory as all the other
+code, or alternatively rewrite all includes in the dependency.
+Secondly it would require changing all relevant configuration, and inserting
+an embedded section inside of our source code.
+
+With the module system this will require absolutely no code changes. The
+calculator module would simply have to define the output ports for
+\txtl{addition} and \txtl{multiplication} as configurable. This is shown in
+Listing \ref{lst:conf_deps}.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+outputPort Addition         { Interfaces: IAddition         }
+outputPort Multiplication   { Interfaces: IMultiplication   }
+\end{minted}
+\caption{Definitions of the output ports for \txtl{addition} and
+    \txtl{multiplication}}
+\label{lst:conf_deps}
+
+\end{listing}
+
+Creating configurations for embedding these and for externally binding is
+trivial as shown in Listing \ref{lst:conf_trivial_embedding}. No changes to the
+existing code is required at all. These profiles can safely use the
+\joliel{"debug"} profiles created in the default configuration files of both
+\txtl{addition} and \txtl{multiplication} since those are included by default.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+profile "calculator-with-embedding" configures "calculator" {
+    outputPort Addition embeds "addition" with "debug"
+    outputPort Multiplication embeds "multiplication" with "debug"
+}
+
+profile "calculator-with-mixed" configures "calculator" {
+    outputPort Addition embeds "addition" with "debug"
+    outputPort Multiplication {
+        Location: "socket://mult.example.com:12345"
+        Protocol: sodep
+    }
+}
+\end{minted}
+
+\caption{Creating vastly different deployments no longer require changes to the
+code. They can instead be solved entirely from configuration files}
+
+\label{lst:conf_trivial_embedding}
+
+\end{listing}
+

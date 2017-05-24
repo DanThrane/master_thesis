@@ -1,0 +1,148 @@
+\section{Examples and Discussion}
+
+\subsection{The Calculator System}
+
+Continuing with the ``modulearized'' version of the calculator system from
+Section \ref{sec:module_examples}.
+
+The first step in making these usable from the package manager is of course to
+create package manifests. This action becomes fairly straight forward,
+especially since we already have a system working with the Jolie module system.
+The package manifest for the \txtl{multiplication} package is shown in Listing
+\ref{lst:multiplication_package}. The only significant multiplications here are
+perhaps a version number, and a formalization of dependencies (in this case the
+\txtl{numbers@1.0.0} package).
+
+\begin{listing}[H]
+\begin{minted}{json}
+{
+    "name": "multiplication",
+    "description": "An multiplication package",
+    "license": "MIT",
+    "authors": ["Dan Sebastian Thrane <dathr12@student.sdu.dk>"],
+    "main": "main.ol",
+    "version": "1.0.0",
+    "dependencies": [{ "name": "numbers", "version": "1.0.0" }]
+}
+\end{minted}
+\caption{Package manifest for the \txtl{multiplication} package}
+\label{lst:multiplication_package}
+\end{listing}
+
+The other package manifests will look fairly similar. The dependency graph ends
+up mimicking the system architecture exactly. However there are some subtle
+problems associated with the current approach.
+
+Currently the calculator will always download the \txtl{numbers} package,
+despite not directly depending on it. This happens due to the dependency on
+\txtl{multiplication} which itself depends on \txtl{numbers}. However the
+\txtl{calculator} service really only depends on \txtl{numbers} if
+\txtl{multiplication} is embedded. At this point this may seem like a minor
+detail, but this can get vastly more complicated if there are more dependencies
+(which themselves may have dependencies and so on).
+
+The solution to this problem, is to make sure the package manager will only
+download the files we actually need, and no more. This would mean if no
+embedding is ever performed, we will need only the dependencies required to
+perform interfacing. If embedding is required we will need both the interface
+dependencies along with a concrete implementation.
+
+For the sake of simplicity the same dependency system is used. It is
+recommended that every service separately publishes its interface and concrete
+implementation. This approach has the added benefit of allowing multiple
+implementations of same service. For closed source services a single package
+containing only the interface could be published.
+
+Depending on if an embedding is desired the concrete implementation can simply
+be listed as a dependency, the interface dependency will implicitly be picked
+up (from the concrete implementation's dependencies). If an embedding is
+\emph{never} desired a dependency can be made to just the interface package.
+
+This then begs the question of when to use a concrete implementation over a
+dependency. TODO say something.
+
+Additionally JPM might benefit from optional dependencies which are only when
+certain conditions are made, for example during some ``development build''.
+This might prove to be a decent compromise, allowing for the convenience of
+embedding without directly forcing users of the package to also depend on it.
+
+\subsection{Using Lifetime Hooks to Improve Development Workflow}
+
+In this example we will discover how the use of Jolie lifetime hooks can
+improve the development workflow. In this example we will look at a hybrid
+Jolie-Java service. The service itself will be written in Jolie, using an
+internal Java service to perform some of the computational heavy-lifting.  The
+\txtl{packages} service, which performs package manifest validation, used in
+the package manager is an example of such a package type. The primary flow and
+communication is performed entirely by Jolie, while the more ``computationally
+heavy'' parts, like parsing, are handled by the internal Java service.  This
+architecture is illustrated in Figure \ref{fig:jolie_java_service}.
+
+\begin{listing}[H]
+\begin{minted}{text}
++----------------------------------------+
+|                                        |
+| jolie-service ---------+               |
+|                        | local         |
+|                        | communication |
+|                        |               |
+|                        v               |
+|                      +----------------+|
+|                      | java-service   ||
+|                      +----------------+|
++----------------------------------------+
+\end{minted}
+\caption{A Jolie service using an internal Java service}
+\label{fig:jolie_java_service}
+\end{listing}
+
+The Java service uses Gradle as its build system. The build system is capable
+of producing a JAR file. The Jolie engine requires this file to be included in
+the classpath in order to perform the embedding. If the file is placed in the
+\txtl{lib} directory this will happen automatically.
+
+A small bash script was made to run JAR creation through Gradle, and then copy
+the artifact into the \txtl{lib} directory. Interested readers may find both
+the Gradle build script and bash script in Appendix 3. Both scripts are
+relatively simple, but should be a sufficient starting point.
+
+The file structure of the project is shown in Listing
+\ref{lst:java_jolie_file_structure}. The \txtl{build} file is the script which
+performs the entire build and copies it into the \txtl{lib} directory.
+
+\begin{listing}[H]
+\begin{minted}{text}
+.
+|-- build
+|-- java-service
+|   |-- build.gradle
+|   `-- src/main/java/dk/thrane/jolie/JavaService.java
+|-- main.ol
+`-- package.json
+\end{minted}
+\caption{}
+\label{lst:java_jolie_file_structure}
+\end{listing}
+
+Assuming a lot of changes are made to the Java service, this would mean two
+commands would almost always be required to create a new iteration of the
+build. This can be minimized by creating a \txtl{pre-start} hook as shown in
+Listing \ref{lst:pre_start_hook}. Having it as a part package manifest makes
+the intent very clear. Having some home-made build script would instead rely
+entirely on convention. Such conventions may vary from project to project,
+while having it as a part of the package manifest would remain consistent
+across all JPM packages.
+
+\begin{listing}[H]
+\begin{minted}{json}
+"events": { "pre-start": "./build" }
+\end{minted}
+\caption{A \txtl{pre-start} hook for performing compilation of the internal
+    Java-service}
+\label{lst:pre_start_hook}
+\end{listing}
+
+The JPM lifetime hooks aim to enforce the implicit workflow a project typically
+has by making it explicit.
+
+TODO Testing...
