@@ -22,31 +22,29 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {3}Jolie Modules}{18}{chapter.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.1}Summarizing the Problem}{18}{section.3.1}
+\contentsline {section}{\numberline {3.1}Modules: Design and Implementation}{18}{section.3.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.2}Modules: Design and Implementation}{18}{section.3.2}
+\contentsline {subsection}{\numberline {3.1.1}Include Algorithm for Jolie}{19}{subsection.3.1.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.1}Include Algorithm for Jolie}{19}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.1.2}Module Include Algorithm}{19}{subsection.3.1.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.2}Module Include Algorithm}{19}{subsection.3.2.2}
+\contentsline {section}{\numberline {3.2}Configuration}{19}{section.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Configuration}{19}{section.3.3}
+\contentsline {subsection}{\numberline {3.2.1}Introducing the Jolie Configuration Format}{21}{subsection.3.2.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}Introducing the Jolie Configuration Format}{21}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.2.2}Input and Output Ports}{23}{subsection.3.2.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.2}Input and Output Ports}{24}{subsection.3.3.2}
+\contentsline {subsection}{\numberline {3.2.3}Parameters}{25}{subsection.3.2.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.3}Parameters}{25}{subsection.3.3.3}
+\contentsline {subsection}{\numberline {3.2.4}Interface Rebinding}{26}{subsection.3.2.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.4}Interface Rebinding}{27}{subsection.3.3.4}
+\contentsline {subsection}{\numberline {3.2.5}Syntax of the Configuration Format (COL)}{29}{subsection.3.2.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.5}Syntax of the Configuration Format (COL)}{29}{subsection.3.3.5}
+\contentsline {section}{\numberline {3.3}Implementing the Configuration Format}{30}{section.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.4}Implementing the Configuration Format}{30}{section.3.4}
+\contentsline {subsection}{\numberline {3.3.1}The Configuration Phase}{31}{subsection.3.3.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.1}The Configuration Phase}{31}{subsection.3.4.1}
-\defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Resolving configuration files}{31}{subsection.3.4.1}
+\contentsline {paragraph}{Resolving configuration files}{31}{subsection.3.3.1}
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{Parsing of configuration files}{33}{Item.14}
 \defcounter {refsection}{0}\relax 
@@ -58,13 +56,13 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {paragraph}{Parameters}{36}{listing.28}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.2}Additions to the Semantic Verifier}{36}{subsection.3.4.2}
+\contentsline {subsection}{\numberline {3.3.2}Additions to the Semantic Verifier}{36}{subsection.3.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.3}Additions to the Interpretation Tree Builder and Late Verification}{37}{subsection.3.4.3}
+\contentsline {subsection}{\numberline {3.3.3}Additions to the Interpretation Tree Builder and Late Verification}{37}{subsection.3.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.5}Examples}{39}{section.3.5}
+\contentsline {section}{\numberline {3.4}Examples}{39}{section.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.5.1}Example A TODO Name}{39}{subsection.3.5.1}
+\contentsline {subsection}{\numberline {3.4.1}Example A TODO Name}{39}{subsection.3.4.1}
 \defcounter {refsection}{0}\relax 
 \contentsline {chapter}{\numberline {4}Jolie Packages}{45}{chapter.4}
 \defcounter {refsection}{0}\relax 

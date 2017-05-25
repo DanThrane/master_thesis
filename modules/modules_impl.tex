@@ -1,6 +1,8 @@
 \section{Modules: Design and Implementation}
 
-A module in Jolie is defined as a project root directory, and optionally an
+The module system of Jolie is made to facilitate better options for
+modularizing code. This will allow for a package manager to exist.  We define a
+module in Jolie is defined as a project root directory, and optionally an
 entry-point. Modules are uniquely identified by a name.
 
 The Jolie engine needs to know about these modules. The engine is informed
@@ -11,12 +13,10 @@ passed as an option, all interpreter instances inside the engine will know
 about each module.  As a result any embedded service will also be aware of the
 same modules.
 
-As an example, we may inform the engine about a module called ``foo'', which
-has its source code placed in \verb!/packages/foo!  with an entry-point in
-\verb!/packages/foo/main.ol! we would write: \mintinline{text}{--mod
-foo,/packages/foo,main.ol}. This implementation technique is very close to
-how, for example, you would add a JAR file to the classpath of a Java program.
-% TODO Very informal argument
+Consider a module ``foo'', with its source code placed at \txtl{/packages/foo}
+and an entry-point at \txtl{/packages/foo/main.ol}. It is possible to inform a
+Jolie interpreter about this module using
+\txtl{--modfoo,/packages/foo,main.ol}.
 
 The result of this decision is that quite a lot of additional options may need
 to be passed to the engine. However this choice was purposely chosen, it is
@@ -35,8 +35,6 @@ project root is changed to that of the package (as opposed to where the engine
 was started). Any file included from within this package should perform its
 includes relative to its own root, rather than the project root.
 
-TODO Example
-
 The new include syntax, along with native support for modules, allows for the
 code to properly organized. With this a module may be placed inside of its own
 directory, without any of the code having to be changed.
@@ -51,8 +49,7 @@ include "<file>" from "<module>"
 
 \subsection{Include Algorithm for Jolie}
 
-TODO To this date I still don't understand how the include algorithm works. Ask
-Fabrizio about this.
+TODO
 
 \subsection{Module Include Algorithm}
 

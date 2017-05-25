@@ -1,12 +1,9 @@
 \subsection{Interface Rebinding}
 \label{sec:interface_rebinding}
 
-TODO Need to be more explicit about which features are new, and which are
-existing features.
-
-In this section we will first more closely inspect the existing aggregation,
-   and courier features of Jolie. This leads to the introduction of interface
-   rebinding which is explained following that.
+In this section we will first look at the existing aggregation, and courier
+features of Jolie. This leads to the introduction of interface rebinding which
+is explained following that.
 
 Jolie provides the ``aggregation'' feature. We first introduced aggregation in
 the background material for Jolie. In short the feature is a generalisation of
@@ -39,8 +36,8 @@ outputPort Calculator {
 \end{listing}
 
 Aggregation can be extended by using couriers, which allows for the service to
-run code associated with requests that are proxied. Couriers may work either
-for an entire interface, or any particular operation. A courier may even
+run code associated with requests that are proxied. Courier choices may work
+either for an entire interface, or any particular operation. A courier may even
 decide not to forward a particular call. Listing \ref{lst:simple_courier} shows
 an extension for the calculator proxy with a courier.
 
@@ -72,14 +69,15 @@ courier Self { // The name of a courier matches its input port
 \end{listing}
 
 Additionally Jolie supports ``interface extenders''. These can, like the name
-suggests, extend the types of operations (in interfaces) with additional
-fields. These may add additional fields for every operation, or specific
-operations. These can also add faults to the type signature of an operation.
+suggests, extend the types of operations with additional fields. These may add
+additional fields for every operation, or specific operations. These can also
+add faults to the type signature of an operation. These are striped before
+forwarding the message.
 
 Like with any other output port, the service relies entirely on the interface
 listed in the output port to be correct. There is no communication with the
-target service about the correct interface. If the interface doesn't match, it
-will simply fail when attempting to invoke the operation.
+target service about the ``correct'' interface. If the interface doesn't match,
+       it will simply fail when attempting to invoke the operation.
 
 \emph{A consequence of this is that it isn't possible to create entirely generic
 proxies without knowing the interface.}
@@ -95,6 +93,10 @@ files to redefine an interface at deployment time. This way the generic service
 may write ordinary code, making no assumptions about the underlying service,
 and only at deployment time it will know which interface the target service
 has.
+
+Creating a configurable interface is done by making the body empty, as shown in
+Listing \ref{lst:ext_interfaces}.
+
 
 \begin{listing}[H]
 \begin{minted}{jolie}

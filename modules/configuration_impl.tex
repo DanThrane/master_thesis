@@ -21,9 +21,9 @@ interpretation tree has been build.
 \subsection{The Configuration Phase}
 
 The configuration phase builds upon the result of the intent and parsing phase.
-From the intent phase we receive information about modules and potentially
-receive the intent to use a certain configuration unit. From the parsing phase
-we obviously get the AST.
+From the intent phase we receive information about modules and the intent to
+use a certain configuration unit. From the parsing phase we obviously get the
+AST.
 
 The configuration phase works by modifying the AST to insert the configuration
 gathered from the configuration unit. The processed AST is handed to the later
@@ -38,13 +38,13 @@ phases, and the remainder of the pipeline works mostly like it has before.
 
 The first step of the configurator is to gather a fully processed configuration
 unit. This process starts by looking for the configuration file which was
-passed from the intent. The intent passes the configuration file using
+passed from the intent. The configuration unit is passed with:
 \\\txtl{--conf <unitName> <filePath>}.
 
 If the file path is an absolute file path, then that file will always be used.
 However if the file path is relative some searching is required. The base case
 for resolving this is to look for the configuration file relative to the
-current directory. However this approach stops working once modules starts
+current working directory. However this approach stops working once modules starts
 embedding other modules in a static fashion.
 
 Consider three modules, each providing one service, \txtl{A} and \txtl{B},
@@ -91,12 +91,11 @@ problem arises because the fixed embedding of module \txtl{C} performed in
 the engine was started, the engine would look for the configuration file in
 module \txtl{A}. To fix this, every time an embedding is performed the engine
 will implicitly add a \txtl{--parent} flag. This flag informs the new
-interpreter (of the child) who performed the embedding. If the parent flag has
+interpreter who performed the embedding. If the parent flag has
 been given, the configuration file will be found relative to that of the
 parent.
 
-Working directory, throughout this is \txtl{/a/}. In the example given above,
-the following will happen:
+Working directory, throughout this is \txtl{/a/}.  The following will happen:
 
 \begin{enumerate}
 
@@ -173,15 +172,15 @@ values if the \txtl{child} doesn't.
 \begin{minted}[linenos=true]{text}
 procedure merge(port: Port, merged: ConfigTree): Region {
     if (!merged.contains(port)) return port
-    existing = merged.getExisting(port)
+    child = merged.getExisting(port)
 
-    if (existing.isComplete) return existing
-    // The existing port cannot be an embedding, since those cannot
+    if (child.isComplete) return existing
+    // The child cannot be an embedding, since those cannot
     // be partial.
 
     for (property in Port.properties) {
-        if (existing[property] == null) {
-            existing[property] = merged[property]
+        if (child[property] == null) {
+            child[property] = merged[property]
         }
     }
     return existing
@@ -198,15 +197,15 @@ procedure merge(port: Port, merged: ConfigTree): Region {
 For parameters the same idea applies. However each parameter definition node in
 the AST potentially only provides a partial value. For example the node
 \joliel{foo.bar = 42}, where the type of \joliel{foo} is \joliel{string { .bar:
-int }}, only provides a partial definition of \joliel{foo}. For this
-reason the parameter nodes are first added from the \txtl{parent} and then by
-the \txtl{child}. This allows the definitions of the \txtl{child} to override
-those of the \txtl{parent}.
+    int }}, only provides a partial definition of \joliel{foo}. For this reason
+    the parameter assignments are first added from the \txtl{parent} and then
+    by the \txtl{child}. This allows the definitions of the \txtl{child} to
+    override those of the \txtl{parent}.
 
 \subsubsection*{Applying Configuration to the AST}
 
 The \txtl{merged} region from the previous section is then used along
-with the AST corresponding to the Jolie program being run. The last phase of
+with the AST corresponding to the Jolie program. The last phase of
 the configurator will process the entire AST and output a new AST, which is
 fully configured. This process works by running a \txtl{process} function on
 every single top-level node. The \txtl{process} function will inspect the node,
@@ -235,7 +234,7 @@ returned. Otherwise the configurator will output a new embedding node. The
 embedding node will contain a reference back to the same configuration file the
 current \txtl{Region} comes from. When the embedding is performed, the
 configurator of the embedded service will lookup the correct configuration unit
-from the same file. This will however cause an addition parsing of the same
+from the same file. This will cause an addition parsing of the same
 file, but a caching layer at the configuration parser could take care of this.
 The embedding process is demonstrated in Listing \ref{lst:embedding_output}.
 
@@ -288,12 +287,12 @@ interface Dummy = Concrete from "my-module"
 
 \end{listing}
 
-The interface will be found by parsing the module's entry point. Its AST will
-then be searched for an interface matching the replacement. Simply replacing
-the dummy with its replacement, however, isn't enough. Consider, for example,
-the scenario shown in Listing \ref{lst:interface_rebinding_types}. In this
-scenario, the processed AST will no longer be valid due to the missing types
-(\txtl{FooRequest} and \txtl{FooResponse}).
+The interface will be found by parsing the module's entry point. Its AST, if it
+exists, will then be searched for an interface matching the replacement. Simply
+replacing the dummy with its replacement, however, isn't enough. Consider, for
+example, the scenario shown in Listing \ref{lst:interface_rebinding_types}. In
+this scenario, the processed AST will no longer be valid due to the missing
+types (\txtl{FooRequest} and \txtl{FooResponse}).
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -329,14 +328,14 @@ necessary type definitions will also be added to the program.
 
 Parameters being a new concept in Jolie simply outputs new nodes for every
 single parameter assignment. This along with the definitions gathered from
-ordinary Jolie code parsing are processed in interpretation tree building
+ordinary Jolie code parsing are processed in the interpretation tree building
 phase.
 
 \subsection{Additions to the Semantic Verifier}
 
 As we have seen several syntax changes were also made to the core languages.
 These modifications to the syntax also slightly changed which programs were
-legal. As an example interfaces are now allowed to be empty at a syntactical
+legal. As an example, interfaces are now allowed to be empty at a syntactical
 level, to signal that they should be replaced by configuration. However having
 an empty interface not being replaced should still cause an error.
 
@@ -358,8 +357,6 @@ implemented by the semantic verifier.
 The semantic verifier is the last phase of the Jolie interpreter when run with
 the \txtl{--check} flag. As we will discuss in the coming section, it is not
 practical to perform type-checking of parameters at this point.
-
-TODO Shouldn't the semantic verifier ensure that parameters are constant?
 
 \subsection{Additions to the Interpretation Tree Builder and Late Verification}
 
@@ -391,8 +388,8 @@ are implemented.
 % When are types ready?
 
 In this phase the ITB will be gathering complete information about types. Type
-building is for the most part a fairly trivial one-to-one translation from the
-AST nodes into the internal type representation. The most important job of the
+building is for the most part a one-to-one translation from the
+AST nodes into the internal representation. An important job of the
 ITB with respect to type building is resolving of type references. This turns
 references to a type name into an actual reference to a concrete internal type.
 Because types aren't build until this phase is what makes type-checking during
@@ -414,8 +411,7 @@ single request gets its own fresh state. All state is copied from the
 initialization execution thread. This thread performs work requested by the ITB
 followed by the \joliel{init} procedure. Thus right after the ITB is done, and
 the initialization execution thread is started, code execution starts. This
-includes both user code in form of Jolie, but also loading of any embedded
-services.
+includes both user code and loading of any embedded services.
 
 It should be noted that any process which works with state must be run on an
 execution thread, since it depends on the state being present on the thread.

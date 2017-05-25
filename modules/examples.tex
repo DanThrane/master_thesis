@@ -6,7 +6,7 @@ aspects of the Jolie module, and configuration system. These examples will be
 revisited again in Section TODO, where they will be shown in the context of
 packages.
 
-\subsection{Example A TODO Name}
+\subsection{A Calculator System}
 
 In this example we will look at the calculator example shown in the
 introductory chapters. The calculator system will be updated to work under the
@@ -42,9 +42,6 @@ copy the directories of our dependencies, as this would place the files in the
 wrong places. We also resort to code files for distributing default
 configuration profiles. Switching between embedding a service and binding to it
 externally will also require significant changes.
-
-TODO This uses the updated example from e-mail. The introduction needs to be
-updated to use the same example.
 
 \begin{listing}[H]
 
@@ -103,24 +100,25 @@ updated to use the same example.
 
 The first step is to update all includes which require files from other
 modules, to use the new module includes. For example, \txtl{multiplication.iol}
-depend on types from the utility module \txtl{numbers} from the file
+depend on the module \txtl{numbers} in the file
 \txtl{numbers.iol}. Their includes change from the old \joliel{include
 "numbers.iol"} to the new module include \\\joliel{include "numbers.iol" from
 "numbers"}.
 
 Using module includes also provides a certain level of namespacing of file
 names. This system will allow for two files to be named the same thing, without
-causing problems. This allows us to give files better names, and allow many
-rather useless prefixes. For example the file \txtl{addition.iol} can be
-renamed to a more meaningful name such as \txtl{types.iol}. Causing includes to
-say \joliel{include "interface.iol" from "addition"}.
+causing problems, as long as they exist in separate packages. This allows us to
+give files better names, and allow many rather useless prefixes to be deleted.
+For example the file \txtl{addition.iol} can be renamed to a more meaningful
+name such as \txtl{interface.iol}. Causing includes to say \joliel{include
+    "interface.iol" from "addition"}.
 
 The next step is to convert the legacy configuration into the new configuration
 format. The contents \txtl{mult_config.iol} previously contained constants for
 configuring the input port and parameters of the service. Legacy configuration
 is shown in Listing \ref{lst:mult_config_legacy}.
 
-In order to convert port, we must first decide which ports need to be
+In order to convert ports, we must first decide which ports need to be
 configured, and which fields should be configurable. In this case we should
 only configure our input port. Since the module makes no assumptions about this
 service's input port, we can simply allow it all to be configurable.
@@ -163,7 +161,7 @@ parameters {
 \label{lst:mult_config_updated}
 \end{listing}
 
-Although we're not quite finished yet with the configuration. The original
+We're not quite finished yet with the configuration. The original
 service provided default configuration. A new directory named \txtl{conf} is
 created. Inside which we can make as many defaults as we wish. For now we can
 create a file named \txtl{default.col}. In Listing
