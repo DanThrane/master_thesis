@@ -47,14 +47,39 @@ include "<file>" from "<module>"
 \label{lst:mod_include}
 \end{listing}
 
-\subsection{Include Algorithm for Jolie}
-
-TODO
-
 \subsection{Module Include Algorithm}
 
-TODO Module includes modify the search path. This also means the injection of
-the include directory, which is used as a convention. This helps maintain
-expected behaviour.
+A module include is an extension of ordinary includes which specify which
+module to perform the inclusion from, that is \joliel{include "file" from
+"module"}.
 
-TODO In order to implement the root switching we use a stack.
+The simple case of such an include is fairly simple. We make a ``context
+switch'' our working directory into the root of the module and start searching
+for the file in that folder. This works quite well, however consider the
+following scenario. From a client we perform a package include: \joliel{include
+    "interface.iol" from "dependency"}. The source code of this file is shown
+Listing \ref{lst:dependency_include}.
+
+\begin{listing}[H]
+\begin{minted}{java}
+/* /dependency/interface.iol */
+include "types.iol"
+
+interface Dependency { /* ... */ }
+
+/* /dependency/types.iol */
+type SomeRequest: void { /* ... */ }
+\end{minted}
+
+\caption{Module includes may cause more ordinary includes. We must make sure
+    the switch in context is kept}
+
+\label{lst:dependency_include}
+\end{listing}
+
+With the current code this would cause the system to incorrectly look for
+\txtl{types.iol} in the current working directory! To fix this a stack is kept.
+This stack gains an entry when a module include is performed, this entry is
+popped off the stack once the contents of that include has finished parsing.
+The stack is then used to inject the module's root into the search path for the
+ordinary includes.
