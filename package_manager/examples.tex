@@ -33,15 +33,11 @@ dan@host:/my-package # cat package.json | json
 }
 \end{minted}
 
-We're now ready to actually implement our service. Here we'll create a simple
-service exposing an interface called \joliel{MyPackageInterface} exposing a
-single operation \joliel{hello(void)(string)} which will respond back with a
-greeting.
-
-With this service created, we can now publish the package to the public JPM
-registry. All JPM commands which interact with a registry optionally takes a
-registry name, if this is omitted it will default to the public registry.
-Before we can publish a package we must create a user on the public registry.
+We're now ready to actually implement our service. With this service created,
+    we can now publish the package to the public JPM registry. All JPM commands
+    which interact with a registry optionally takes a registry name, if this is
+    omitted it will default to the public registry.  Before we can publish a
+    package we must create a user on the public registry.
 
 \begin{minted}{text}
 dan@host:/my-package # jpm register
@@ -103,8 +99,9 @@ dan@host:/client # tree .
 2 directories, 5 files
 \end{minted}
 
-We can see that this generates a lockfile which states that ``my-package'' has
-been resolved from the public registry as version 0.1.0.
+We can see that this generates a lockfile (Section \ref{sec:lockfiles}) which
+states that ``my-package'' has been resolved from the public registry as
+version 0.1.0.
 
 \begin{minted}{text}
 dan@host:/client # cat jpm_lock.json | json
