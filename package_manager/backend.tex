@@ -6,57 +6,104 @@ are performed directly by this service, while quite a few others are
 delegated.
 
 The most important partner the back end service has is the registry service.
-The back end will communicate with one or more registry services, which are
-covered more in depth in Section TODO.
+The back end will communicate with one or more registry services.
 
 The JPM back end collaborates with a few external services, these are
-illustrated in Figure \ref{fig:jpm_arch}.
+illustrated in Table \ref{tab:collab_jpm}.
 
-\begin{enumerate}
-
-\item \textbf{registry}: Primary collaborator, responsible for storing
-packages. See Section TODO
-
-\item \textbf{execution}: Used for starting package (Section TODO), and
-executing life-time hooks (Section TODO)
-
-\item \textbf{lockfiles}: Handles the lockfiles feature (Section TODO)
-
-\item \textbf{semver}: Library package for dealing with semantic versioning
-(Section TODO)
-
-\item \textbf{cached downloader}: Acts as a cache for downloaded packages
-(Section TODO)
-
-\item \textbf{packages}: Validator for the internal package format (Section
-TODO)
-
-\item \textbf{pkg}: Responsible for creating the binary format used for
-distribution (Section \ref{sec:pkg})
-
-\end{enumerate}
+\begin{table}[H]
+\centering
 
 
-\begin{listing}[H]
-\begin{minted}{text}
-+------------+  +---------+ +------------+ +-------------+
-| execution  |  |callback | | registry   | | lockfiles   |
-+------------+  +---------+ +------------+ +-------------+
-      ^             ^           ^                ^
-      |             |           |          +-----+
-      |             |           |          |
-+--------------------------------------------+   +-----------+
-| jpm                                        |-->| semver    |
-+--------------------------------------------+   +-----------+
-      |             |           |
-      |             |           |
-      v             v           v
-+------------+ +----------+ +------------+
-| cached     | |          | |            |
-| downloader | | packages | | pkg        |
-+------------+ +----------+ +------------+
-\end{minted}
-\caption{System architecture, from the back end's point of view}
-\label{fig:jpm_arch}
-\end{listing}
+\begin{longtable}[c]{@{}lll@{}}
+\toprule
+\begin{minipage}[b]{0.17\columnwidth}\raggedright\strut
+Service Name
+\strut\end{minipage} &
+\begin{minipage}[b]{0.60\columnwidth}\raggedright\strut
+Responsibilities
+\strut\end{minipage} &
+\begin{minipage}[b]{0.14\columnwidth}\raggedright\strut
+Sections
+\strut\end{minipage}\tabularnewline
+\midrule
+\endhead
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{registry}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Responsible for storing packages
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\ref{sec:registry}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{execution}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Used for starting packages and executing life-time hooks
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+N/A
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{lockfiles}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Handles the lockfiles feature
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\ref{sec:lockfiles}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{semver}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Library package for semantic versioning
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\ref{sec:versions}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{jpm-downloader}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Acts as a cached downloader and package installer
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\ref{sec:cache}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{packages}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Validator for the package format
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\ref{sec:manifest}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{pkg}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Creates the binary format used for distribution
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\ref{sec:pkg}
+\strut\end{minipage}\tabularnewline
+\begin{minipage}[t]{0.17\columnwidth}\raggedright\strut
+\txtl{callback}
+\strut\end{minipage} &
+\begin{minipage}[t]{0.60\columnwidth}\raggedright\strut
+Callback service. JPM calls this about events
+\strut\end{minipage} &
+\begin{minipage}[t]{0.14\columnwidth}\raggedright\strut
+\ref{sec:cli}
+\strut\end{minipage}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\caption{Collaborators with the JPM backend}
+\label{tab:collab_jpm}
+\end{table}
 
