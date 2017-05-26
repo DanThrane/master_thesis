@@ -1,0 +1,45 @@
+# Stuff that needs to be written, which has not yet been written:
+
+  - Primary package manager functions (Dependency trees, starting packages,
+          general stuff)
+  - Discussion of multiple registries (at TODO)
+  - Discussion of dependencies (short)
+  - Discussion of JPM backend (maybe as part of the introduction)
+  - Integrity checks (Maybe mention code signing and make a reference, but
+    don't talk about it)
+  - Finish up authentication tokens 
+  - Finish up on testing
+  - Pull in sources
+
+  - Explain shell notation
+
+# Do at the end:
+
+  - Background: Microservices
+  - Background: Package managers
+  - Introduction and Conclusion
+  - Abstract
+
+# The Packages Chapter
+
+  - Introduction
+  - Manifest
+  - Dependencies
+  - Lockfiles
+  - Lifetime hooks
+  - .pkg Format (Is this closer to the package manager? Seems to be on the
+          boundary)
+  - Integrity checks
+
+# The Package Manager Chapter
+
+  - Introduce the CLI and what we can do
+  - Introduce registries, function, and architecture
+  - Introduce JPM backend, function, and architecture
+  - Registry database
+  - Cache
+  - Security
+  - Authentication tokens (Move into Security)
+  - Dependency trees and starting services
+  - CLI architecture
+  - Examples

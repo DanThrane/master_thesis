@@ -1,7 +1,5 @@
 \section{The JPM Back End}
 
-\subsection{Introduction and Responsibilities}
-
 The back end service is responsible for performing most of the heavy lifting,
 for the commands that are send to it from the front end. Some of the jobs
 are performed directly by this service, while quite a few others are
@@ -10,33 +8,6 @@ delegated.
 The most important partner the back end service has is the registry service.
 The back end will communicate with one or more registry services, which are
 covered more in depth in Section TODO.
-
-The responsibilities of the back end can roughly be divided into three
-categories:
-
-\begin{enumerate}
-\item \textbf{Package management (See Section TODO)}
-    \begin{itemize}
-        \item Installing packages
-        \item Publishing packages
-        \item Upgrading packages
-        \item Searching for packages
-    \end{itemize}
-\item \textbf{Account management (See Section TODO)}
-    \begin{itemize}
-        \item Login/logout with each registry
-        \item Create user
-        \item Team management
-    \end{itemize}
-\item \textbf{Helper scripts (See Section TODO)}
-    \begin{itemize}
-        \item Creating a new package
-        \item Clearing the cache
-        \item Starting a package
-    \end{itemize}
-\end{enumerate}
-
-\subsection{Architecture}
 
 The JPM back end collaborates with a few external services, these are
 illustrated in Figure \ref{fig:jpm_arch}.
