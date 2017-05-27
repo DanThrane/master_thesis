@@ -102,64 +102,66 @@
 \defcounter {refsection}{0}\relax 
 \contentsline {section}{\numberline {5.4}Registry}{58}{section.5.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.5}The JPM Cache}{59}{section.5.5}
+\contentsline {section}{\numberline {5.5}The Package Database ( \mintinline {text}{registry-db} )}{59}{section.5.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.6}Security}{59}{section.5.6}
+\contentsline {section}{\numberline {5.6}The JPM Cache}{61}{section.5.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.6.1}Authentication}{60}{subsection.5.6.1}
+\contentsline {section}{\numberline {5.7}Security}{62}{section.5.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.6.2}Authorization}{61}{subsection.5.6.2}
+\contentsline {subsection}{\numberline {5.7.1}Authentication}{62}{subsection.5.7.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.6.3}Integration with JPM}{63}{subsection.5.6.3}
+\contentsline {subsection}{\numberline {5.7.2}Authorization}{64}{subsection.5.7.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}Authentication Tokens}{63}{section.5.7}
+\contentsline {subsection}{\numberline {5.7.3}Integration with JPM}{64}{subsection.5.7.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.8}Calculating Dependency Trees}{64}{section.5.8}
+\contentsline {section}{\numberline {5.8}Authentication Tokens}{66}{section.5.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.9}Examples and Discussion}{64}{section.5.9}
+\contentsline {section}{\numberline {5.9}Calculating Dependency Trees}{67}{section.5.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.9.1}Creating, Sharing, Using, and Upgrading a JPM Package}{64}{subsection.5.9.1}
+\contentsline {section}{\numberline {5.10}Examples and Discussion}{67}{section.5.10}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.9.2}The Calculator System}{67}{subsection.5.9.2}
+\contentsline {subsection}{\numberline {5.10.1}Creating, Sharing, Using, and Upgrading a JPM Package}{67}{subsection.5.10.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.9.3}Using Lifetime Hooks to Improve Development Workflow}{69}{subsection.5.9.3}
+\contentsline {subsection}{\numberline {5.10.2}The Calculator System}{70}{subsection.5.10.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{71}{chapter.6}
+\contentsline {subsection}{\numberline {5.10.3}Using Lifetime Hooks to Improve Development Workflow}{71}{subsection.5.10.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Appendix}{72}{appendix.A}
+\contentsline {chapter}{\numberline {6}Conclusion}{74}{chapter.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}JPM Manifest Specification}{72}{section.A.1}
+\contentsline {chapter}{\numberline {A}Appendix}{75}{appendix.A}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{name}{72}{section.A.1}
+\contentsline {section}{\numberline {A.1}JPM Manifest Specification}{75}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{version}{72}{section.A.1}
+\contentsline {subsubsection}{name}{75}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{license}{73}{section.A.1}
+\contentsline {subsubsection}{version}{75}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{authors}{73}{section.A.1}
+\contentsline {subsubsection}{license}{76}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{private}{73}{section.A.1}
+\contentsline {subsubsection}{authors}{76}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{main}{74}{section.A.1}
+\contentsline {subsubsection}{private}{76}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{dependencies}{74}{section.A.1}
+\contentsline {subsubsection}{main}{77}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{dependency}{74}{section.A.1}
+\contentsline {subsubsection}{dependencies}{77}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{dependency.name}{74}{section.A.1}
+\contentsline {subsubsection}{dependency}{77}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{dependency.version}{75}{section.A.1}
+\contentsline {paragraph}{dependency.name}{77}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{dependency.registry}{75}{section.A.1}
+\contentsline {paragraph}{dependency.version}{78}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{registries}{75}{section.A.1}
+\contentsline {paragraph}{dependency.registry}{78}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{registry}{75}{section.A.1}
+\contentsline {subsubsection}{registries}{78}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{registry.name}{76}{section.A.1}
+\contentsline {subsubsection}{registry}{78}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{registry.location}{76}{section.A.1}
+\contentsline {paragraph}{registry.name}{79}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}COL Grammar}{76}{section.A.2}
+\contentsline {paragraph}{registry.location}{79}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.3}Scripts from Lifetime Hooks Example}{77}{section.A.3}
+\contentsline {section}{\numberline {A.2}COL Grammar}{79}{section.A.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.3}Scripts from Lifetime Hooks Example}{80}{section.A.3}

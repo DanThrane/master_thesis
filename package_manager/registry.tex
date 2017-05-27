@@ -1,14 +1,39 @@
-% Status: Draft
-
 \section{Registry}
 \label{sec:registry}
 
-Stuff we need to cover in this section:
+In this section we will briefly cover the responsibilities of JPM registries.
+For the most part we will cover the specific features it provides in other
+section and make references to them, when relevant.
 
-\begin{itemize}
-\item Core responsibilities, such as: publish and download
-\item Secondary responsibilities: Package information and dependencies
-\item Tertiary responsibilities: Users and groups
-\item Once responsibilities are in place we should talk about how we split up
-the work-load.
-\end{itemize}
+The primary responsibility of a JPM registry is to manage packages and serve
+them to clients who request them. When a developer publishes a packages then
+this is done to a particular package registry. When a developer downloads a
+package this is done from a registry. Almost anytime the \txtl{jpm} tool needs
+to do anything it must contact a registry for information.
+
+Many registries can exist in the JPM ecosystem. A default registry, the public
+registry\footnote{As of writing this thesis the module system and package
+    system has not yet been merged into the Jolie language. As a result, when
+    referring to the public registry, we're referring to a registry which might
+    exist in the future. The software required to run a registry is however
+    implemented, as described in this thesis. A public registry does, however,
+    not exist yet.}, is made for sharing open-source packages with the Jolie
+community. Operations in the \txtl{jpm} tool that needs to speak to a registry
+will default to this registry.
+
+Having multiple registries is beneficial for example if an organization wishes
+to share packages, but only wishes to share them internally within the
+organization. The JPM registry, and all other packages in the JPM ecosystem,
+are JPM packages. They are available from the public registry. This makes it
+relatively easy to host your own registry, since the process of this is the
+exact same as any other Jolie package.
+
+The \registry package also provides user and team management. Different rights
+may be assigned to these users, which can control who may perform certain
+actions. This is needed for controlling who's allowed to publish updates for a
+package. This also allows for a registry to be configured to only allow users
+from within an organization to use it. These features are covered by the
+\security package which is described in Section \ref{sec:security}.
+
+Keeping track of package information is delegated to the \regdb package. We
+cover this package in Section \ref{sec:regdb}.

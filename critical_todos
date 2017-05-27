@@ -41,5 +41,6 @@
   - Security
   - Authentication tokens (Move into Security)
   - Dependency trees and starting services
+  - Publishing and downloading packages?
   - CLI architecture
   - Examples
