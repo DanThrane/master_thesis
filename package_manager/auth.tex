@@ -65,6 +65,16 @@ generated string to each password. The salt itself isn't secret,
 but is instead used to avoid precomputed reverse lookup tables for
 the hashes (rainbow tables).
 
+\subsubsection*{Security Concerns}
+
+TODO This might not be the best place for this
+
+Limiting number of login attempts within a period is often recommended. This is
+done to avoid brute-force attacks. This isn't possible in Jolie, since the
+sender isn't available to Jolie user code. This is most likely due to the fact
+that no unique sender ID exists, since Jolie can accept messages from various
+types of networks.
+
 \subsubsection*{Authentication Process}
 
 We start the discussion of how the authentication process works by looking at
@@ -152,7 +162,7 @@ which can be either read from or written to.
   \label{tab:acm_example}
 \end{table}
 
-\subsection{Integration with JPM}
+\subsection{Permissions in Registries}
 
 The \registry service is the only consumer of the \security service. On top of
 this service the \registry service implements the security model JPM uses. JPM
@@ -174,10 +184,24 @@ the \txtl{packages.*/read} right then that group is allowed to download ever
 package in the \registry. This is exactly how a \registry might provide guest
 downloads.
 
-TODO Find a place for this
+\subsection{Authentication in JPM}
 
-Limiting number of login attempts within a period is often recommended. This is
-done to avoid brute-force attacks. This isn't possible in Jolie, since the
-sender isn't available to Jolie user code. This is most likely due to the fact
-that no unique sender ID exists, since Jolie can accept messages from various
-types of networks.
+When a user successfully authenticates the authorization framework will provide
+an authentication token proving the user's identity.
+
+For user convenience the JPM system does not require a valid username and
+password combination for every privileged operation. To avoid this, JPM will
+store the authentication token returned by the \registry. These are stored in a
+file on the file-system.
+
+The authentication token is saved instead of the username and password.  Since
+if an attacker were to gain access to both the username and password, she would
+be able to gain full control over the user, this includes being able to
+generate new authentication tokens.
+
+If an attacker instead were to gain only the authentication token, the damage
+is not as bad. The attacker would still be able to pose as the user, but only
+while the authentication token is valid.
+
+TODO I really don't think we have much to say on this topic. Perhaps go into
+depth with things we perhaps should have done.

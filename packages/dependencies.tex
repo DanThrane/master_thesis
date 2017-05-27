@@ -1,1 +1,112 @@
 \section{Dependencies}
+
+A JPM dependency describes a dependency on another JPM package. Since JPM
+packages are extensions of Jolie modules, what we're really describing is a
+code dependency.
+
+There is an important, but subtle, distinction between the dependencies of a
+Jolie service and the dependencies listed in a JPM package manifest. For the
+sake of clarity, we will refer to the first one as service dependencies, and
+the latter as package dependencies.
+
+Consider, the Jolie service shown in Listing \ref{lst:jolie_dep_service}.  For
+this service we can define one explicit service dependency on the
+\txtl{Example} service and one implicit service dependency on the client
+calling us, the \txtl{Self} service.
+
+However given this service, encapsulated in a package, it would have no package
+dependencies. For JPM a package dependency is a dependency on the code of
+another module. In this example, however, we have no dependency on external
+code.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+// service.ol
+interface ExampleInterface { RequestResponse: example(undefined)(undefined) }
+
+outputPort Example {
+    // ...
+    Interfaces: ExampleInterface
+}
+
+interface SelfInterface { RequestResponse: hello(undefined)(undefined) }
+
+inputPort Self {
+    // ...
+    Interface: SelfInterface
+}
+
+main {
+    [hello(request)(response) {
+        // ...
+        example@Example(exampleRequest)(exampleResponse);
+        // ...
+    }]
+}
+\end{minted}
+\caption{A simple Jolie service served defined in a single file
+    (\txtl{service.ol})}
+\label{lst:jolie_dep_service}
+\end{listing}
+
+If we change the previous example, such that the interface of \txtl{Example} is
+defined in another package named \joliel{"example"}, then we could define a
+package dependency on the \joliel{"example"} package. This is shown in Listing
+\ref{lst:jolie_dep_package}.
+
+\begin{listing}[H]
+\begin{minted}{javascript}
+/* /example/package.json */
+{
+    "name": "example",
+    "version": "1.0.0"
+    /* remaining fields omitted */
+}
+
+/* /self/package.json */
+{
+    "name": "self",
+    "dependencies": [{ "name": "example", "version": "1.0.0" }]
+    /* remaining fields omitted */
+}
+\end{minted}
+
+\begin{minted}{jolie}
+/* /example/interface.iol */
+interface ExampleInterface { RequestResponse: example(undefined)(undefined) }
+
+/* /self/main.ol */
+include "interface.iol" from "example"
+
+outputPort Example {
+    // ...
+    Interfaces: ExampleInterface
+}
+
+// input port and interface of Self omitted
+
+main {
+    [hello(request)(response) {
+        // ...
+        example@Example(exampleRequest)(exampleResponse);
+        // ...
+    }]
+}
+\end{minted}
+\caption{}
+\label{lst:jolie_dep_package}
+\end{listing}
+
+TODO Talk about how dependencies of dependencies are also added. Talk about how
+the dependency graph of a project is created
+
+A package dependency can be described by the 3-tuple $(name, version,
+registry)$, as covered the manifest will implicitly set the registry to
+\joliel{"public"} if not specified.
+
+
+The dependency tree of a JPM package is build starting at the package itself.
+The algorithm for calculating the dependency tree is shown, in pseudo-code, in
+Listing \ref{lst:dep_tree}.
+
+TODO Write code
