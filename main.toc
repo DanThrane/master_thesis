@@ -2,166 +2,176 @@
 \defcounter {refsection}{0}\relax 
 \select@language {english}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {1}Introduction}{4}{chapter.1}
+\contentsline {chapter}{\numberline {1}Introduction}{6}{chapter.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {2}Background}{5}{chapter.2}
+\contentsline {section}{\numberline {1.1}Structure of this Thesis}{7}{section.1.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.1}Microservices}{5}{section.2.1}
+\contentsline {section}{\numberline {1.2}Notation Used}{7}{section.1.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.2}Package Managers}{5}{section.2.2}
+\contentsline {section}{\numberline {1.3}Implementation Status}{9}{section.1.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.3}Introduction to Jolie}{5}{section.2.3}
+\contentsline {chapter}{\numberline {2}Background}{10}{chapter.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.4}The Jolie Engine and Interpreter}{10}{section.2.4}
+\contentsline {section}{\numberline {2.1}Microservices}{10}{section.2.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {2.5}A Complete Application with Jolie}{12}{section.2.5}
+\contentsline {section}{\numberline {2.2}Package Managers}{10}{section.2.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.5.1}Architecture}{12}{subsection.2.5.1}
+\contentsline {section}{\numberline {2.3}Introduction to Jolie}{10}{section.2.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {2.5.2}Implementing the Calculator Service}{12}{subsection.2.5.2}
+\contentsline {section}{\numberline {2.4}The Jolie Engine and Interpreter}{15}{section.2.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {3}Jolie Modules}{18}{chapter.3}
+\contentsline {section}{\numberline {2.5}A Complete Application with Jolie}{17}{section.2.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.1}Modules: Design and Implementation}{18}{section.3.1}
+\contentsline {subsection}{\numberline {2.5.1}Architecture}{17}{subsection.2.5.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.1.1}Module Include Algorithm}{19}{subsection.3.1.1}
+\contentsline {subsection}{\numberline {2.5.2}Implementing the Calculator Service}{18}{subsection.2.5.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.2}Configuration}{19}{section.3.2}
+\contentsline {chapter}{\numberline {3}Jolie Modules}{23}{chapter.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.1}Introducing the Jolie Configuration Format}{21}{subsection.3.2.1}
+\contentsline {section}{\numberline {3.1}Modules: Design and Implementation}{23}{section.3.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.2}Input and Output Ports}{24}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.1.1}Module Include Algorithm}{24}{subsection.3.1.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.3}Parameters}{25}{subsection.3.2.3}
+\contentsline {section}{\numberline {3.2}Configuration}{24}{section.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.4}Interface Rebinding}{26}{subsection.3.2.4}
+\contentsline {subsection}{\numberline {3.2.1}Introducing the Jolie Configuration Format}{26}{subsection.3.2.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.2.5}Syntax of the Configuration Format (COL)}{28}{subsection.3.2.5}
+\contentsline {subsection}{\numberline {3.2.2}Input and Output Ports}{29}{subsection.3.2.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.3}Implementing the Configuration Format}{30}{section.3.3}
+\contentsline {subsection}{\numberline {3.2.3}Parameters}{30}{subsection.3.2.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.1}The Configuration Phase}{30}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.2.4}Interface Rebinding}{31}{subsection.3.2.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Resolving configuration files}{31}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.2.5}Syntax of the Configuration Format (COL)}{33}{subsection.3.2.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Parsing of configuration files}{32}{Item.14}
+\contentsline {section}{\numberline {3.3}Implementing the Configuration Format}{35}{section.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Merging configuration files}{33}{Item.14}
+\contentsline {subsection}{\numberline {3.3.1}The Configuration Phase}{35}{subsection.3.3.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Ports}{34}{listing.26}
+\contentsline {paragraph}{Resolving configuration files}{36}{subsection.3.3.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Interface Rebinding}{35}{listing.27}
+\contentsline {paragraph}{Parsing of configuration files}{37}{Item.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{Parameters}{36}{listing.29}
+\contentsline {paragraph}{Merging configuration files}{38}{Item.21}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.2}Additions to the Semantic Verifier}{36}{subsection.3.3.2}
+\contentsline {paragraph}{Ports}{39}{listing.caption.36}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.3.3}Additions to the Interpretation Tree Builder and Late Verification}{36}{subsection.3.3.3}
+\contentsline {paragraph}{Interface Rebinding}{40}{listing.caption.37}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {3.4}Examples}{38}{section.3.4}
+\contentsline {paragraph}{Parameters}{41}{listing.caption.39}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {3.4.1}A Calculator System}{38}{subsection.3.4.1}
+\contentsline {subsection}{\numberline {3.3.2}Additions to the Semantic Verifier}{41}{subsection.3.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {4}Jolie Packages}{44}{chapter.4}
+\contentsline {subsection}{\numberline {3.3.3}Additions to the Interpretation Tree Builder and Late Verification}{41}{subsection.3.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.1}Introduction}{44}{section.4.1}
+\contentsline {section}{\numberline {3.4}Examples}{43}{section.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.2}Architecture}{45}{section.4.2}
+\contentsline {subsection}{\numberline {3.4.1}A Calculator System}{43}{subsection.3.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.3}Package Manifest}{45}{section.4.3}
+\contentsline {chapter}{\numberline {4}Jolie Packages}{49}{chapter.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.1}The {\tt name} Attribute}{45}{subsection.4.3.1}
+\contentsline {section}{\numberline {4.1}Introduction}{49}{section.4.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.2}The Meta Data Attributes ({\tt license, authors, description})}{46}{subsection.4.3.2}
+\contentsline {section}{\numberline {4.2}Architecture}{50}{section.4.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.3}The {\tt version} Attribute}{47}{subsection.4.3.3}
+\contentsline {section}{\numberline {4.3}Package Manifest}{50}{section.4.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.4}The Lifetime Attributes ({\tt events}, {\tt main})}{48}{subsection.4.3.4}
+\contentsline {subsection}{\numberline {4.3.1}The {\tt name} Attribute}{51}{subsection.4.3.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {4.3.5}The {\tt registries} Attribute}{48}{subsection.4.3.5}
+\contentsline {subsection}{\numberline {4.3.2}The Meta Data Attributes ({\tt license, authors, description})}{51}{subsection.4.3.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.4}Dependencies}{49}{section.4.4}
+\contentsline {subsection}{\numberline {4.3.3}The {\tt version} Attribute}{52}{subsection.4.3.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.5}Lock Files}{51}{section.4.5}
+\contentsline {subsection}{\numberline {4.3.4}The Lifetime Attributes ({\tt events}, {\tt main})}{53}{subsection.4.3.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.6}Lifetime Hooks}{54}{section.4.6}
+\contentsline {subsection}{\numberline {4.3.5}The {\tt registries} Attribute}{54}{subsection.4.3.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.7}The {\tt .pkg} Format}{55}{section.4.7}
+\contentsline {section}{\numberline {4.4}Dependencies}{54}{section.4.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {4.8}Integrity Checks}{55}{section.4.8}
+\contentsline {section}{\numberline {4.5}Lock Files}{59}{section.4.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {5}Package Manager}{56}{chapter.5}
+\contentsline {section}{\numberline {4.6}Lifetime Hooks}{61}{section.4.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.1}Introduction}{56}{section.5.1}
+\contentsline {section}{\numberline {4.7}The {\tt .pkg} Format}{62}{section.4.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.2}The Command Line Interface}{57}{section.5.2}
+\contentsline {chapter}{\numberline {5}Package Manager}{63}{chapter.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.2.1}Internal Organization and Deployment}{58}{subsection.5.2.1}
+\contentsline {section}{\numberline {5.1}Introduction}{63}{section.5.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.3}The JPM Back End}{60}{section.5.3}
+\contentsline {section}{\numberline {5.2}The Command Line Interface}{63}{section.5.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.4}Registry}{60}{section.5.4}
+\contentsline {subsection}{\numberline {5.2.1}Internal Organization and Deployment}{65}{subsection.5.2.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.5}The Package Database ( \mintinline {text}{registry-db} )}{61}{section.5.5}
+\contentsline {section}{\numberline {5.3}The JPM Back End}{67}{section.5.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.6}The JPM Cache}{63}{section.5.6}
+\contentsline {section}{\numberline {5.4}Registry}{67}{section.5.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.7}Security}{64}{section.5.7}
+\contentsline {section}{\numberline {5.5}The Package Database ( \mintinline {text}{registry-db} )}{68}{section.5.5}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.7.1}Authentication}{64}{subsection.5.7.1}
+\contentsline {section}{\numberline {5.6}The JPM Cache}{70}{section.5.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.7.2}Authorization}{66}{subsection.5.7.2}
+\contentsline {section}{\numberline {5.7}Security}{71}{section.5.7}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.7.3}Permissions in Registries}{68}{subsection.5.7.3}
+\contentsline {subsection}{\numberline {5.7.1}Authentication}{71}{subsection.5.7.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.7.4}Authentication in JPM}{68}{subsection.5.7.4}
+\contentsline {subsection}{\numberline {5.7.2}Authorization}{73}{subsection.5.7.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.8}Putting it all Together: Installing Dependencies}{68}{section.5.8}
+\contentsline {subsection}{\numberline {5.7.3}Permissions in Registries}{75}{subsection.5.7.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {5.9}Examples and Discussion}{69}{section.5.9}
+\contentsline {subsection}{\numberline {5.7.4}Authentication in JPM}{75}{subsection.5.7.4}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.9.1}Creating, Sharing, Using, and Upgrading a JPM Package}{69}{subsection.5.9.1}
+\contentsline {section}{\numberline {5.8}Putting it all Together: Starting Packages}{75}{section.5.8}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.9.2}The Calculator System}{72}{subsection.5.9.2}
+\contentsline {subsection}{\numberline {5.8.1}The \mintinline {text}{jpm} Binary}{76}{subsection.5.8.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsection}{\numberline {5.9.3}Using Lifetime Hooks to Improve Development Workflow}{73}{subsection.5.9.3}
+\contentsline {subsection}{\numberline {5.8.2}The JPM Front-End (\mintinline {text}{jpm-cli})}{76}{subsection.5.8.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {6}Conclusion}{76}{chapter.6}
+\contentsline {subsection}{\numberline {5.8.3}The JPM Back-End (\mintinline {text}{jpm})}{76}{subsection.5.8.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {chapter}{\numberline {A}Appendix}{77}{appendix.A}
+\contentsline {section}{\numberline {5.9}Examples and Discussion}{76}{section.5.9}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.1}JPM Manifest Specification}{77}{section.A.1}
+\contentsline {subsection}{\numberline {5.9.1}Creating, Sharing, Using, and Upgrading a JPM Package}{76}{subsection.5.9.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{name}{77}{section.A.1}
+\contentsline {subsection}{\numberline {5.9.2}The Calculator System}{79}{subsection.5.9.2}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{version}{77}{section.A.1}
+\contentsline {subsection}{\numberline {5.9.3}Using Lifetime Hooks to Improve Development Workflow}{80}{subsection.5.9.3}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{license}{78}{section.A.1}
+\contentsline {chapter}{\numberline {6}Conclusion}{83}{chapter.6}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{authors}{78}{section.A.1}
+\contentsline {chapter}{\numberline {A}Appendix}{84}{appendix.A}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{private}{78}{section.A.1}
+\contentsline {section}{\numberline {A.1}JPM Manifest Specification}{84}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{main}{79}{section.A.1}
+\contentsline {subsubsection}{name}{84}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{dependencies}{79}{section.A.1}
+\contentsline {subsubsection}{version}{84}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{dependency}{79}{section.A.1}
+\contentsline {subsubsection}{license}{85}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{dependency.name}{79}{section.A.1}
+\contentsline {subsubsection}{authors}{85}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{dependency.version}{80}{section.A.1}
+\contentsline {subsubsection}{private}{85}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{dependency.registry}{80}{section.A.1}
+\contentsline {subsubsection}{main}{86}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{registries}{80}{section.A.1}
+\contentsline {subsubsection}{dependencies}{86}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {subsubsection}{registry}{80}{section.A.1}
+\contentsline {subsubsection}{dependency}{86}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{registry.name}{81}{section.A.1}
+\contentsline {paragraph}{dependency.name}{86}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {paragraph}{registry.location}{81}{section.A.1}
+\contentsline {paragraph}{dependency.version}{87}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.2}COL Grammar}{81}{section.A.2}
+\contentsline {paragraph}{dependency.registry}{87}{section.A.1}
 \defcounter {refsection}{0}\relax 
-\contentsline {section}{\numberline {A.3}Scripts from Lifetime Hooks Example}{82}{section.A.3}
+\contentsline {subsubsection}{registries}{87}{section.A.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {subsubsection}{registry}{87}{section.A.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{registry.name}{88}{section.A.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {paragraph}{registry.location}{88}{section.A.1}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.2}COL Grammar}{88}{section.A.2}
+\defcounter {refsection}{0}\relax 
+\contentsline {section}{\numberline {A.3}Scripts from Lifetime Hooks Example}{89}{section.A.3}

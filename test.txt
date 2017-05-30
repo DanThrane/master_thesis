@@ -1,0 +1,114 @@
+TODO Something which gets us onto the package track.
+
+Packages comes in many different forms, and what they are mostly depends
+on the system that they serve. For example, binary package managers may
+ship applications which are then installed into the user’s system. An
+example of such as package manager could be the iOS App Store. In
+general, a package manager primarily makes several things easier:
+
+1.  Publishing of packages
+
+2.  Find packages to install
+
+3.  Automatically install dependencies
+
+4.  Handle available updates
+
+These same principles have also been applied to the application level.
+Application-level packages are usually software components, which are
+intended to be run locally as a part of your application. Package
+managers also typically attempt to establish some sort of
+language/framework convention for developing packages. This is done such
+that packages may be imported into a software project in a consistent
+manner.
+
+The goal of this thesis is to develop a package manager for the
+Jolie[@montesi2010jolie; @JOLA] ecosystem. Jolie is a service-oriented
+programming language. As such, we aim not only at covering the local
+packages (i.e., services running locally), but also external services.
+From the perspective of a local Jolie service, an external service is
+any service, which run on an external virtual machine.
+
+Before being able to achieve the goal of creating a package manager, a
+few hurdles must first be overcome. In this thesis we will present a new
+natively supported module and configuration system for Jolie.
+
+Structure of this Thesis
+========================
+
+Notation Used
+=============
+
+Service Diagrams {#service-diagrams .unnumbered}
+----------------
+
+Discuss figures here.
+
+File Listings {#file-listings .unnumbered}
+-------------
+
+When code snippets are presented, where the file-name and location is
+relevant, then the file name and file-path will be shown in a comment
+before the file contents. We will commonly show multiple files in a
+single listing. As an example, if we have the directory structure shown
+in Listing \[lst:file\_structure\_example\].
+
+\[H\]
+
+``` {.text}
+/
+|-- a
+|   `-- 1
+|-- b
+|   `-- 2
+`-- c
+    `-- 3
+
+3 directories, 3 files
+```
+
+And the file contents of file is “A”, contains “B”, and contains “C”,
+then we would show the contents of these files as in Listing
+\[lst:multiple\_files\_example\].
+
+\[H\]
+
+``` {.text}
+/* /a/1 */
+A
+
+/* /b/2 */
+B
+
+/* /c/3 */
+C
+```
+
+Command Line Illustrations {#command-line-illustrations .unnumbered}
+--------------------------
+
+In certain cases examples are made by showing the output of a command
+line session. The reader is expected to be familiar with a basic
+Unix-like shell. When the working directory is relevant, then it will be
+shown as part of the prompt. An example of this is shown in Listing
+\[lst:shell\_example\]. In this example two commands are invoked ( and .
+The symbols marks the beginning of the command. Lines not containing
+this symbol should be considered output from the previous command.
+Before that the absolute path to the current working directory is shown,
+in these cases they were both .
+
+\[H\]
+
+``` {.text}
+dan@host:/this/is/the/path # ls
+hello-world.ol
+
+dan@host:/this/is/the/path # cat hello-world.ol
+include "console.iol"
+main {
+    println@Console("Hello, World!")()
+}
+```
+
+Implementation Status
+=====================

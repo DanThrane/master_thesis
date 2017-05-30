@@ -31,7 +31,7 @@ The authentication system has a user based system. Users authenticate
 themselves using a password. A group is a collection of users, which have an
 associated set of permission. A single user may be part of many groups, it is
 from groups that a user gains permission to use parts of the system. We cover
-user permissions in Section \ref{sec:authorization}.
+group permissions in Section \ref{sec:authorization}.
 
 The authentication system is build following recommendations from
 OWASP\autocite{OWASP1,OWASP2,OWASP3}. In this section the
@@ -66,8 +66,6 @@ but is instead used to avoid precomputed reverse lookup tables for
 the hashes (rainbow tables).
 
 \subsubsection*{Security Concerns}
-
-TODO This might not be the best place for this
 
 Limiting number of login attempts within a period is often recommended. This is
 done to avoid brute-force attacks. This isn't possible in Jolie, since the
@@ -120,10 +118,7 @@ correct.
 \subsection{Authorization}
 \label{sec:authorization}
 
-% TODO More sources?
-% https://en.wikipedia.org/wiki/Access_Control_Matrix#cite_ref-1
-
-The authorization system based on an ``Access Control
+The authorization system is based on an ``Access Control
 Matrix''\cite{sandhu1994access} to define its security model. An access control
 matrix, is a matrix $A$, where $A_{ij}$ contains the \emph{rights} that
 \emph{role} $i$ has for \emph{resource} $j$.
@@ -137,7 +132,7 @@ with it. This could, for example, be a file, which might have associated rights
 such as ``read'' and ``write''.
 
 A \emph{role} is some entity which have a set of rights for resources. In the
-implementation roles have been replaced with \emph{groups}. A group is a
+implementation roles are represented by \emph{groups}. A group is a
 collection of users, which are provided by the authentication system.
 
 Table \ref{tab:acm_example} shows an access control matrix for a few files,
@@ -186,8 +181,8 @@ downloads.
 
 \subsection{Authentication in JPM}
 
-When a user successfully authenticates the authorization framework will provide
-an authentication token proving the user's identity.
+When a user successfully authenticates, the authorization framework will
+provide an authentication token proving the user's identity.
 
 For user convenience the JPM system does not require a valid username and
 password combination for every privileged operation. To avoid this, JPM will
@@ -202,6 +197,3 @@ generate new authentication tokens.
 If an attacker instead were to gain only the authentication token, the damage
 is not as bad. The attacker would still be able to pose as the user, but only
 while the authentication token is valid.
-
-TODO I really don't think we have much to say on this topic. Perhaps go into
-depth with things we perhaps should have done.

@@ -1,12 +1,16 @@
 \section{A Complete Application with Jolie}
 \label{sec:complete}
 
-In this section we will describe a complete application written in Jolie. The
-application will contain several services, and will be written using best
+In this section, we will describe a complete application written in Jolie. The
+application will contain several services and will be written using best
 practices from before the module and package system.
 
-Along the way several patterns used for re-using code will be highlighted. This
-will serve as the core motivation for our solution.
+Along the way, several patterns used for re-using code will be highlighted.
+This will serve as the core motivation for our solution. The observations made
+in this section are drawn from the Jolie Documentation\autocite{JOLB}, the
+Leonardo\footnote{A web server written in Jolie by the Jolie team. Used to
+    power the official Jolie website} web server\autocite{LEO}, and the
+    source-code for the Jolie website\autocite{LEOB}.
 
 \subsection{Architecture}
 
@@ -17,51 +21,43 @@ will serve as the core motivation for our solution.
 %   - Project structure, and why this is a problem
 %   - Parameter configuration
 
-The application we will be building is a very simple calculator system. The
-architecture of our application is shown in Figure \ref{fig:complete_arch} we
-see an illustration of the system's architecture.
+The application we'll be building is a very simple calculator system. The
+architecture of our application is shown in Figure \ref{fig:complete_arch}.
 
 The calculator service will provide various operations for applying an operator
-on a sequence of numbers. In order to perform this, highly complex, action of
-applying these operators, the calculator will contact other microservices.
+on a sequence of numbers. In order to perform this, the action of applying
+these operators, the calculator will contact other microservices. This example
+is obviously contrived. Writing services for such simplistic services in the
+real world would be considered an anti-pattern. However, this example allows us
+to see services interact with each other without thinking that much about the
+business logic of the services, which in this case is fairly irrelevant.
 
-The dashed region (TODO) displays services that should be running in the same
-Jolie engine. This is accomplished via embedding, which was introduced in a
-previous section.
-
-\begin{listing}[H]
-\begin{minted}{text}
-+---------------+     +---------------+     +---------------------+
-| web-calc      | --> | calculator    | --> | multiplication      |
-+---------------+     +---------------+     +---------------------+
-                              |
-                              |
-                              v
-                      +---------------+
-                      | addition      |
-                      +---------------+
-\end{minted}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{background/calc_system.eps}
 \caption{The Architecture of a Simple Microservice System}
 \label{fig:complete_arch}
-\end{listing}
+\end{figure}
 
 \subsection{Implementing the Calculator Service}
 
-We will keep our focus on the \emph{calculator} service, and its interacting
+We will keep our focus on the \txtl{calculator} service, and its interactions
 with other services. Putting together the stuff learned from the previous
-sections, we can quickly setup an input port for the service, which has the
-appropriate interface. It is considered best practice to place the public
-interfaces that a service exposes in its own separate file. Files intended for
-other services to include typically have the file extension \verb!.iol! as
-opposed to \verb!.ol!. There is no technical difference between the two, but it
-allows for the developer to more easily express intent. Files that are included
-can be placed in the \verb!include! directory, this directory is always
-implicitly added to the search path.
+sections, we can quickly create an input port for the service with the
+appropriate interface.
 
-Thus in order to implement our calculator service we create two files, one for
-the service implementation (\verb!calculator.ol!), and another which can be
-used by other services (\verb!calculator.iol!). The implementation and
-interfaces are shown in Listing \ref{lst:simple_start}.
+It is considered best practice to place the public interfaces that a service
+exposes in its own separate file. Files intended for other services to include
+typically have the file extension \txtl{.iol} as opposed to \txtl{.ol}. There
+is no technical difference between the two, but it allows for the developer to
+more easily express intent. Files that are included can be placed in the
+\txtl{include} directory. This directory is always implicitly added to the
+search path.
+
+Thus in order to implement our calculator service we create two files. One file
+for the service implementation (\verb!calculator.ol!), and another which can be
+used by other services (\verb!calculator.iol!). These files are shown in
+Listing \ref{lst:simple_start}.
 
 \begin{listing}[H]
 \begin{multicols}{2}
@@ -102,64 +98,80 @@ interface ICalculator {
 }
 \end{minted}
 \end{multicols}
-\caption{TODO Caption}
+\caption{Interface and implementation of the \txtl{calculator} service}
 \label{lst:simple_start}
 \end{listing}
 
 \begin{observation}
-    The interfaces and types of a service are typically separated into their
-    own files. This files typically has the extension \verb!.iol! to indicate
-    that it does not contain a service implementation, but is rather intended
-    for inclusion by a service which requires it.
 
-    This file is typically put in the \verb!include! directory. This directory
-    is always added to the search path natively by the Jolie engine.
+The interfaces and types of a service are typically separated into their own
+files. These files typically have the extension \verb!.iol! to indicate that it
+does not contain a service implementation, but is rather intended for inclusion
+by a service which requires it.
+
+These files are typically put in the \verb!include! directory. This
+directory is always added to the search path natively by the Jolie engine.
+
 \end{observation}
 
-The operations that the calculator exposes, needs to collaborate with the other
-services. In order for us to speak to them they need output ports.
+The operations which the calculator exposes needs to collaborate with the other
+services. In order for us to speak to them, they need output ports.  The output
+ports need interfaces, just like the calculator service these should be exposed
+from a dedicated file.
 
-First of all the output ports needs interfaces. Like we did with the calculator
-service, the other services have exposed their interfaces in a special file
-intended for inclusion. As a result we will have to copy the
-\mintinline{text}{.iol} files of these services into our own.
+Secondly, these output port needs to be reached. The port can either be
+embedded or we can provide external bindings to it. For output ports, we may
+change this binding dynamically at runtime. This is unlike input ports which
+must be ready at deployment time.
 
-Secondly these output port needs to be reached. We can either embed the
-services, making it run inside of the same Jolie engine as our calculator
-service, or we can provide external bindings to it. For output ports we may
-change this binding dynamically at runtime. Note that this is unlike input
-ports which must be ready at deployment time.
+Binding an output port to an external service, is done by setting the
+\joliel{Location} and \joliel{Protocol} properties. For example, to make
+\joliel{Multiplication} bind to an external service we could define it as shown
+in Listing \ref{lst:mult_ext_port}.
 
-Binding an output port to an external service is relatively easy. For example
-to let the \verb!multiplication! port bind to a service using https, we might
-write \mintinline{jolie}{Location: "socket://mult.example.com:443"} and
-\mintinline{jolie}{Protocol: https}. The input port at the multiplication processor
-would also have to match this, to ensure it runs on the correct port and speaks
-the correct protocol.
+\begin{listing}[H]
+\begin{minted}{jolie}
+outputPort Multiplication {
+    Location: "socket://mult.example.com:443"
+    Protocol: https
+}
+\end{minted}
+\caption{The \joliel{Multiplication} port is bound to an external service}
+\label{lst:mult_ext_port}
+\end{listing}
 
-It is a similar to bind an output port to an embedded service. However this is
-done by setting the \mintinline{jolie}{Location} or \mintinline{jolie}{Protocol}
-attributes. We must instead instruct the engine to embed the service, which
-most importantly requires us to point to some executable service. The Jolie
-engine supports several language for these embedded services, including Jolie,
-Java, and JavaScript. For our desired deployment, we wanted to embed the
-addition service inside of the calculator service. Assuming that the addition
-service is written as a Jolie service, and its service is implemented in
-\mintinline{text}{addition.ol}, then we may create an embedding as shown in
-Listing \ref{lst:simple_embedding}. Just like in the case of the external
-services, the input port of the receiving service \emph{must match}. In the
-case of embedded service there must be an input port listening on the
-\mintinline{jolie}{"local"} location.
+It is possible to define embeddings of services in the \joliel{embedded} block.
+For our desired deployment, we wanted to embed the addition service inside of
+the calculator service. Assuming that the addition service is written as a
+Jolie service, and its service is implemented in \txtl{addition.ol}, then we
+may create an embedding as shown in Listing \ref{lst:simple_embedding}. Just
+like in the case of the external services, the input port of the receiving
+service \emph{must match}. In the case of embedded service, there must be an
+input port listening on the \joliel{"local"} location.
+
+\begin{listing}[H]
+\begin{minted}{jolie}
+embedded {
+    Jolie:
+        "addition.ol" in Addition
+}
+\end{minted}
+
+\caption{Embedding the \mintinline{jolie}{addition} service in the
+    \mintinline{jolie}{Addition} output port}
+
+\label{lst:simple_embedding}
+
+\end{listing}
 
 Quite often the location of an input port is considered a deployment problem.
-We see this quite clearly in the case of embedding a service. All current
-solutions in Jolie, require us to \emph{modify the source code of a service},
-simply to change where the service should listen. Best practices in Jolie
-attempt to make this less of a problem by including a configuration file which
-contains constants. The addition service, might include a file called
-\verb!addition.iol! with constants setting up the location and protocol
-of the service. An example of this is shown in Listing
-\ref{lst:include_as_conf}.
+We see this quite clearly in the case of embedding a service. All solutions to
+change the deployment of a service in Jolie, all require us to \emph{modify the
+    source code of a service}.  Best practices in Jolie attempt to make this
+    less of a problem by including a configuration file which contains
+    constants. The \txtl{addition} service, might include a file called
+    \verb!addition.iol! which sets up the location and protocol of the service.
+    An example of this is shown in Listing \ref{lst:include_as_conf}.
 
 \begin{listing}[H]
 \begin{multicols}{2}
@@ -194,52 +206,40 @@ constants {
 \end{listing}
 
 \begin{observation}
-    Most configuration of Jolie services are done via constants. Jolie
-    constants, different from most other languages, can be simple literal
-    types, or they may even contain identifiers. This makes them rather
-    versatile in what they may configure.
 
-    The constants are placed in a separate source file, which is included by
-    the service requiring the configuration.
+Most configuration of Jolie services is done via constants. Jolie constants,
+different from most other languages, can be simple literal types, or they
+may even contain identifiers. This makes them rather versatile in what
+they can configure.
+
+The constants are typically placed in a separate source file, which is
+included by the service requiring the configuration.
+
 \end{observation}
 
-\begin{listing}[H]
-\begin{minted}{jolie}
-embedded {
-    Jolie:
-        "addition.ol" in Addition
-}
-\end{minted}
-
-\caption{Embedding the \mintinline{jolie}{addition} service in the
-    \mintinline{jolie}{Addition} output port}
-
-\label{lst:simple_embedding}
-
-\end{listing}
-
-With the code from Listing \ref{lst:simple_start} where the output port
-\mintinline{jolie}{Console} is defined. The output port points to an embedding
-of the console service, and is included directly in the \verb!console.iol!
-file. This is a fairly common pattern used in Jolie, especially for services
-that work in a library-like fashion (i.e. not intended as a stand-alone
-service). This pattern is used for almost every single service in the Jolie
-standard library.
+In Listing \ref{lst:simple_start} the output port \txtl{Console} is used. This
+output port isn't visibly defined in the source code we see, it is instead
+defined in the included file \txtl{console.iol}. This is common practice in
+Jolie. This is especially used for services that work in a library-like
+fashion, that is not intended as a stand-alone service. This pattern is used
+for almost all services in the Jolie standard library\autocite{JOLB}.
 
 \begin{observation}
-    Services intended to be used as libraries are often contained in a single
-    \verb!.iol! file. This file contain everything required to set it up,
-    included interfaces, types and an embedded output port.
 
-    This makes it very easy to use the service, however it also makes it
-    impossible to bind to this service externally, without first getting an
-    embedding. This isn't possible since we cannot include the interfaces and
-    types by themselves.
+Services intended to be used as libraries are often contained in a single
+\verb!.iol! file. This file contains everything required to set it up, included
+interfaces, types and an embedded output port.
+
+This makes it very easy to use the service, however, it also makes it
+impossible to bind to this service externally, without first getting an
+embedding. This isn't possible since we cannot include the interfaces and
+types by themselves.
+
 \end{observation}
 
 With the output ports correctly configured, we may now implement the actual
-business logic for our calculator. For completeness sake this might look like
-shown in Listing \ref{lst:op_impl}.
+business logic for our calculator. This might look like shown in Listing
+\ref{lst:op_impl}.
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -259,12 +259,12 @@ shown in Listing \ref{lst:op_impl}.
 \label{lst:op_impl}
 \end{listing}
 
-Finally we want to reflect slightly on the file structure that this service
-ended up having. In order to use external services, we had to include files
-which contain these interfaces. This version is worse when an embedding is
-desired, since the entire service with its implementation is suddenly required.
+Finally, we want to reflect slightly on the file structure that this service
+has. In order to use external services, we had to include files which contain
+these interfaces. This version is worse when an embedding is desired, since the
+entire service with its implementation is suddenly required.
 
-The files from these external service are also hard to manage. It isn't
+The files from these external services are also hard to manage. It isn't
 possible to simply move the source code of a service into its own directory.
 This is not possible since includes, unlike in most other languages, are not
 relative to the file performing the include, but rather relative to the project
@@ -272,7 +272,7 @@ level root. Thus if we wish to move the service to a new directory, all
 includes in the source code would have to be updated. A common result of this
 is that every single file gets dumped into the project level root. When all
 files are stored in the same directory, we also get a much larger chance of
-having name conflicts. As a result names tend to become rather large, to make
+having name conflicts. As a result, names tend to become rather large, to make
 it less likely that a conflict occurs.
 
 The final file structure of the calculator service is shown in Listing
@@ -281,12 +281,12 @@ The final file structure of the calculator service is shown in Listing
 \begin{listing}[H]
 \begin{minted}{text}
 .
-+-- include
-|   +-- calculator.iol
 |-- addition.iol
 |-- addition.ol
-|-- multiplication.iol
-+-- calculator.ol
+|-- calculator.ol
+|-- include
+|   `-- calculator.iol
+`-- multiplication.iol
 \end{minted}
 \caption{File structure of the calculator service}
 \label{lst:file_structure}
@@ -295,8 +295,8 @@ The final file structure of the calculator service is shown in Listing
 \begin{observation}
 
     In order to collaborate with other services, it is often needed to manually
-    copy files into the service. The files required depend on if an embedding
-    is required, when an embedding is required we will need the entire service
+    copy files into the service. Which files are required depend on the
+    deployment. When an embedding is required, we will need the entire service
     (and any services it may depend on itself). If we just need to interface
     with it, we can simply include the files required for its interface files.
 

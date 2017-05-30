@@ -1,78 +1,68 @@
 \section{Configuration}
 \label{sec:col}
 
-% TODO Define configuration and which constructs we want to be configurable
-
 From Observation 2 we saw that most configuration was done via the inclusion of
 source code. This source code would expose constants (read: literal values
 \emph{and} identifiers). The included source code, however, can do anything
-that Jolie source normally can, and isn't limited to just the desired
+that Jolie source normally can, and is not limited to just the desired
 configuration. As a result, a service developer cannot be certain that the
 configurator (entity providing configuration) doesn't start messing with
 other details of the program. Deploying defensive
 programming\footnote{Defensive programming techniques are usually employed for
 systems that require high availability, or where safety and security is
-required.} techniques against this becomes significantly more problematic,
-since no guarantees about the configuration source file can really be made.
+required\autocite{Jon05}.} techniques against this becomes significantly more
+problematic, since no guarantees about the configuration source file can
+be made.
 
 Distributing re-useable packages is problematic with this approach. Common
-features of package managers require packages to be read-only. For example,
-updating of packages require this, without it source-code merges would
-be required.
+features of package managers expect the source code of packages to be
+read-only, for example, when updating packages. Without this property,
+    source-code merges would be required.
 
 This gives us plenty of reason to explore the need for a native configuration
 format.  Most other systems would most likely go for a system defined in user
-code, as opposed to natively. An example of such framework, could be Vert.x, it
-is a tool-kit for building reactive applications on the JVM.  Examples of such
-``reactive applications'' are microservices. The configuration workflow is
-shown in Figure \ref{fig:normal_conf}. The system will retrieve, and read
-external configuration files, directed by the user code, and apply the
-configuration as needed.
+code, as opposed to natively. An example of such framework, is Vert.x, a
+tool-kit for building reactive applications on the JVM.  Examples of such
+``reactive applications'' are microservices. The configuration workflow of
+Vert.x\autocite{VERTA} is shown in Figure \ref{fig:normal_conf}. The system
+will retrieve, and read external configuration files, directed by the user
+code, and apply the configuration as needed.
 
 % Most other systems can do this at run time
 % For example Vert.x does this by reading external configuration files
 % Once configuration is done, we can start up the server
 
-\begin{listing}[H]
-\begin{minted}{text}
-+------------------+     +-------------------+     +--------------------+
-| executable start | --> | retrieve conf     | --> | read conf files    |
-+------------------+     +-------------------+     +--------------------+
-                                                             |
-                            +-----+                          |
-                            |     | reconfigure              |
-                            |     v                          v
-                         +-------------------+     +--------------------+
-                         | server running    | <-- | perform conf       |
-                         +-------------------+     +--------------------+
-\end{minted}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{modules/normal_conf.eps}
 \caption{Simplified workflow for configuration of Vert.x applications}
 \label{fig:normal_conf}
-\end{listing}
+\end{figure}
 
 % http://vertx.io/blog/vert-x-application-configuration/
 % http://vertx.io/docs/vertx-config/kotlin/
 
-%TODO Defined deployment time somewhere
-
-However implementing such as a system in Jolie has its problems, most of these
-come from the difference between general-purpose programming languages and
-specialized programming languages.
-
+However, it is not straight forward to implement such a system in Jolie.
 In general-purpose languages, the constructs (such as a server's socket) for
 the microservice architecture are created in user code. As a result they are
 entirely accessible from user code. This make it feasible to change their
 behaviour, since code can run before deployment occurs.
 
-In Jolie the constructs are managed directly by Jolie. Doing this has multiple
-advantages, such as less complexity in user code, but it also means that user
-code is capable of doing less. Jolie user code can, for example, not control
-networking directly, but is instead forced to use the abstractions provided by
-Jolie (sending messages).  The language requires certain structs to be fully
-configured directly in source code. As a result, not all constructs can be
-changed at run time.  Concrete examples of this includes the input ports, which
-needs to be ready at deployment time. Thus without native support for
-configuration of these, it would not be possible to change the input port.
+In Jolie, the constructs are managed directly by Jolie. This has multiple
+advantages, such as less complexity in user code, but Jolie user code also
+loses power in the process. For example, a Jolie program cannot control the
+network directly, but must instead use the abstractions provided by the
+language (message-passing).
+
+The primary need for a native solution comes from input ports. Input ports in
+Jolie require their values to be set at deployment time. It is not possible to
+reconfigure their location during runtime, and for good reasons. TODO Reasons
+can't come up with any right now.
+
+Additionally, creating a native solution provides many opportunities in terms of
+creating more powerful features. For example, the configuration format allows
+us to easily move between embedding a service, and binding to an external
+service.
 
 \subsection{Introducing the Jolie Configuration Format}
 \label{sec:conf_units}
@@ -185,11 +175,11 @@ profile "a-profile" configures "a-module" {
 
 As seen in the examples, it is okay to provide partial configuration as opposed
 to complete configuration. Certain values may be provided by the underlying
-module, which uses this unit. In that case the configuration unit cannot
+module, which uses this unit. In that case, the configuration unit cannot
 override it.  In other cases partial configuration is okay due to profiles
 extending other profiles.
 
-A configuration unit may extend another unit. The two, however, must configures
+A configuration unit may extend another unit. The two, however, must configure
 the same module. The inheritance tree may be of an arbitrary depth, but
 each unit may only extend a single unit, and they must configure the same
 module.
@@ -220,7 +210,7 @@ profile "b" configures "a-module" extends "a" {
 \label{lst:conf_extends}
 \end{listing}
 
-The module developer is often aware of what the defaults should be. For this
+The module developer is often aware of what the defaults should be. For this,
 default configuration profiles can be shipped along the modules. These
 are implicitly imported into every configuration file. The Jolie engine will
 look for any \txtl{.col} file in the \txtl{conf} folder. This folder should be
@@ -234,15 +224,10 @@ extends this, simply by writing \joliel{profile "something" configures "a"
 It should be noted that no single unit is required to provide all
 configuration. The system doesn't have any ``abstract''\footnote{As in abstract
 classes, a concept often used in object oriented programming} configuration
-units. However it is required configuration unit used by the interpreter
+units. However, it is required configuration unit used by the interpreter
 provides all the necessary configuration, as declared by the module.
 
 \subsection{Input and Output Ports}
-
-% TODO Need to clean this up.
-%
-% 1. Present solution
-% 2. Discuss problems
 
 Input and output ports, both existing constructs, are defined just like before
 in the Jolie code.
@@ -253,18 +238,18 @@ port.
 
 Only the fields which are not already listed become configurable. This is
 useful when building a service that needs to make assumptions about its input
-ports. For example if a developer is building a generic web-server, it is
+ports. For example, if a developer is building a generic web-server, it is
 useful to allow the developer to change the location, but the protocol should
 remain fixed.
 
 One typical assumption that Jolie services make about their input ports come
 from aliases that are made in the protocol configuration, an example is shown
 in line 4 of Listing \ref{lst:configurable_input}. The pointer statement takes
-two variable paths, and makes the one on the left link to the one on the right.
+two variable paths and makes the one on the left link to the one on the right.
 The result of this is setting \txtl{statusCode} will cause the HTTP status code
 It should also be noted that the configuration units \emph{do not} support
 aliases, and there are no other ways of accessing variables hidden in the
-protocol configuration. As a result any service which needs to do something
+protocol configuration. As a result, any service which needs to do something
 special with its protocol configuration, like aliasing, must do it in source
 code. Since the aliased variable now also takes on a new semantic meaning, it
 also makes sense that it must be named directly in source code, and not left to
@@ -284,7 +269,7 @@ inputPort MyWebServer {
 \label{lst:configurable_input}
 \end{listing}
 
-However simply leaving out fields, and assuming they must be configurable
+However, simply leaving out fields, and assuming they must be configurable
 proves somewhat problematic for output ports. Output ports require no fields,
 other than the interfaces, to be defined at deployment time. It is quite
 common for dynamic ports to not add a default location or protocol,
@@ -342,21 +327,21 @@ profile "my-profile" configures "service" {
 
 From a high-level point of view, parameters are very similar to constants.
 However parameters weren't implemented as an extension of constants due to the
-implementation of constants. Namely constants aren't implemented using the
+implementation of constants. Namely, constants aren't implemented using the
 ``Value'' system, which is used by all variables and messages in Jolie, but
 rather implemented at the parser level.
 
 When the Jolie parser encounters a constant definition, it will save the token
-from the assignment and associate it with the identifier on the left hand side.
+from the assignment and associate it with the identifier on the left-hand side.
 Only identifier tokens and simple value tokens are allowed. The constant
-definitions are limited to only a single token. As a result it isn't possible
+definitions are limited to only a single token. As a result, it is not possible
 to define more advanced tree-like values, which parameters such as
 \joliel{myParameter} from Listing \ref{lst:params} would require.
 
-Whenever the parser reaches a places where a constant would be allowed, it will
+Whenever the parser reaches a place where a constant would be allowed, it will
 look at the next token, check if it is an identifier, and try to replace the
 current token with the token defined by the constant. This produces some rather
-surprising results and has limitations, which isn't commonly found in other
+surprising results and has limitations, which is not commonly found in other
 programming languages.  Listing \ref{lst:jolie_constants} illustrates how the
 Jolie parser processes constants.
 

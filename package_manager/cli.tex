@@ -1,8 +1,12 @@
 \section{The Command Line Interface}
 \label{sec:cli}
 
+The command line application serves as the user interface to JPM. The
+application is, perhaps not unsurprisingly, named \mintinline{text}{jpm}. The
+tool will be used in several examples.
+
 The command line application is responsible for displaying a more user friendly
-interface to inner workings of JPM. The tool will perform almost not work by
+interface to inner workings of JPM. The tool will perform almost no work by
 itself, but will instead delegate this to the back end (See Section TODO).
 
 When first running the tool, the user will be welcomed with the following
@@ -67,19 +71,21 @@ my-package
 
 \subsection{Internal Organization and Deployment}
 
-The command line tool delegates most of the work to the back end service (here
-called jpm). Figure \ref{fig:cli_arch} shows the architecture from the CLI's
-point of view. Most noteably is the callback server, this server is responsible
-for receiving information about events that occur in the back end. These are
-primarily used to communicate progress, this is especially useful for long
-running processes, such as downloading dependencies. The back end will in these
-cases these events to a callback server, which can then choose to display
-information about this event. The need for a separate service comes mostly from
-a limitation in Jolie. In Jolie all communication follows either a one-way, or
-request-response communication pattern. As a result of this, it isn't possible
-for JPM to send back information while a request is being processed. To handle
-this the front end (in this case \mintinline{text}{jpm-cli}) will inform the
-back end of where it should send events.
+The command line tool delegates most of the work to the back end service.
+Figure \ref{fig:cli_arch} shows the architecture from the CLI's point of view.
+
+Most notably is the callback server, this server is responsible for receiving
+information about events that occur in the back end. These are primarily used
+to communicate progress, this is especially useful for long running processes,
+   such as downloading dependencies. The back end will in these cases these
+   events to a callback server, which can then choose to display information
+   about this event. The need for a separate service comes mostly from a
+   limitation in Jolie. In Jolie all communication follows either a one-way, or
+   request-response communication pattern. As a result of this, it isn't
+   possible for JPM to send back information while a request is being
+   processed. To handle this the front end (in this case
+           \mintinline{text}{jpm-cli}) will inform the back end of where it
+   should send events.
 
 \begin{listing}[H]
 \begin{minted}{text}
@@ -101,7 +107,7 @@ back end of where it should send events.
                                    |        |
                                    v        |
                  +-------------------------------------+
-                 |                jpm                  |
+                 |           jpm (back-end)            |
                  +-------------------------------------+
                      |         |         |         |
                      v         v         v         v
@@ -113,7 +119,7 @@ back end of where it should send events.
 \label{fig:cli_arch}
 \end{listing}
 
-Quite a lot of services exists on the client side, notable
+Quite a lot of services exists on the client side, notably
 \mintinline{text}{jpm-cli} and \mintinline{text}{jpm}. From a usability
 perspective this is less optimal. For this reason the \mintinline{text}{jpm}
 binary, which ships with the package manager, will use a deployment which

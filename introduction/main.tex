@@ -1,1 +1,181 @@
-Introduction goes here
+TODO Something which gets us onto the package track.
+
+Packages come in many different forms, and what they are mostly depends on the
+system that they serve. For example, binary package managers may ship
+applications which are then installed on the user’s system. An example of
+such as package manager could be the iOS App Store. In general, a package
+manager primarily makes several things easier:
+
+\begin{enumerate}
+    \item Publishing of Packages
+    \item Find packages to install
+    \item Automatically install dependencies
+    \item Handle available updates
+\end{enumerate}
+
+These same principles have also been applied to the application level.
+Application-level packages are usually software components, which are intended
+to be run locally as a part of your application. Package managers also
+typically attempt to establish some sort of language/framework convention for
+developing packages. This is done such that packages may be imported into a
+software project in a consistent manner.
+
+The goal of this thesis is to develop a package manager for the
+Jolie\autocite{montesi2010jolie,JOLA} ecosystem. Jolie is a service-oriented
+programming language.
+% Do we really need this?
+As such, we aim not only at covering the local packages (i.e., services running
+        locally), but also external services. From the perspective of a local
+Jolie service, an external service is any service, which runs on an external
+virtual machine.
+
+Before being able to achieve the goal of creating a package manager, a few
+hurdles must first be overcome. In this thesis, we will present a new natively
+supported module and configuration system for Jolie.
+
+% Should also cover the somewhat blurry line there is between package manager
+% and build tool
+
+% Method
+% ------
+% This section focuses a bit too much on looking at other products. We should
+% still mention a few up here. But we never actually looked straight at other
+% products.
+%
+% There is also no focus on the configuration system which is developed.
+
+\pagebreak
+
+\section{Structure of this Thesis}
+
+\textbf{Chapter 1}. This chapter. Introduces the thesis, explains the structure
+of it, and notations used throughout the thesis.
+
+\textbf{Chapter 2}. Covers background material which is relevant for the entire
+thesis.
+
+\textbf{Chapter 3}. Covers the module system and the configuration system which
+had been made to support the package manager efforts.
+
+\textbf{Chapter 4}. Explains the concept of ``Jolie Packages'' which are what
+the Jolie Package Manager (JPM) supports. This chapter will also cover many
+of the features that are directly related to packages, which JPM implements.
+
+\textbf{Chapter 5}. Covers architectural and implementation specific details
+for JPM.
+
+\textbf{Chapter 6}. Conclusion of this thesis.
+
+\section{Notation Used}
+
+\subsection*{Service Diagrams}
+
+Simple box-and-line diagrams are used for illustrating how service are
+deployed, and how they depend on eachother. Figure
+\ref{fig:simple_box_and_line} shows a simple diagram with two services \txtl{A}
+and \txtl{B}. In this diagram \txtl{A} depends on the services provided by
+\txtl{B}.
+
+\begin{figure}[H]
+
+\centering
+\includegraphics[width=0.5\textwidth]{introduction/simple_box_and_line.eps}
+
+\caption{A service diagram showing two services: \txtl{A} and \txtl{B}. In this
+    diagram service \txtl{A} depends on service \txtl{B}}
+
+\label{fig:simple_box_and_line}
+
+\end{figure}
+
+We'll illustrate embedding (a Jolie concept, see Chapter \ref{cha:background})
+by drawing a service inside another. The parent service will show its
+dependency on this service through similar means.
+
+\begin{figure}[H]
+
+\centering
+\includegraphics[width=0.5\textwidth]{introduction/embedding.eps}
+
+\caption{A \txtl{parent} service embedding a \txtl{child} service}
+
+\label{fig:box_and_line_embedding}
+
+\end{figure}
+
+\subsection*{File Listings}
+
+When code snippets are presented, where the file name and location is relevant
+then the file name and file path will be shown in a comment before the file
+contents. We will commonly show multiple files in a single listing.  As an
+example, if we have the directory structure shown in Listing
+\ref{lst:file_structure_example}.
+
+\begin{listing}[H]
+\begin{minted}{text}
+/
+|-- a
+|   `-- 1
+|-- b
+|   `-- 2
+`-- c
+    `-- 3
+
+3 directories, 3 files
+\end{minted}
+\caption{We will illustrate a directory structure in this manner}
+\label{lst:file_structure_example}
+\end{listing}
+
+And the file contents of file \txtl{/a/1} is ``A'', \txtl{/b/2} contains ``B'',
+    and \txtl{/c/3} contains ``C'', then we would show the contents of these
+    files as in Listing \ref{lst:multiple_files_example}.
+
+\begin{listing}[H]
+\begin{minted}{text}
+/* /a/1 */
+A
+
+/* /b/2 */
+B
+
+/* /c/3 */
+C
+\end{minted}
+
+\caption{Multiple files shown in a single listing where file path and name is
+    relevant.}
+
+\label{lst:multiple_files_example}
+\end{listing}
+
+\subsection*{Command Line Illustrations}
+
+In certain cases, examples are made by showing the output of a command line
+session. The reader is expected to be familiar with a basic Unix-like shell.
+When the working directory is relevant, then it will be shown as part of the
+prompt. An example of this is shown in Listing \ref{lst:shell_example}.  In
+this example two commands are invoked (\txtl{ls} and \txtl{cat hello-world.ol}.
+The \verb!#! symbols mark the beginning of a command. Lines not
+containing this symbol should be considered as part of the output from
+the previous command. Before that the absolute path to the current
+working directory is shown, in these cases they were both
+\txtl{/this/is/the/path}.
+
+\begin{listing}[H]
+\begin{minted}{text}
+dan@host:/this/is/the/path # ls
+hello-world.ol
+
+dan@host:/this/is/the/path # cat hello-world.ol
+include "console.iol"
+main {
+    println@Console("Hello, World!")()
+}
+\end{minted}
+\caption{Illustration of two commands being invoked in a shell}
+\label{lst:shell_example}
+\end{listing}
+
+\section{Implementation Status}
+

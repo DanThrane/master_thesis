@@ -19,8 +19,7 @@ this package provides.
 
 The core data stored in the database is shown in Figure
 \ref{fig:registry_database}. The core database model consists of three tables:
-\txtl{package}, \txtl{package_dependency}, \txtl{package_versions}. The last
-two tables both have foreign keys referencing the \txtl{package} table. The
+\txtl{package}, \txtl{package_dependency}, \txtl{package_versions}. The
 \txtl{package} table describes a particular known package. Using any particular
 entry in the \txtl{package} table, we may find all known versions of this
 package. From a particular version of the package we may find all its known
@@ -33,7 +32,7 @@ dependencies.
     \label{fig:registry_database}
 \end{figure}
 
-The \txtl{origin} field which appears in all three tables reference the origin
+The \txtl{origin} fields which appear in all three tables reference the origin
 registry. This is used for handling both cross-registry dependencies, but also
 for storing information about packages from different registries. The latter is
 useful for cache-like services, which collect information from many different
@@ -41,9 +40,7 @@ registries.
 
 Any particular package version also contains a \txtl{checksum} field. This
 field can contain any generic checksum which can be serialized as text, that is
-the actual checksum algorithm is defined by the client. We discuss how
-checksums are used in JPM in Section \ref{sec:integrity_check} and
-\ref{sec:cache}.
+the actual checksum algorithm is defined by the client.
 
 The remainder of the fields stored in the database simply mirror the most
 important fields of the package manifests. Certain fields from the package

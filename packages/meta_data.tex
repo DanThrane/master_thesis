@@ -3,8 +3,6 @@
 
 In this section we'll cover, in details, the format of Jolie manifests. The
 complete specification for the package manifest can be found in Appendix 1.
-However in this section we'll also cover some of the reasoning behind the
-choices found in Appendix 1.
 
 \subsection{The {\tt name} Attribute}
 
@@ -44,14 +42,7 @@ rules of identifiers. This has affected the design of the Jolie module system.
 This is, for example, the reason that strings are used in both configuration
 files and module includes, when making references to other modules.
 
-Rule 4 states that package names are unique within a single registry. But this
-constraint actually goes even further, since these packages directly extend
-from the modules, we cannot have a system containing two packages named the
-same thing, even if they reside in two different registries. Generally we make
-no assumptions that registries communicate with each other, for this reason it
-is perfectly allowed that two distinct registries may contain name clashes, but
-any single package must not have a dependency which clashes either with another
-dependency, or the package who has the dependency itself.
+Rule 5 states that package names are unique within a single registry.
 
 \subsection{The Meta Data Attributes ({\tt license, authors, description})}
 
@@ -61,10 +52,10 @@ information.
 
 License identifiers are validated against a pre-existing list of license
 identifiers. This is done to ensure that typos are not made in license names.
-The identifiers used are from the SPDX license list, which contains a list of
-commonly found licenses. Currently only the license identifiers are supported,
-this could be extended to use SPDX License Expression Syntax, which allows for
-references to custom licenses.
+The identifiers used are from the SPDX license list\autocite{SPDX}, which
+contains a list of commonly found licenses. Currently only the license
+identifiers are supported, this could be extended to use SPDX License
+Expression Syntax, which allows for references to custom licenses.
 
 \subsection{The {\tt version} Attribute}
 \label{sec:versions}
@@ -72,9 +63,9 @@ references to custom licenses.
 % source: Semantic Versioning 2.0.0 - Tom Preston-Werner - http://semver.org/
 
 The \mintinline{text}{version} attribute used by packages declare which version
-of the source code the manifest describes. This field uses the Semantic
-Versioning (SemVer) specification for version numbers. It is a requirement to
-use SemVer versions, if a version is specified, which is not a valid SemVer
+of the package the manifest describes. This field uses the Semantic Versioning
+(SemVer)\autocite{SEMV} specification for version numbers. It is a requirement
+to use SemVer versions, if a version is specified, which is not a valid SemVer
 version, then validation of the manifest will fail. Enforcing this standard
 allows for several other features, which will be covered in a moment.
 
@@ -122,8 +113,6 @@ Semantic Versioning has become a commonly used standard across many different
 package managers, examples include
 Cargo\autocite{CRAA} and NPM\autocite{NPMA}.
 
-TODO Highlight benefits of using semantic versioning.
-
 % source: https://docs.npmjs.com/misc/semver
 
 For dependencies the version field allows for a bit more flexibility using
@@ -131,6 +120,19 @@ SemVer expressions, also known as SemVer ranges\autocite{NPMB}. These
 expressions allows the developer more freedom in which version to use. In short
 the expressions allows the developer to both whitelist certain ranges for use,
     and blacklist certain ranges for use.
+
+SemVer expressions allows for a wide range of different comparators, and range
+builder syntaxes. For more information see \autocite{NPMB}. A few examples are
+shown below, along with a description of what they mean:
+
+\begin{itemize}
+    \item \txtl{1.2.3}: Exactly version \txtl{1.2.3}
+    \item \txtl{1.0.X}: Major must be 1, minor must be 0, patch can be anything
+    \item \txtl{1.0.*}: Major must be 1, minor must be 0, patch can be anything
+    \item \txtl{>1.0.0}: Any version larger than version \txtl{1.0.0}
+    \item \txtl{1.0.0 - 1.2.3}: Any version between \txtl{1.0.0} and
+    \txtl{1.2.3} both inclusive
+\end{itemize}
 
 This provides both a convenience factor, i.e. the developer can express that
 she doesn't care which specific version is used, as long as it has feature X
@@ -172,17 +174,17 @@ described in Section \ref{sec:lifetime_hooks}.
 \subsection{The {\tt registries} Attribute}
 
 The package manager may communicate with one or more registries, when
-performing its work. This may either be to install dependencies, or it could be
-to perform some of the more organizational commands, such as creating an
-account.
+performing its work. This can be to install dependencies, or it could be to
+perform some of the more organizational commands, such as creating an account.
 
 For this the package manager will need to know about the different registries.
 This is what the \mintinline{text}{registries} attribute describes, it is an
 array containing definitions for all known registries (known to the package).
 
 A registry is defined by a unique (within the package) name, and a location (a
-URI following the same rules that Jolie does for its port locations). Listing
-\ref{lst:registry_definition} shows an example.
+        URI following the same rules that Jolie does for its port locations).
+Listing \ref{lst:registry_definition} shows an example. Note that the protocol
+is always fixed to \joliel{sodep}.
 
 \begin{listing}[H]
 
@@ -205,5 +207,3 @@ entry points to the public registry. Every command which needs to use a
 registry, will optionally receive a registry name. If this name is specified,
 it will look within the \mintinline{text}{registries} attribute. If no name is
 specified, the ``public'' entry will be used.
-
-TODO Should we talk about why it is good to have multiple registries here?

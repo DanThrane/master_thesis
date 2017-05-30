@@ -1,15 +1,14 @@
 \section{The {\tt .pkg} Format} \label{sec:pkg}
 
 The \verb!.pkg! file format, is the format that JPM uses for distribution of
-packages. Simply the file format contains a Jolie package zipped up into a
+packages. Simply put, the file format contains a Jolie package zipped up into a
 single file.
 
 Currently the contents of the zip file maps directly with the underlying
 package. The format is however open to extension, by allowing for new files to
-be introduced that can be used in various extensions. One such extension could
-for example be native code signing, which we discuss in more details in Section
-TODO. An obvious implementation strategy would involve adding the necessary
-files directly into the ZIP archive.
+be introduced that can be used in various extensions. An obvious implementation
+strategy would involve adding the necessary files directly into the ZIP
+archive.
 
 Extending the ZIP file format is a quite common occurrence. Especially when
 shipping what is essentially a collection of files. Popular examples of other

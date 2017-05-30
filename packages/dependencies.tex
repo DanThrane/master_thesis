@@ -12,7 +12,7 @@ the latter as package dependencies.
 Consider, the Jolie service shown in Listing \ref{lst:jolie_dep_service}.  For
 this service we can define one explicit service dependency on the
 \txtl{Example} service and one implicit service dependency on the client
-calling us, the \txtl{Self} service.
+calling the \txtl{Self} service.
 
 However given this service, encapsulated in a package, it would have no package
 dependencies. For JPM a package dependency is a dependency on the code of
@@ -52,7 +52,8 @@ main {
 If we change the previous example, such that the interface of \txtl{Example} is
 defined in another package named \joliel{"example"}, then we could define a
 package dependency on the \joliel{"example"} package. This is shown in Listing
-\ref{lst:jolie_dep_package}.
+\ref{lst:jolie_dep_package}. This service dependencies in this example remain
+unchanged.
 
 \begin{listing}[H]
 \begin{minted}{javascript}
@@ -93,20 +94,132 @@ main {
     }]
 }
 \end{minted}
-\caption{}
+\caption{A package dependency is a dependency on the code of another package}
 \label{lst:jolie_dep_package}
 \end{listing}
-
-TODO Talk about how dependencies of dependencies are also added. Talk about how
-the dependency graph of a project is created
 
 A package dependency can be described by the 3-tuple $(name, version,
 registry)$, as covered the manifest will implicitly set the registry to
 \joliel{"public"} if not specified.
 
-
 The dependency tree of a JPM package is build starting at the package itself.
-The algorithm for calculating the dependency tree is shown, in pseudo-code, in
-Listing \ref{lst:dep_tree}.
+The algorithm for calculating the dependency tree is shown, in pseudo-jolie, in
+Listing \ref{lst:dep_tree}. Some details, like lockfiles and data marshalling,
+are left out. Error handling is illustrated by the \txtl{Error}
+procedure. In reality the error handling is slightly more advanced, but
+not relevant to our discussion.
 
-TODO Write code
+\begin{coded}
+\begin{minted}{jolie}
+define DependencyTree {
+    // "manifest" is set at entry to this procedure
+    dependencyStack << manifest.dependencies;
+    currDependency -> dependencyStack[0];
+
+    while (#dependencyStack > 0) {
+        RegistrySetLocation; // Registry now points to origin of dependency
+
+        // Lookup version information from the registry
+        getPackageInfo@Registry(currDependency.name)(packageListing);
+        if (#packageListing.results == 0) { Error };
+
+        resolved -> resolvedDependencies.(currDependency.name);
+        if (is_defined(resolved)) {
+            // Check if 'resolved' matches requirement of 'currDependency'
+            satisfies@SemVer({
+                .version = resolved.version, .range = currDependency.version
+            })(versionSatisfied);
+            if (!versionSatisfied) { Error };
+        } else {
+            allVersions -> /* extract versions from packageListing.results */;
+
+            // Find the best match for our version expression
+            sortRequest.versions -> allVersions;
+            sortRequest.satisfying = currDependency.version;
+            sort@SemVer(sortRequest)(sortedVersions);
+            if (#sortedVersions.versions == 0) { Error };
+
+            // Insert resolved dependency
+            with (information) {
+                .version << sortedVersions.versions
+                    [#sortedVersions.versions - 1];
+                .registryLocation = Registry.location;
+                .registryName = registryName
+            };
+            resolved << information;
+
+            // Insert dependencies of this dependency on the stack
+            dependenciesRequest.packageName = name;
+            dependenciesRequest.version << resolved.version;
+            getDependencies@Registry(dependenciesRequest)(depsResponse);
+            for (i = 0, i < #depsResponse.dependencies, i++) {
+                item << depsResponse.dependencies[i];
+                dependencyStack[#dependencyStack] << item
+            }
+        }
+    }
+}
+\end{minted}
+\caption{Pseudo-Jolie code for calculating a dependency tree}
+\label{lst:dep_tree}
+\end{coded}
+
+The algorithm keeps two primary data-structures: the \joliel{dependencyStack}
+and the \joliel{resolved} versions. The algorithm starts by inserting all the
+listed dependencies from the \joliel{manifest} onto the
+\joliel{dependencyStack}, this is done in lines 2-5. The algorithm then enters
+the main loop (line 7).
+
+This loop will pop a dependency off the stack and start the process of
+resolving the dependency to a known version. Recall that dependencies use
+SemVer expressions in their version field. We need to resolve this field to a
+particular version. In this process we will also confirm that the registry has
+knowledge of this version.
+
+This process starts by asking for a complete version listing for a package
+matching the name of our dependency (lines 8-12). At this point we can be
+certain that the registry at least know of a package by that name. We then
+check if a previous dependency already has resolved this dependency.
+The \joliel{resolved} dependencies data structure is a dictionary, mapping
+a package name to a resolved version. There are two important takeaways from
+this decision:
+
+\begin{enumerate}
+
+\item \textbf{A package cannot have two (or more) identically named
+    dependencies.} Even though it is technically possible to have two
+    identically named dependencies, as long as they do not originate from the
+    same registry, this is still disallowed. The reason for this lies in the
+    module implementation, where modules are uniquely identified only by their
+    name. As a result we would have to either identify all packages by their
+    name and registry, or simply disallow two identically named dependencies.
+    We chose the latter to simplify the use of packages in code.
+
+\item \textbf{A package cannot depend on two (or more) different versions of a
+    package}. This is similar to the first point, but made worse by the lack
+    of any namespacing in Jolie. Because of this, if two packages were to
+    provide any two constructs which clash in name, the Jolie engine would be
+    unable to distinguish them.
+
+\end{enumerate}
+
+If a dependency has not been resolved (lines 20-46) we will start the resolving
+phase. The package manager will \emph{always} select the newest version
+available in the registry which matches the SemVer expression as defined by the
+dependency (lines 21-27). When the package has been resolved its dependencies
+are looked up (by contacting the registry, we don't have the actual manifest).
+These dependencies are then added onto the stack (lines 38-46).
+
+If the dependency has already been resolved, we must check if this dependency
+works under these conditions, by matching its SemVer expression to the resolved
+dependency. If this is possible we can continue. \emph{The package manager
+    makes no additional attempts to resolve the constraints imposed by the
+        manifests}.
+
+These constraints mean that there plenty of dependency trees can be
+constructed, such that the greedy approach of selecting the newest version,
+    will lead to conflicts. This approach was chosen for its simplicity. More
+    advanced approaches were not explored. The greedy approach will most likely
+    also be significantly more efficient. At least one other package manager
+    was also found to be using this exact same approach to constraint
+    solving\cite{YARNA}.

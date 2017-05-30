@@ -7,12 +7,14 @@
 
 Before continuing with the packages we'll take a quick de-tour to look at the
 overall architecture of JPM. This should help the reader understand in which
-context the packages exist. The details of this architecture will be covered in
+context the packages exist. The details of this system will be covered in
 Chapter \ref{cha:pkg_mngr}.
 
-The entirety of the ecosystem around JPM is written in Jolie, using the
+The services of the ecosystem around JPM is written in Jolie, using the
 features that the Jolie Module System provides, along with the features that
-JPM itself provides.
+JPM itself provides. Some library services in the ecosystem are written in
+Java, using the powerful embedding features of Jolie, which allow certain
+foreign languages to be embedded as services.
 
 At the ten-thousand foot view of the architecture, it consists of three
 core services, as shown in figure \ref{fig:high_level_arch}:

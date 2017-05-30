@@ -1,43 +1,54 @@
 \section{Modules: Design and Implementation}
 
-The module system of Jolie is made to facilitate better options for
-modularizing code. This will allow for a package manager to exist.  We define a
-module in Jolie is defined as a project root directory, and optionally an
-entry-point. Modules are uniquely identified by a name.
+The module system of Jolie is made to facilitate better options for the
+modularization of code. This is what allows for a package-manager to exist. We
+discuss the package manager in detail in Chapter \ref{cha:packages} and
+\ref{cha:pkg_mngr}. A Jolie module is described by the following three
+properties:
+
+\begin{enumerate}
+
+    \item \textbf{A name.} For a single running Jolie engine, this will
+    uniquely identify a module
+
+    \item \textbf{A file path to the Jolie code-base.} We will refer to this as
+    the project root or just root.
+
+    \item \textbf{(Optional) The entry point to the Jolie code.} This is a file
+    path given relatively to the project root.
+
+\end{enumerate}
 
 The Jolie engine needs to know about these modules. The engine is informed
 about these modules from the intent, passed as options, which starts the
-engine. This information is collected in the ``intent parsing'' phase, and is
+engine. This information is collected in the ``intent parsing'' phase and is
 made available to any later phase that might need it.  Since the intent is
 passed as an option, all interpreter instances inside the engine will know
-about each module.  As a result any embedded service will also be aware of the
+about each module.  As a result, any embedded service will also be aware of the
 same modules.
 
 Consider a module ``foo'', with its source code placed at \txtl{/packages/foo}
 and an entry-point at \txtl{/packages/foo/main.ol}. It is possible to inform a
 Jolie interpreter about this module using
-\txtl{--modfoo,/packages/foo,main.ol}.
+\txtl{--mod foo,/packages/foo,main.ol}.
 
-The result of this decision is that quite a lot of additional options may need
-to be passed to the engine. However this choice was purposely chosen, it is
-left for another tool to make this job easier. In this case a package manager
-is expected to take the heavy lifting, and figure out which modules exists.
-This allows for more freedom in how these tools are implemented, and another
-implementation strategy, than the one provided in the package manager, could be
-created without any changes to the language infrastructure. See Section TODO
-about how the package manager passes this information to the engine.
+As a result, a lot of additional options must be passed to the engine. In this
+case, a package manager is expected to take the heavy lifting and figure out
+which modules exist.  This allows for more freedom in how these tools are
+implemented. If another approach were to be found later, then a new
+implementation could simply be created without breaking the language.
 
-To allow for better organization, a new type of include has been added to the
-language. These include allows the developer to include from a particular
-package. The syntax of this include is shown in Listing \ref{lst:mod_include}.
-When a package include is used, the search path will be altered, such that the
-project root is changed to that of the package (as opposed to where the engine
-was started). Any file included from within this package should perform its
-includes relative to its own root, rather than the project root.
+A new include primitive has been added, a module include. This has been created
+to allow for better internal organization. This primitive allows the developer
+to include files from a particular module. The new primitive is shown in
+Listing \ref{lst:mod_include}. When a module include is used, the search path
+will be altered, such that the project root is changed to that of the package.
+As opposed to the original include primitive, which would look for files
+relative to the current working directory.
 
-The new include syntax, along with native support for modules, allows for the
-code to properly organized. With this a module may be placed inside of its own
-directory, without any of the code having to be changed.
+The new include primitive, along with native support for modules, allows for
+the code to be properly organized. With this, a module may be placed inside of
+its own directory, without any code has to change.
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -53,12 +64,11 @@ A module include is an extension of ordinary includes which specify which
 module to perform the inclusion from, that is \joliel{include "file" from
 "module"}.
 
-The simple case of such an include is fairly simple. We make a ``context
-switch'' our working directory into the root of the module and start searching
-for the file in that folder. This works quite well, however consider the
-following scenario. From a client we perform a package include: \joliel{include
-    "interface.iol" from "dependency"}. The source code of this file is shown
-Listing \ref{lst:dependency_include}.
+The base case of such an include is simple. We make a ``context switch'' from
+our working directory into the root of the module and start searching for the
+file in that folder. This works quite well, however, consider the following
+scenario.  From a client we perform a module include: \joliel{include
+    "interface.iol" from "dependency"}.
 
 \begin{listing}[H]
 \begin{minted}{java}
@@ -77,9 +87,9 @@ type SomeRequest: void { /* ... */ }
 \label{lst:dependency_include}
 \end{listing}
 
-With the current code this would cause the system to incorrectly look for
-\txtl{types.iol} in the current working directory! To fix this a stack is kept.
-This stack gains an entry when a module include is performed, this entry is
-popped off the stack once the contents of that include has finished parsing.
-The stack is then used to inject the module's root into the search path for the
-ordinary includes.
+With the code in Listing \ref{lst:dependency_include}, the system would
+incorrectly look for \txtl{types.iol} in the current working directory! To fix
+this a stack is kept.  This stack gains an entry when a module include is
+performed, this entry is popped off the stack once the contents of that include
+has finished parsing.  The stack is then used to inject the module's root into
+the search path for the ordinary includes.

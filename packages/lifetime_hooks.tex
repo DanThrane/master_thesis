@@ -7,11 +7,11 @@ package developer to augment the package manager, and potentially affect the
 work it performs.
 
 This is a feature which is available in many other types of software, for
-example the popular version control system Git\autocite{chacon2009pro} provides
-such a feature.
+example the popular version control system Git provides such a
+feature\autocite{chacon2009pro}.
 
 All hooks are performed on the client-side, and never on the server side (i.e.
-registries). Only the hooks of the current package will be run, the
+on registries). Only the hooks of the current package will be run, the
 hooks of a dependency will not be executed. Hooks that run before a certain
 action, denoted by a \verb!pre-! prefix, may stop the corresponding command
 from being executed.  These scripts may do so by returning a non-zero exit

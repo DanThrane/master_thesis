@@ -1,16 +1,6 @@
-% Status: draft
-
 \section{The Jolie Engine and Interpreter}
 
-\begin{itemize}
-\item Values and types
-\item Phases of the compiler
-\item Anything we need to explain the changes that were made
-\end{itemize}
-
-% ---
-
-In this section the internals of the Jolie engine will be introduced. This
+In this section, the internals of the Jolie engine will be introduced. This
 should give the reader the necessary knowledge to understand the changes made
 to support a module and package system for Jolie.
 
@@ -22,59 +12,52 @@ embedding several other Jolie services.
 A simplified view of the Jolie interpreter's pipeline can be seen in Figure
 \ref{fig:jolie_pipeline}.
 
-\begin{listing}[H]
-\begin{minted}{text}
-+--------------------------+     +--------------------------+
-|  Intent parsing          | --> |  Jolie code parsing      |
-+--------------------------+     +--------------------------+
-                                            |
-                                            v
-+--------------------------+     +--------------------------+
-|  Interpretation tree     | <-- |  Semantic verifier       |
-+--------------------------+     +--------------------------+
-          |
-          v
-+--------------------------+     +--------------------------+
-|  CommCore init           | --> |  Init & main process     |
-+--------------------------+     +--------------------------+
-\end{minted}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{background/pipeline.eps}
 \caption{A simplified view of the Jolie interpreter pipeline}
 \label{fig:jolie_pipeline}
-\end{listing}
+\end{figure}
 
-The first phase of the interpreter is parsing the intent. In this phase we
-essentially figure out why the interpreter has been created, and what actions
-it should perform.
+The first phase of the interpreter is parsing the intent. In this phase the
+interpreter will determine its purpose and, if any, modifiers to its ordinary
+behavior.
 
 The Jolie engine can be invoked from the command-line, the command-line is the
 source of the intent which starts the first interpreter. The syntax for the
-command line is (roughly) as follows: \mintinline{bash}{jolie [commands and
-options] <program> [program arguments]}. The options passed change the
-overall behaviour of the engine, and all interpreter instances share these.
-Commands and program arguments, however, only belong to the interpreter that
-they were originally passed.
+command line is (roughly) as follows: \txtl{jolie [commands and options]
+    <program> [program arguments]}.
 
-The intent parsing phase is also responsible for locating and retrieving the
-program used. This is passed to the program parser. The program parser is the
-second phase, and is responsible for creating the Abstract Syntax Tree (AST)
-which represents the input program. The parser will produce only a single root
-node, namely the \verb!Program! node. As a consequence of this, any file which
-is included is semantically identical to copying and pasting the source code of
-that file into the original file, in place of the include statement. It should
-also be noted that include paths are \emph{not} relative to the file that
-includes, but rather relative to the current working directory (i.e. where the
-engine was started).
+Options change the overall behavior of the engine, all interpreter instances
+share these. These change the behavior of the interpreter.
+
+Commands and program arguments, only belong to the interpreter that they were
+originally passed. These determine what the interpreter will do.
+
+The intent parsing phase is responsible for locating and retrieving the program
+used.
+
+A URI matching the input program is given to the program parser, the second
+phase. The parser is responsible for creating the Abstract Syntax Tree (AST)
+    which represents the input program. The parser will produce only a single
+    root node, namely the \txtl{Program} node. Includes are thus implemented by
+    essentially inserting the contents of the include target. A quirk for Jolie
+    includes, is that relative file includes are not resolved relative to the
+    current file, but rather to the current working directory (i.e. where the
+            engine was started).
 
 The third phase traverses the AST to make sure that it is semantically valid.
-This weeds out programs which are syntactically correct, but do not make sense.
-The amount of work done in this phase is somewhat limited, given the otherwise
+This weeds out programs that are syntactically correct, but not semantically
+valid. The checks performed in this phase are somewhat limited, given the
 dynamic nature of the language.
 
 Given a semantically valid AST the interpreter is ready to build the
-interpretation tree. The interpretation tree contains new nodes, known as
-processes. Each of these processes can be run, to execute the correct
-behaviour.
+interpretation tree. The interpretation tree contains new nodes, which are
+runnable.
 
-Once the interpretation tree is build, we're ready to execute the actual code
-(which lives in the interpretation tree). First the init block is run, followed
-by the main block.
+Once the interpretation tree is built, we're ready to execute the actual code
+(which lives in the interpretation tree). The \txtl{CommCore} component is
+responsible for all communication, we'll discuss this briefly when relevant.
+Following its initialization, the user code of Jolie will start executing. The
+\joliel{init} procedure is executed first followed by the \joliel{main}
+procedure.

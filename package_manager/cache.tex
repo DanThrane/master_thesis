@@ -4,11 +4,11 @@
 The \cache of JPM is responsible for downloading packages, and maintaining the
 packages in a local cache.
 
-The local cache acts as a database of known packages. This database contains
+The \cache acts as a database of known packages. This database contains
 both the information needed to know about the database, as well as the binary
 containing the package data.
 
-The local cache consists of previously downloaded packages, along with a
+The \cache consists of previously downloaded packages, along with a
 locally kept database which matches the type that the \registry uses. The
 database kept also track the origin \registry, since the \cache will
 potentially download from multiple. The key used for this is the location URI
@@ -32,9 +32,7 @@ When a new package is received from a \registry, two parts will be returned:
 the binary itself, along with the checksum that the \registry believes the
 package to have. Checksums are both checked when initially receiving the
 package, but also at every install from the cache. This helps prevent initial
-corruption and further protects from the cache itself being corrupted. A more
-thorough discussion of this feature can be found in Section
-\ref{sec:integrity_check}.
+corruption and further protects from the cache itself being corrupted.
 
 The \cache will maintain a \regdb just like the \registry component does. When
 new entries are loaded into the \cache, it will updated the \regdb in a similar

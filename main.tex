@@ -26,7 +26,7 @@
 \usepackage{chemfig}
 \usepackage{cleveref}
 \usepackage{multicol}
-\usepackage{minted}
+\usepackage[newfloat]{minted}
 \usepackage{mdframed}
 
 \interfootnotelinepenalty=3000
@@ -35,6 +35,8 @@
 
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+\newenvironment{coded}{\captionsetup{type=listing}}{}
 
 \setminted{linenos,frame=lines,framesep=2mm}
 \setminted[text]{linenos=false}
@@ -140,6 +142,11 @@
 
 \begin{document}
 \include{title}
+
+\include{abstract}
+
+\include{acknowledgements}
+
 \tableofcontents
 
 \blankpage
@@ -150,6 +157,7 @@
 \input{introduction/main}
 
 \chapter{Background}
+\label{cha:background}
 \input{background/main}
 
 \chapter{Jolie Modules}
