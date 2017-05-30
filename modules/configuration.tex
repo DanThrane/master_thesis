@@ -80,15 +80,13 @@ values.
 The configuration system will only allow configuration of constructs which has
 been marked as such by the module. This should also allow a developer, and
 potentially tools, to quickly identify which constructs allow configuration.
-As much as possible the code should act as documentation of itself.
+As much as possible, the code should act as documentation of itself.
 
 Additionally the system should work with the existing checking tools (e.g. the
 \txtl{--check} flag). The checking tools of Jolie are, for example,
 used by editor plugins to show errors. These checks do not execute
 any code. The checking algorithm should check that the provided
-configuration is valid. Additional arguments can be added at a
-later point, which may configure if missing configuration should
-be considered an error.
+configuration is valid.
 
 % Basic concepts and example
 
@@ -98,11 +96,11 @@ a single Jolie module.
 
 A unit is uniquely identified by its profile name and module. Having multiple
 profiles for the same module can be useful for a variety of use-cases. A common
-use-case, could for example be to have separate profiles for development and
+use-case, for example, could be separate profiles for development and
 production.
 
-The units hold configuration for every possible type of configurable construct
-in Jolie. The ones supported are:
+The units can hold configuration for every possible type of configurable
+construct in Jolie. The configuration format support the following constructs:
 
 \begin{enumerate}
     \item Input and output ports
@@ -116,9 +114,9 @@ in Jolie. The ones supported are:
     \item Interface rebinding
 \end{enumerate}
 
-We'll introduce the configuration format through examples. The configuration
-format is custom, and made to mimic the syntax of Jolie. This decision was
-chosen to make it easier to convert existing Jolie code.
+We'll start by introducing the configuration format through examples.  The
+configuration format is custom, and made to mimic the syntax of Jolie. This
+decision was chosen to make it easier to convert existing Jolie code.
 
 Listing \ref{lst:simple_conf} shows a simple configuration unit. This
 units sets the location and protocol for the output port \joliel{A} (line 3 and
@@ -154,10 +152,10 @@ This moves the embedding from being a code problem to, what it should have
 been, a deployment problem.
 
 Listing \ref{lst:conf_embedding} shows the embedding of output port \joliel{A}.
-Note that we need to make a reference to the module, since the profile names
-are placed under a namespace for each module. This way multiple services can
-share the same name, a situation which is likely to occur with common profile
-names, such as ``development'' and ``production''.
+Note that we need to make a reference to the module (line 2), since the profile
+names are placed under a namespace for each module. This way multiple services
+can share the same name, a situation which is likely to occur with common
+profile names, such as ``development'' and ``production''.
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -173,11 +171,11 @@ profile "a-profile" configures "a-module" {
 \label{lst:conf_embedding}
 \end{listing}
 
-As seen in the examples, it is okay to provide partial configuration as opposed
-to complete configuration. Certain values may be provided by the underlying
-module, which uses this unit. In that case, the configuration unit cannot
-override it.  In other cases partial configuration is okay due to profiles
-extending other profiles.
+As seen in the examples, providing partial configuration, as opposed to
+complete configuration, is allowed. In certain cases, partial configuration is
+provided because the remaining values are defined by the module itself. In
+other cases, partial configuration is provided due to the extension of other
+profiles.
 
 A configuration unit may extend another unit. The two, however, must configure
 the same module. The inheritance tree may be of an arbitrary depth, but
@@ -210,10 +208,11 @@ profile "b" configures "a-module" extends "a" {
 \label{lst:conf_extends}
 \end{listing}
 
-The module developer is often aware of what the defaults should be. For this,
-default configuration profiles can be shipped along the modules. These
-are implicitly imported into every configuration file. The Jolie engine will
-look for any \txtl{.col} file in the \txtl{conf} folder. This folder should be
+The module developer is often aware of what the default configuration should
+be.  For this, default configuration profiles can be shipped along the modules.
+The default configuration units are implicitly imported into every
+configuration file which uses a particular module.  The Jolie engine will look
+for any \txtl{.col} file in the \txtl{conf} folder. This folder should be
 placed relative to the module's root. For example, if module "a" has a file
 called \txtl{conf/my-defaults.col}, which contains a unit called "default".
 Then the user of the package may either write a configuration unit which
@@ -221,11 +220,9 @@ extends this, simply by writing \joliel{profile "something" configures "a"
     extends "default"}, or the default directly. There is no need for any
     inclusion of this file.
 
-It should be noted that no single unit is required to provide all
-configuration. The system doesn't have any ``abstract''\footnote{As in abstract
-classes, a concept often used in object oriented programming} configuration
-units. However, it is required configuration unit used by the interpreter
-provides all the necessary configuration, as declared by the module.
+While no configuration unit is required to be complete, the one used by the
+engine must be complete. If an interpreter is instructed to use a partial
+configuration unit an error will be produced.
 
 \subsection{Input and Output Ports}
 
@@ -381,8 +378,9 @@ courier Foo {
 
 \end{multicols}
 
-\caption{Constants in Jolie works by replacing tokens at the parser level. Left:
-    The input program. Right: The program which the parser ends up seeing}
+\caption{Constants in Jolie works by replacing tokens at the parser level.
+    Left: The input program. Right: The program which the parser ends up
+        seeing}
 
 \label{lst:jolie_constants}
 
