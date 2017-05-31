@@ -21,13 +21,13 @@ interpretation tree has been build.
 \subsection{The Configuration Phase}
 
 The configuration phase builds upon the result of the intent and parsing phase.
-From the intent phase we receive information about modules and the intent to
-use a certain configuration unit. From the parsing phase we obviously get the
-AST.
+From the intent phase, we receive information about modules and the selected
+configuration unit. From the parsing phase we, obviously, get the AST.
 
 The configuration phase works by modifying the AST to insert the configuration
-gathered from the configuration unit. The processed AST is handed to the later
-phases, and the remainder of the pipeline works mostly like it has before.
+gathered from the selected configuration unit. The processed AST is handed to
+the later phases, and the remainder of the pipeline works mostly like it has
+before.
 
 \subsubsection*{Processing of Configuration Files}
 
@@ -35,7 +35,7 @@ phases, and the remainder of the pipeline works mostly like it has before.
 
 The first step of the configurator is to gather a fully processed configuration
 unit. This process starts by looking for the configuration file which was
-passed from the intent. The configuration unit is passed with:
+passed from the intent. The selected configuration unit is passed with:
 \\\txtl{--conf <unitName> <filePath>}.
 
 If the file path is an absolute file path, then that file will always be used.
@@ -44,9 +44,8 @@ for resolving this is to look for the configuration file relative to the
 current working directory. However this approach stops working once modules starts
 embedding other modules in a static fashion.
 
-Consider three modules, each providing one service, \txtl{A} and \txtl{B},
-\txtl{C}. Module \txtl{A} depends on \txtl{B}, and \txtl{B} depends on
-\txtl{C}.
+Consider three modules \txtl{A} and \txtl{B}, \txtl{C}. Module \txtl{A} depends
+on \txtl{B}, and \txtl{B} depends on \txtl{C}.
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -72,10 +71,7 @@ embedded {
 profile "c-deployment" configures "c" { /* ... */ }
 \end{minted}
 
-\caption{Relevant source code for modules \txtl{A} and \txtl{B}. Each file
-    marked by a comment, placed in a directory corresponding to their module.
-        For example \txtl{/a/main.ol} is the \txtl{main.ol} file which belongs
-        to the module \txtl{A}}
+\caption{Relevant source code for modules \txtl{A} and \txtl{B}}
 
 \label{lst:need_for_parent}
 
@@ -84,15 +80,15 @@ profile "c-deployment" configures "c" { /* ... */ }
 Relevant code is shown in Listing \ref{lst:need_for_parent}.  Assume that we
 start module \txtl{A} with \\\txtl{--conf a-deployment config.col a.mod}.  The
 problem arises because the fixed embedding of module \txtl{C} performed in
-\txtl{B}. Because the files are resolved relative to working directory in which
-the engine was started, the engine would look for the configuration file in
-module \txtl{A}. To fix this, every time an embedding is performed the engine
-will implicitly add a \txtl{--parent} flag. This flag informs the new
-interpreter who performed the embedding. If the parent flag has
-been given, the configuration file will be found relative to that of the
-parent.
+\txtl{B}. Because the files are resolved relative to the working directory in
+which the engine was started, the engine would look for the configuration file
+in module \txtl{A}. To fix this, every time an embedding is performed the
+engine will implicitly add a \txtl{--parent} flag. This flag informs the new
+interpreter who performed the embedding. If the parent flag has been given, the
+configuration file will be found relative to that of the parent.
 
-Working directory, throughout this is \txtl{/a/}.  The following will happen:
+The working directory, throughout this, is \txtl{/a/}.  The following will
+happen:
 
 \begin{enumerate}
 
@@ -111,68 +107,68 @@ to \\\txtl{/b/embedded.col} because of relative path with parent.
 
 \paragraph{Parsing of configuration files}
 
-With the configuration file resolved, it is passed to the configuration parser
-along with a list of known modules. The parser follows the conventions
-established by the existing Jolie code parser. The parser is a hand-written
-recursive descent parser with one token lookahead.
+The resolved configuration file is passed to the configuration parser along
+with known modules. The parser is written in the same style as the Jolie code
+parser.  The parser is a hand-written recursive descent parser with one token
+lookahead.
 
-The parser directly outputs the AST. At the top level the AST consists of
-\javal{Region}s which directly map to the configuration unit abstraction. Each
-\javal{Region} are namespaced under the module that they configure. Internally
-each namespace maps the name of the \javal{Region} to the actual
-\javal{Region}. The top-level node of the AST contains a dictionary mapping
+The parser directly outputs the AST. At the top level, the AST consists of
+\javal{ConfigUnit}s which directly map to the configuration unit abstraction.
+Each \javal{ConfigUnit} is namespaced under the module that they configure.
+Internally each namespace maps the name of the \javal{ConfigUnit} to the actual
+\javal{ConfigUnit}. The top-level node of the AST contains a dictionary mapping
 between the name of modules and their namespaces. The Java type for this
-mapping ends up being \javal{Map<String, Map<String, Region>>}, this allows for
-easy access of \javal{Region}s when they are needed. This does however also
-mean that duplicates must be caught during parsing, since they would otherwise
-just silently override previous entries. This would typically have been
-performed in a later stage to keep the parser ``pure''. In this case some
+mapping ends up being \javal{Map<String, Map<String, ConfigUnit>>}, this allows
+for easy access of \javal{ConfigUnit}s when they are needed. This does however
+also mean that duplicates must be caught during parsing since they would
+otherwise just silently override previous entries. This would typically have
+been performed in a later stage to keep the parser ``pure''. In this case, some
 purity was sacrificed for some efficiency and ease of use.
 
 The grammar of the configuration format closely follows the grammar of Jolie
-code. As a result the configuration format also re-uses AST nodes where
+code. As a result, the configuration format also re-uses AST nodes where
 possible. As we will see later, this proved helpful when outputting a
 configured AST. The configuration grammar only supports a subset of the
 features that Jolie code does.
 
 Recall from Section \ref{sec:conf_units} that each module may publish default
 configuration units, which can be used by user-level configuration units. For
-this reason the parser will make special note of references to other
+this reason, the parser will make special note of references to other
 configuration units. Such references currently only appear in output port
-embeddings (e.g. \\\joliel{outputPort Foo embeds "foo" with "a-foo-unit"}).
+embeddings, e.g., \\\joliel{outputPort Foo embeds "foo" with "a-foo-unit"}.
 
 Once the initial file has been parsed, every single configuration file placed
 in the ``conf'' directory of referenced modules are parsed and placed in the
 same AST. Configuration files parsed during this phase may itself have
 references to other modules, in that case these will be pulled in as well.  A
-set of parsed defaults is kept to avoid parsing the same file multiple times,
-or potentially infinite loops.
+set of parsed defaults is kept to avoid parsing the same file multiple times
+or potentially reach infinite loops.
 
 \paragraph{Merging configuration files}
 
 With the entire configuration tree in place, merging is performed to create a
-single \javal{Region} which represents the actual configuration. The merging
-occurs between a \txtl{child} and its \txtl{parent} region (that is, the one it
-        extends, if any) and results in a \txtl{merged} region. The
-\txtl{parent} is always merged (via a recursive call) first. The first
-\txtl{child} selected is the \txtl{Region} matching the profile name and
+single \javal{ConfigUnit} which represents the actual configuration of this
+module. The merging occurs between a \txtl{child} and its \txtl{parent} unit
+(that is, the one it extends, if any) and results in a \txtl{merged} unit. The
+\txtl{parent} is always merged, via a recursive call, first. The first
+\txtl{child} selected is the \txtl{ConfigUnit} matching the profile name and
 package given by the intent.
 
 For ports, the merging algorithm works by inserting all the ports of the
-\txtl{child} into the \txtl{merged} region. The ports of the \txtl{parent} are
-then merged with the preliminary output of the \txtl{merged} region. The
-process of merging a \txtl{port} of the \txtl{parent} against the \txtl{merged}
-region is shown, in pseudo code, in Listing \ref{lst:merge_ports}. In short the
+\txtl{child} into the \txtl{merged} unit. The ports of the \txtl{parent} are
+then merged with the preliminary output of the \txtl{merged} unit. The
+process of merging a \txtl{port} of the \txtl{parent} with the \txtl{merged}
+unit is shown, in pseudo code, in Listing \ref{lst:merge_ports}. In short the
 merging will favor the \txtl{child}, and the \txtl{parent} will only provide
 values if the \txtl{child} doesn't.
 
 \begin{listing}[H]
 \begin{minted}[linenos=true]{text}
-procedure merge(port: Port, merged: ConfigTree): Region {
+procedure merge(port: Port, merged: ConfigTree): Port {
     if (!merged.contains(port)) return port
     child = merged.getExisting(port)
 
-    if (child.isComplete) return existing
+    if (child.isComplete) return child
     // The child cannot be an embedding, since those cannot
     // be partial.
 
@@ -181,7 +177,7 @@ procedure merge(port: Port, merged: ConfigTree): Region {
             child[property] = merged[property]
         }
     }
-    return existing
+    return child
 }
 \end{minted}
 
@@ -195,19 +191,19 @@ procedure merge(port: Port, merged: ConfigTree): Region {
 For parameters the same idea applies. However each parameter definition node in
 the AST potentially only provides a partial value. For example the node
 \joliel{foo.bar = 42}, where the type of \joliel{foo} is \joliel{string { .bar:
-    int }}, only provides a partial definition of \joliel{foo}. For this reason
-    the parameter assignments are first added from the \txtl{parent} and then
-    by the \txtl{child}. This allows the definitions of the \txtl{child} to
-    override those of the \txtl{parent}.
+    int }}, only provides a partial definition of \joliel{foo}. For this
+    reason, the parameter assignments are first added from the \txtl{parent}
+    and then by the \txtl{child}. This allows the definitions of the
+    \txtl{child} to override those of the \txtl{parent}.
 
 \subsubsection*{Applying Configuration to the AST}
 
-The \txtl{merged} region from the previous section is then used along
-with the AST corresponding to the Jolie program. The last phase of
-the configurator will process the entire AST and output a new AST, which is
-fully configured. This process works by running a \txtl{process} function on
-every single top-level node. The \txtl{process} function will inspect the node,
-and depending on the node return a list of replacement nodes.
+The \txtl{merged} unit from the previous section is then used along with the
+AST corresponding to the Jolie program. The last phase of the configurator will
+process the entire AST and output a new, fully configured, AST. This process
+works by running a \txtl{process} function on every single top-level node. The
+\txtl{process} function will inspect the node and return a list of replacement
+nodes.
 
 Throughout this process the configurator will also verify that no configuration
 is performed on nodes which aren't configurable. This includes dynamic ports
@@ -215,26 +211,25 @@ and non-empty interface definitions.
 
 \paragraph{Ports}
 
-When a port node is encountered in the AST, the \txtl{merged} region is
-searched for an output port matching its name. If none is found, the AST node
-is returned as it is, no modifications are made to it. Otherwise the
-configuration proceeds. For input ports and non-embedding output ports the
-process is the same. The properties of the AST port and the port represented in
-the configuration region are compared one-by-one. If any property is defined by
-both, an error is returned pointing to the AST node and the place that the
-configuration took place. At the end, if no errors are returned, a new port is
-returned with their properties merged together.
+When a port node is encountered in the AST, the \txtl{merged} unit is searched
+for an output port matching its name. If none is found, the node is returned as
+it is. Otherwise the configuration proceeds. For input ports and non-embedding
+output ports, the process is the same. The properties of the AST port and the
+port represented in the configuration unit are compared one-by-one. If any
+property is defined by both, an error is returned pointing to the AST node and
+the place that the configuration took place. At the end, if no errors are
+returned, a new port is returned with their properties merged together.
 
-For output ports which embed another module the process is slightly different.
+For output ports which embed another module, the process is slightly different.
 The configurator will first verify the existence of the configuration unit by
 looking it up in the configuration tree. If it is not found an error will be
-returned. Otherwise the configurator will output a new embedding node. The
+returned. Otherwise, the configurator will output a new embedding node. The
 embedding node will contain a reference back to the same configuration file the
-current \txtl{Region} comes from. When the embedding is performed, the
+current \txtl{ConfigUnit} comes from. When the embedding is performed the
 configurator of the embedded service will lookup the correct configuration unit
-from the same file. This will cause an addition parsing of the same
-file, but a caching layer at the configuration parser could take care of this.
-The embedding process is demonstrated in Listing \ref{lst:embedding_output}.
+from the same file. This will cause an addition parsing of the same file, but a
+caching layer at the configuration parser could take care of this.  The
+embedding process is demonstrated in Listing \ref{lst:embedding_output}.
 
 \begin{listing}[H]
 \begin{multicols}{2}
@@ -263,10 +258,10 @@ outputPort Foo embeds "foo" with "foo-profile"
 
 \paragraph{Interface Rebinding}
 
-Just like ports, when an interface definition is found the \txtl{merged} region
+Just like ports, when an interface definition is found, the \txtl{merged} unit
 is searched for a matching interface definition. Assuming no errors, the
 configurator must now replace the dummy interface definition with the real
-interface definition as the configuration specifies.
+interface definition, as the configuration specifies.
 
 Quickly recapping interface rebinding in the configuration is shown in Listing
 \ref{lst:interface_rebinding_recap}. Note that the only information the
@@ -285,12 +280,13 @@ interface Dummy = Concrete from "my-module"
 
 \end{listing}
 
-The interface will be found by parsing the module's entry point. Its AST, if it
-exists, will then be searched for an interface matching the replacement. Simply
-replacing the dummy with its replacement, however, isn't enough. Consider, for
-example, the scenario shown in Listing \ref{lst:interface_rebinding_types}. In
-this scenario, the processed AST will no longer be valid due to the missing
-types (\txtl{FooRequest} and \txtl{FooResponse}).
+The interface will be found by parsing the module, starting at its entry point.
+Its AST, if it exists, will then be searched for an interface matching the
+replacement. Simply replacing the dummy with its replacement, however, isn't
+enough. Consider, for example, the scenario shown in Listing
+\ref{lst:interface_rebinding_types}. In this scenario, the processed AST will
+no longer be valid due to the missing types (\txtl{FooRequest} and
+\txtl{FooResponse}).
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -331,15 +327,15 @@ phase.
 
 \subsection{Additions to the Semantic Verifier}
 
-As we have seen several syntax changes were also made to the core languages.
-These modifications to the syntax also slightly changed which programs were
+As we have seen, several syntax changes were also made to the core languages.
+These modifications to the syntax changed which programs were
 legal. As an example, interfaces are now allowed to be empty at a syntactical
 level, to signal that they should be replaced by configuration. However having
 an empty interface not being replaced should still cause an error.
 
-This means that additional checking must not be performed to ensure that
-programs are semantically valid. Such a phase already exists in the compiler,
-the semantic verifier.
+This means that additional checking must now be performed, since it no longer
+will be caught during parsing, to ensure that programs are semantically valid.
+Such a phase already exists in the compiler, the semantic verifier.
 
 The semantic verifier works by performing an AST traversal and validate the
 semantics of each node.
@@ -352,9 +348,10 @@ trees.
 Non-dynamic ports are ensured to be constant by using features already
 implemented by the semantic verifier.
 
-The semantic verifier is the last phase of the Jolie interpreter when run with
-the \txtl{--check} flag. As we will discuss in the coming section, it is not
-practical to perform type-checking of parameters at this point.
+The semantic verifier is the last phase of the Jolie interpreter when running
+with the \txtl{--check} flag. As we will discuss in the coming section, it is
+not practical to perform type-checking of parameters at this point. As a
+result, it will not be checked using the \txtl{--check} flag.
 
 \subsection{Additions to the Interpretation Tree Builder and Late Verification}
 
@@ -364,9 +361,9 @@ Interpretation tree building was expanded to support parameters. All other
 features required no changes to AST structure, and could simply reuse existing
 features.
 
-This section will discuss the technical of how the Interpretation Tree Builder
-(ITB) works. It will cover issues that are quite technical, and very specific
-to this particular implementation of the Jolie engine.
+This section will discuss the technical details of how the Interpretation Tree
+Builder (ITB) works. It will cover issues that are specific to this particular
+implementation of the Jolie engine.
 
 % What is the ITB and what does it do?
 
@@ -378,23 +375,22 @@ code procedures.
 
 % Processes
 
-Within code procedures the ITB will produce processes from the AST nodes which
-are runnable. It is from processes the meat of code execution is implemented.
-For example it is from processes everything from addition to operation calls
-are implemented.
+Within code procedures the ITB will produce ``processes'' from the AST nodes
+which are runnable. It is from processes the meat of code execution is
+implemented.  For example, it is from processes everything from addition to
+operation calls are implemented.
 
 % When are types ready?
 
-In this phase the ITB will be gathering complete information about types. Type
-building is for the most part a one-to-one translation from the
-AST nodes into the internal representation. An important job of the
-ITB with respect to type building is resolving of type references. This turns
-references to a type name into an actual reference to a concrete internal type.
-Because types aren't build until this phase is what makes type-checking during
-semantic verification problematic. The semantic verifier would essentially have
-to duplicate the work of the ITB in order to perform type-checking earlier.
-This also means that type-checking cannot be performed until the ITB is
-finished.
+In this phase, the ITB will be gathering complete information about types. Type
+building is, for the most part, a one-to-one translation from the AST nodes
+into the internal representation. An important job of the ITB with respect to
+type building is resolving of type references.  This turns references to a name
+into an actual type reference.  Because types aren't built until this phase is
+what makes type-checking during semantic verification problematic. The semantic
+verifier would essentially have to duplicate the work of the ITB in order to
+perform type-checking earlier.  This also means that type-checking cannot be
+performed until the ITB is finished.
 
 % State, and how the ITB changes initial state.
 
@@ -403,23 +399,23 @@ the ITB will initialize the \joliel{location} and \joliel{protocol} variables
 of output ports. These variables are local only to a single request. At this
 point, however, the state of the Jolie program has not yet been initialized.
 
-In Jolie, state is associated with the current thread of execution. Jolie uses
-a separate thread of execution for handling every message. As a result every
-single request gets its own fresh state. All state is copied from the
+In Jolie, the state is associated with the current thread of execution. Jolie
+uses a separate thread of execution for handling every message. As a result,
+every single request gets its own fresh state. All state is copied from the
 initialization execution thread. This thread performs work requested by the ITB
 followed by the \joliel{init} procedure. Thus right after the ITB is done, and
-the initialization execution thread is started, code execution starts. This
+the initialization execution thread is running, code execution starts. This
 includes both user code and loading of any embedded services.
 
 It should be noted that any process which works with state must be run on an
-execution thread, since it depends on the state being present on the thread.
+execution thread since it depends on the state being present on the thread.
 
 % Handling of parameter definitions and assignments inside the ITB
 
 The ITB receives two new node types from the configurator and code parser:
 parameter assignments, and parameter definitions.
 
-For parameter definitions the ITB will resolve the types. Ensuring that all
+For parameter definitions, the ITB will resolve the types. Ensuring that all
 links are properly resolved. This will output a ``processed'' parameter
 definition which the ITB will inform the interpreter about.
 
@@ -429,18 +425,19 @@ being ready before the ITB finishes. Simply outputting processes for
 configuration will make it impossible to perform type-checking before code
 execution starts, due to their dependency on state.
 
-The processed assignments contains an ordinarily processed LHS, which contains
-the variable path. The RHS has been processed into an expression, which can be
-evaluated into a native Jolie value on which type-checking can be performed.
+The processed assignments contain an ordinarily processed LHS (of the
+        assignment), which contains the variable path. The RHS has been
+processed into an expression, which can be evaluated into a native Jolie value
+on which type-checking can be performed.
 
 % Introduction of new phase and working around lack of state
 
 Because of these constraints a new ``late-checking phase'' has been created.
 This phase runs right after the ITB, but before code execution starts. In this
-phase it is not possible to directly touch the init state. It is however
-possible to both create values, and evaluate expression. This phase creates a
-synthetic state by creating a new value, which will act as the state.
-Expression are evaluated against this root and later type-checked. The result
-of evaluating the parameter assignments are then copied into the init state,
-   assuming, of course, that type-checking was successful.
+phase, it is not possible to directly touch the init state. It is, however,
+    possible to both create values, and evaluate expression. This phase creates
+    a synthetic state by creating a new value which will act as the state.  The
+    expressions are evaluated against this root and later type-checked. The
+    result of evaluating the parameter assignments are then copied into the
+    init state, assuming, of course, that type-checking was successful.
 

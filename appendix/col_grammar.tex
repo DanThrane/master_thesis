@@ -3,13 +3,14 @@
 Presented as an ABNF-like syntax. All literals are case sensitive.
 
 \begin{minted}{abnf}
-configuration-tree = *include *region
+configuration-tree = *include *config-unit
 
 include = "include" qstring
 
-region = region-header "{" region-body "}"
-region-header = [ "profile" qstring ] "configures" qstring [ "extends" qstring ]
-region-body = *definition
+config-unit = config-unit-header "{" config-unit-body "}"
+config-unit-header = [ "profile" qstring ] "configures" qstring 
+                     [ "extends" qstring ]
+config-unit-body = *definition
 definition = port | interface | parameter
 
 port = input-port | output-port

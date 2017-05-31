@@ -80,13 +80,13 @@ values.
 The configuration system will only allow configuration of constructs which has
 been marked as such by the module. This should also allow a developer, and
 potentially tools, to quickly identify which constructs allow configuration.
-As much as possible, the code should act as documentation of itself.
+As much as possible, the code of a module should act as documentation of
+itself.
 
-Additionally the system should work with the existing checking tools (e.g. the
-\txtl{--check} flag). The checking tools of Jolie are, for example,
-used by editor plugins to show errors. These checks do not execute
-any code. The checking algorithm should check that the provided
-configuration is valid.
+Additionally the system should work with the existing checking tools, e.g., the
+\txtl{--check} flag. The checking tools of Jolie are, for example, used by
+editor plugins to show errors. These checks do not execute any code. The
+checking algorithm should check that the provided configuration is valid.
 
 % Basic concepts and example
 
@@ -107,7 +107,7 @@ construct in Jolie. The configuration format support the following constructs:
         \begin{itemize}
             \item Location
             \item Protocol and protocol parameters
-            \item Embedding of other services (output ports only)
+            \item Embedding of other modules (output ports only)
         \end{itemize}
     \item General purpose parameters (values accessible from
             Jolie programs)
@@ -116,12 +116,12 @@ construct in Jolie. The configuration format support the following constructs:
 
 We'll start by introducing the configuration format through examples.  The
 configuration format is custom, and made to mimic the syntax of Jolie. This
-decision was chosen to make it easier to convert existing Jolie code.
+decision was made to make it easier to convert existing Jolie code.
 
-Listing \ref{lst:simple_conf} shows a simple configuration unit. This
-units sets the location and protocol for the output port \joliel{A} (line 3 and
-        4), the location of the input port \joliel{ModuleInput} (line 8), and
-two parameter assignments (line 11 and 12).
+Listing \ref{lst:simple_conf} shows a simple configuration unit. This units
+sets the \joliel{Location} and \joliel{Protocol} of the output port \joliel{A}
+(line 3 and 4), the location of the input port \joliel{ModuleInput} (line 8),
+    and two parameter assignments (line 11 and 12).
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -174,18 +174,15 @@ profile "a-profile" configures "a-module" {
 As seen in the examples, providing partial configuration, as opposed to
 complete configuration, is allowed. In certain cases, partial configuration is
 provided because the remaining values are defined by the module itself. In
-other cases, partial configuration is provided due to the extension of other
-profiles.
+other cases, a partial configuration is provided due to the unit being an
+extension of another unit.
 
-A configuration unit may extend another unit. The two, however, must configure
-the same module. The inheritance tree may be of an arbitrary depth, but
-each unit may only extend a single unit, and they must configure the same
-module.
-
-If the child and parent disagree on configuration, the child always decides.
-For example, if unit ``B'' extends ``A'', and they both configure the same
-value, then the constructs found in B are the ones that are used. Listing
-\ref{lst:conf_extends} shows an example of inheritance.
+A configuration unit may extend, at most, one other unit. The two, however,
+  must configure the same module.  If the child and parent disagree on
+  configuration, the child always decides.  For example, if unit ``B'' extends
+  ``A'', and they both configure the same value, then the constructs found in B
+  are the ones that are used. Listing \ref{lst:conf_extends} shows an example
+  of inheritance.
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -217,11 +214,11 @@ placed relative to the module's root. For example, if module "a" has a file
 called \txtl{conf/my-defaults.col}, which contains a unit called "default".
 Then the user of the package may either write a configuration unit which
 extends this, simply by writing \joliel{profile "something" configures "a"
-    extends "default"}, or the default directly. There is no need for any
-    inclusion of this file.
+    extends "default"}, or use the default directly. There is no need for any
+    inclusion of this file, due to the implicit include.
 
-While no configuration unit is required to be complete, the one used by the
-engine must be complete. If an interpreter is instructed to use a partial
+While no configuration unit is required to be complete, the one used by an
+interpreter must be complete. If an interpreter is instructed to use a partial
 configuration unit an error will be produced.
 
 \subsection{Input and Output Ports}
@@ -243,8 +240,8 @@ One typical assumption that Jolie services make about their input ports come
 from aliases that are made in the protocol configuration, an example is shown
 in line 4 of Listing \ref{lst:configurable_input}. The pointer statement takes
 two variable paths and makes the one on the left link to the one on the right.
-The result of this is setting \txtl{statusCode} will cause the HTTP status code
-It should also be noted that the configuration units \emph{do not} support
+Setting \txtl{statusCode} will cause the HTTP status code to be set
+accordingly. It should be noted, configuration units \emph{do not} support
 aliases, and there are no other ways of accessing variables hidden in the
 protocol configuration. As a result, any service which needs to do something
 special with its protocol configuration, like aliasing, must do it in source
@@ -286,7 +283,7 @@ shows a parameter definition and its use.
 The type-checking feature functions both as a mean of documentation and
 ensuring that the supplied configuration is valid. Like any other type-checked
 feature of Jolie, it is possible to opt-out simply be setting the type to be
-\txtl{undefined}.
+\joliel{undefined}.
 
 \begin{listing}[H]
 \begin{multicols}{2}
@@ -323,10 +320,10 @@ profile "my-profile" configures "service" {
 \end{listing}
 
 From a high-level point of view, parameters are very similar to constants.
-However parameters weren't implemented as an extension of constants due to the
-implementation of constants. Namely, constants aren't implemented using the
-``Value'' system, which is used by all variables and messages in Jolie, but
-rather implemented at the parser level.
+However, parameters weren't implemented as an extension of constants due to the
+existing implementation of constants. Namely, constants aren't implemented
+using the ``Value'' system, which is used by all variables and messages in
+Jolie, but rather implemented at the parser level.
 
 When the Jolie parser encounters a constant definition, it will save the token
 from the assignment and associate it with the identifier on the left-hand side.
@@ -337,10 +334,10 @@ to define more advanced tree-like values, which parameters such as
 
 Whenever the parser reaches a place where a constant would be allowed, it will
 look at the next token, check if it is an identifier, and try to replace the
-current token with the token defined by the constant. This produces some rather
-surprising results and has limitations, which is not commonly found in other
-programming languages.  Listing \ref{lst:jolie_constants} illustrates how the
-Jolie parser processes constants.
+current token with the replacement token defined by the constant. This produces
+some rather surprising results and has limitations which are not commonly found
+in other programming languages.  Listing \ref{lst:jolie_constants} illustrates
+how the Jolie parser processes constants.
 
 \begin{listing}[H]
 \begin{multicols}{2}
@@ -378,7 +375,7 @@ courier Foo {
 
 \end{multicols}
 
-\caption{Constants in Jolie works by replacing tokens at the parser level.
+\caption{Constants in Jolie works by replacing tokens at the parsing level.
     Left: The input program. Right: The program which the parser ends up
         seeing}
 
@@ -395,9 +392,8 @@ a value.
 
 The new parameters block is an addition to the AST of Jolie programs. This
 addition currently only works in collaboration with the configuration and
-module system. The block is simply not valid to use without. If any parameter
-is not defined by configuration or has the wrong type the checking scripts of
-Jolie will throw an error.
+module system. If any parameter is not defined by configuration or has the
+wrong type the checking scripts of Jolie will throw an error.
 
 Even though the parameters block is added to the AST it will not be visible in
 the final interpretation tree. We'll learn more about this in Section
@@ -414,22 +410,23 @@ Appendix 2.
 All literals are case sensitive.
 
 A configuration file starts by a list of includes, followed by a list of
-regions, as shown in start rule \mintinline{abnf}{configuration-tree}.
+config-units, as shown in start rule \mintinline{abnf}{configuration-tree}.
 
 \begin{minted}{abnf}
-configuration-tree = *include *region
+configuration-tree = *include *config-unit
 
 include = "include" qstring
 
-region = region-header "{" region-body "}"
-region-header = [ "profile" qstring ] "configures" qstring
+config-unit = config-unit-header "{" config-unit-body "}"
+config-unit-header = [ "profile" qstring ] "configures" qstring
                 [ "extends" qstring ]
-region-body = *definition
+config-unit-body = *definition
 definition = port | interface | parameter
 \end{minted}
 
-The definitions inside of a region correspond to the different configurable
-units. The syntax is made to closely mimic the syntax of existing Jolie code.
+The definitions inside of a config-unit correspond to the different
+configurable units. The syntax is made to closely mimic the syntax of existing
+Jolie code.
 
 \begin{minted}{abnf}
 port = input-port | output-port
@@ -457,8 +454,8 @@ primitive = qstring | int | long | double | bool
 \end{minted}
 
 The values very closely resemble what Jolie allows, primarily just removing
-variables from the syntax. Variable identifiers can be strings, like in Jolie,
-to allow for special variable names which would otherwise not be
+variable references from the syntax. Variable identifiers can be strings, like
+in Jolie, to allow for special variable names which would otherwise not be
 valid identifiers. This is primarily useful for building dictionary like
 structures with arbitrary string keys.
 

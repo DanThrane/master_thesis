@@ -1,14 +1,14 @@
 \section{Examples}
 \label{sec:module_examples}
 
-In this section we will introduce two examples, which will showcase different
-aspects of the Jolie module, and configuration system. These examples will be
-revisited again in Section \ref{sec:package_manager_examples}, where they will
+In this section, we will introduce two examples which will showcase different
+aspects of the Jolie module and configuration system. These examples will be
+revisited again in Section \ref{sec:package_manager_examples} where they will
 be shown in the context of packages.
 
 \subsection{A Calculator System}
 
-In this example we will look at the calculator example shown in the
+In this example, we will look at the calculator example shown in the
 introductory chapters. The calculator system will be updated to work under the
 new Jolie module system. We will also show how what was previous problems that
 required code changes, can now be performed entirely in independent
@@ -16,7 +16,7 @@ configuration files.
 
 Quickly recapping from previous chapters.  Figure \ref{fig:simple_calc} shows
 the system architecture for the calculator system. The system contains three
-services. The main-point of contact for a client is the \txtl{calculator}
+services. The main point-of-contact for a client is the \txtl{calculator}
 service. This service will delegate the ``hard'' work to the other two
 services, that is \txtl{addition} and \txtl{multiplication}.
 
@@ -27,13 +27,13 @@ services, that is \txtl{addition} and \txtl{multiplication}.
 \label{fig:simple_calc}
 \end{figure}
 
-The file structure of our services contained a lot of duplication. The file
-structure is shown in Listing \ref{lst:start_file_structure}. As we can see
-from this there is quite a bit of duplication of files, and we cannot simply
-copy the directories of our dependencies, as this would place the files in the
-wrong places. We also resort to code files for distributing default
-configuration profiles. Switching between embedding a service and binding to it
-externally will also require significant changes.
+The file structure of our services contained a lot of duplication previously.
+The file structure is shown in Listing \ref{lst:start_file_structure}. As we
+can see from this there is quite a bit of duplication of files, and we cannot
+simply copy the directories of our dependencies, as this would place the files
+in the wrong places. We also had to resort to code files for distributing
+default configuration profiles. Switching between embedding a service and
+binding to it externally would also require significant changes.
 
 \begin{listing}[H]
 
@@ -91,27 +91,26 @@ externally will also require significant changes.
 \end{listing}
 
 The first step is to update all includes which require files from other
-modules, to use the new module includes. For example, \txtl{multiplication.iol}
-depend on the module \txtl{numbers} in the file
-\txtl{numbers.iol}. Their includes change from the old \joliel{include
-"numbers.iol"} to the new module include \\\joliel{include "numbers.iol" from
-"numbers"}.
+modules, to use the new module includes. For example, \txtl{multiplication}
+depends on the file \txtl{numbers.iol} from \txtl{numbers}.  Their includes
+change from the old \joliel{include "numbers.iol"} to the new module include
+\\\joliel{include "numbers.iol" from "numbers"}.
 
-Using module includes also provides a certain level of namespacing of file
+Using module includes provides a certain level of namespacing for file
 names. This system will allow for two files to be named the same thing, without
 causing problems, as long as they exist in separate packages. This allows us to
 give files better names, and allow many rather useless prefixes to be deleted.
-For example the file \txtl{addition.iol} can be renamed to a more meaningful
+For example, the file \txtl{addition.iol} can be renamed to a more meaningful
 name such as \txtl{interface.iol}. Causing includes to say \joliel{include
     "interface.iol" from "addition"}.
 
 The next step is to convert the legacy configuration into the new configuration
 format. The contents \txtl{mult_config.iol} previously contained constants for
-configuring the input port and parameters of the service. Legacy configuration
-is shown in Listing \ref{lst:mult_config_legacy}.
+configuring the input port and parameters of the service. The legacy
+configuration is shown in Listing \ref{lst:mult_config_legacy}.
 
 In order to convert ports, we must first decide which ports need to be
-configured, and which fields should be configurable. In this case we should
+configured, and which fields should be configurable. In this case, we should
 only configure our input port. Since the module makes no assumptions about this
 service's input port, we can simply allow it all to be configurable.
 
@@ -153,16 +152,15 @@ parameters {
 \label{lst:mult_config_updated}
 \end{listing}
 
-We're not quite finished yet with the configuration. The original
-service provided default configuration. A new directory named \txtl{conf} is
-created. Inside which we can make as many defaults as we wish. For now we can
-create a file named \txtl{default.col}. In Listing
-\ref{lst:mult_default_config} we show some default configuration.  The
-inheritance feature allows us to easily create profiles for various deployment
-configurations which a user of the module might wish to use. The
-\joliel{"self-hosted"} profile would be ideal for hosting the service
-standalone, while the \joliel{"embedded"} and \joliel{"debug"} profiles would
-be ideal for development.
+We're not quite finished yet with the configuration. The original service
+provided default configuration. A new directory named \txtl{conf} is created.
+Inside which we can make as many defaults as we wish. For now, we create a file
+named \txtl{default.col}. In Listing \ref{lst:mult_default_config} we show the
+default configuration.  The inheritance feature allows us to easily create
+profiles for various deployment configurations which a user of the module might
+wish to use. The \joliel{"self-hosted"} profile would be ideal for hosting the
+service as standalone, while the \joliel{"embedded"} and \joliel{"debug"}
+profiles would be ideal for development.
 
 \begin{listing}[H]
 \begin{minted}{jolie}
@@ -199,15 +197,15 @@ profile "debug" configures "multiplication" extends "embedded" {
 \end{minted}
 
 \caption{Providing defaults for a Jolie module. Using inheritance we can create
-suitable profiles for various typical deployment configurations.}
+suitable profiles for typical deployment configurations.}
 
 \label{lst:mult_default_config}
 
 \end{listing}
 
 At this point we can now clean-up in the directories of each module. The Jolie
-module system technical allows for any organization of modules, but for now we
-will simply put the source code of each module inside a directory called
+module system technically allows for any organization of modules, but for now
+we will simply put the source code of each module inside a directory called
 \txtl{modules}. In this directory we will place a directory named the same as
 the module, containing the complete source code of the modules.
 
@@ -270,9 +268,9 @@ up with the file structure shown in listing \ref{lst:final_file_structure}.
 \end{listing}
 
 This file structure, as we shall also discuss later, is much better for
-potential package managers. The overhead which is associated with actually
-launching the service now is bigger. Currently in order to launch this program
-the following would be needed:
+potential package managers. Launching the service now requires a longer
+command. Currently in order to launch this program the following would be
+needed:
 
 \begin{minted}{text}
 dan@host:/calculator # jolie                            \
@@ -283,7 +281,7 @@ dan@host:/calculator # jolie                            \
     calculator.mod
 \end{minted}
 
-In contrast this is quite a bit more than previously:
+In contrast, this is quite a bit more than previously:
 
 \begin{minted}{text}
 dan@host:/calculator # jolie calculator.ol
