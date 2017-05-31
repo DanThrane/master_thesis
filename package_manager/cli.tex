@@ -7,7 +7,8 @@ tool will be used in several examples.
 
 The command line application is responsible for displaying a more user friendly
 interface to inner workings of JPM. The tool will perform almost no work by
-itself, but will instead delegate this to the back end (See Section TODO).
+itself, but will instead delegate this to the back end (See Section
+\ref{sec:jpm_back}).
 
 When first running the tool, the user will be welcomed with the following
 message:
@@ -87,37 +88,12 @@ to communicate progress, this is especially useful for long running processes,
            \mintinline{text}{jpm-cli}) will inform the back end of where it
    should send events.
 
-\begin{listing}[H]
-\begin{minted}{text}
-                 +-------------------------------------+
-                 | terminal (user)                     |
-                 +-------------------------------------+
-                                   |
-                                   v
-                 +-------------------------------------+
-+------------+   |            embeds                   |
-| console-ui |<--| jpm-cli ----------------+           |
-+------------+   |                         |           |
-+------------+   |                         v           |
-| arg-parser |<--|                   +----------------+|
-+------------+   |                   | callback       ||
-                 |                   +----------------+|
-                 +--------------------------^----------+
-                                   |        |
-                                   |        |
-                                   v        |
-                 +-------------------------------------+
-                 |           jpm (back-end)            |
-                 +-------------------------------------+
-                     |         |         |         |
-                     v         v         v         v
-                 +-------+ +-------+ +-------+ +-------+
-                 | reg-a | | reg-b | | reg-c | | reg-d |
-                 +-------+ +-------+ +-------+ +-------+
-\end{minted}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{package_manager/cli_arch.eps}
 \caption{The system architecture from the CLI's point of view}
 \label{fig:cli_arch}
-\end{listing}
+\end{figure}
 
 Quite a lot of services exists on the client side, notably
 \mintinline{text}{jpm-cli} and \mintinline{text}{jpm}. From a usability

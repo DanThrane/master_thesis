@@ -40,14 +40,14 @@ main {
 Listing \ref{lst:simple_jolie} shows a very simple application written in
 Jolie.
 
-The missing semicolons on lines 12, 14, or 16 are not mistakes. The semicolon
-is not needed here, in fact, it would be a syntax error. The reason for this is
-that the semicolon isn't used strictly for parsing purposes, but it instead
-used for composing statements in a process.
+The missing semicolons on lines 4, 13, 15, or 17 are not mistakes. The
+semicolon is not needed here, in fact, it would be a syntax error to add them.
+The reason for this is that the semicolon isn't used strictly for parsing
+purposes, but it instead used for composing statements in a process.
 
 Semicolon statements, or sequence statements, have a syntax of \joliel{A ; B}.
 It should be read as: first, execute \joliel{A} then execute \joliel{B}. The
-sequence statement requires both operands to be present, hence the syntax error
+sequence statement requires both operands to be present. Hence the syntax error
 for adding a semicolon to the last statement of a block.
 
 A similar composition operator is, the parallel statement, which has a syntax
@@ -210,19 +210,10 @@ Communicating with these services, through Jolie code, is done exactly the same
 way as with any other service. As a result, it is entirely transparent to the
 application code where the service is located.
 
-Aggregation is a generalization of proxies and load balancers. An illustration
-of this concept can be seen in Figure \ref{fig:aggregation}. Aggregation is
+Aggregation is a generalization of proxies and load balancers. Aggregation is
 useful for creating a wide variety of proxy like architectural patterns. The
 aggregation feature is often used alongside the courier and interface extender
 features. Couriers allow the developer to insert code in-between the receiving
 the request and forwarding it. These features, for example, allow you to add
 authentication to a service which otherwise doesn't have it. This is done
 entirely without having to touch the original service.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.6\textwidth]{pictures/aggregation.png}
-    \caption{Aggregation is a generalisation of proxies and load balancers}
-    \label{fig:aggregation}
-\end{figure}
-

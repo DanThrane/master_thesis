@@ -1,3 +1,117 @@
 \section{Package Managers}
 
-Some background on package managers.
+In this thesis we will work solely with application-level package managers.
+As mentioned in the introduction, application-level package managers deal with
+application-level packages. These packages are typically software components.
+
+The work on the Jolie Package Manager (JPM), which this thesis presents, is
+hugely inspired by the following works:
+
+\begin{enumerate}
+    \item \textbf{NPM:} The package manager for Node.js\autocite{NPMC}.
+    \item \textbf{Yarn:} An alternative package manager for 
+    Node.js\autocite{YARNC}.
+    \item \textbf{Cargo:} Build tool for the Rust language\autocite{CARB}.
+    \item \textbf{Gradle:} Build tool, typically used for JVM languages
+    (e.g. Java)\autocite{GRAB}.
+\end{enumerate}
+
+In the remainder of this section we will cover the most common traits from
+these works.
+
+The primary role of a package manager, as the name would suggest, is to manage
+software packages. A package manager usually describes software packages
+through a special file, in this thesis we will refer to this file as the
+package manifest. NPM and Yarn both use a file called \txtl{package.json},
+Cargo uses a \txtl{Cargo.toml}, Gradle using a \txtl{build.gradle}.
+Common for all of these are, that they typically describe the package itself,
+and the dependencies of this package.
+
+Listing \ref{lst:cargo_example} shows an example for Cargo, and shows a similar
+manifest for NPM is shown in Listing \ref{lst:npm_example}. Common to both of
+these examples, is that their descriptions use a few attributes for describing
+the package itself. Additionally they have a section describing the
+dependencies, i.e., the packages that should be ``managed''. Most importantly of
+the attributes describing the package are the ``name'' and ``version'', which
+can uniquely refer to a specific version of the package.
+
+\begin{listing}[H]
+\begin{minted}{ini}
+[package]
+name = "my-cargo-crate"
+version = "1.2.3"
+authors = ["Dan Sebastian Thrane <dathr12@student.sdu.dk>"]
+
+[dependencies]
+log = "0.3.8"
+left-pad = "1.0.1"
+\end{minted}
+\caption{A simple manifest for a Cargo package (a ``Crate'')}
+\label{lst:cargo_example}
+\end{listing}
+
+
+\begin{listing}[H]
+\begin{minted}{json}
+{
+  "name": "my-npm-package",
+  "version": "1.0.0",
+  "description": "This is a NPM package",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Dan Sebastian Thrane <dathr12@student.sdu.dk>",
+  "license": "ISC",
+  "dependencies": {
+    "left-pad": "^1.1.3"
+  }
+}
+\end{minted}
+\caption{A simple manifest for a NPM package}
+\label{lst:npm_example}
+\end{listing}
+
+Most package managing tools come with CLI (Command-Line Interface) tools, which
+help the user perform various tasks. For example, both of the manifest examples
+(Listing \ref{lst:cargo_example}, and \ref{lst:npm_example}) could be generated
+via their respective tools as shown in Listing \ref{lst:tools_example}.
+
+\begin{listing}[H]
+\begin{minted}{text}
+dan@host:/ # cargo new my-cargo-package
+    Created library `my-cargo-package` project
+
+dan@host:/ # npm init
+This utility will walk you through creating a package.json file.
+It only covers the most common items and tries to guess sensible defaults.
+
+( ... Cut for brevity ... )
+\end{minted}
+\caption{Package managers typically ship CLI tools which help with common
+    tasks}
+\label{lst:tools_example}
+\end{listing}
+
+Similarly these tools can be used to download and install their dependencies,
+for Cargo \txtl{cargo build}, for NPM \txtl{npm install}. The
+packages, that these dependencies resolve to, can be stored in
+various places. A common approach, which we see both NPM, Yarn, and Cargo, is
+to use a default centralized registry. Gradle uses a similar approach but
+doesn't have a single default registry (which they refer to as repositories).
+The registries will act as a database of packages, which the tools will use
+to download, and install packages. Registries typically also have some type of
+user management. Such a feature becomes relevant when controlling who is
+allowed to publish updates for a package.
+
+The reader may have observed already, that we have been referring to both Cargo
+and Gradle as package managers, even though they were listed as build tools.
+The build tool description is pulled directly from their own descriptions.
+However, the border between package managers and build tools are typically
+blurry. Especially because many modern tools include dependency management as a
+core part of their features. Even tools, like NPM, which advertise themselves
+still build provide ``build tool''-like features, such as running tests and
+starting the application. In this thesis, we will simply refer to our own tool,
+the Jolie Package Manager, as a package manager. This is done, since
+it is its primary responsibility, and technically there is nothing to
+build in Jolie, due to its dynamic nature.

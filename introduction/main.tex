@@ -88,7 +88,7 @@ and \txtl{B}. In this diagram \txtl{A} depends on the services provided by
 
 \end{figure}
 
-We'll illustrate embedding (a Jolie concept, see Chapter \ref{cha:background})
+We will illustrate embedding (a Jolie concept, see Chapter \ref{cha:background})
 by drawing a service inside another. The parent service will show its
 dependency on this service through similar means.
 
@@ -178,4 +178,22 @@ main {
 \end{listing}
 
 \section{Implementation Status}
+
+The module system has been implemented in a fork of the main Jolie repository.
+The fork is open-source and is available at
+\url{https://github.com/DanThrane/jolie}. As of writing this thesis, the work
+is available on the \txtl{feature-packages} branch. It is expected that this
+branch will eventually be merged into the master branch of the Jolie
+repository\footnote{Available at \url{https://github.com/jolie/jolie}}.
+
+The package manager and the associated services are also made available,
+    open-source. This repository is available at
+    \url{https://github.com/DanThrane/jolie-packages}. This repository also
+    contains a series of end-to-end tests, which also performs test made in
+    the module system.
+
+The software contains the features which this thesis describes. Although, in
+some cases, the software is missing minor features which could be
+desireable for public consumption. These minor features are almost entirely
+related to user interface tweaks and minor design adjustments.
 

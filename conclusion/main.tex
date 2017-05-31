@@ -1,0 +1,41 @@
+In this thesis, we have presented two new extensions to the Jolie programming
+language, namely, the module system and the configuration system.
+
+The module system allows the Jolie engine to think about collections of files
+which are rooted in a particular directory. This introduced the new module
+include primitive.
+
+The configuration system is built upon the module system to allow configuration
+of modules. The configuration system introduced the new configuration format
+(COL) which allows the user configuration of modules. COL files entirely
+replace the old way of doing configuration, through ordinary Jolie source
+files. COL files present a way of configuring a module, in a similar syntax to
+that of ordinary Jolie code.
+
+Input ports and output ports, the primitives used by Jolie for communication,
+can be configured. The configuration of ports, follow the features that
+the Jolie language already provided. As a result, it is now possible to
+move freely between externally bound output ports to embedding the same
+service, entirely from the configuration. This was previously not possible
+without changing the source code of a service.
+
+Parameters allow for configuration values to be provided to a service.
+Parameters are automatically type-checked at deployment time of a service. Due
+to constraints within the Jolie engine, a new verification stage was added to
+the Jolie engine.
+
+The configuration system introduced a notion of interface parametricity through
+interface rebinding. This feature allows developers to write generic Jolie
+services which use the, already existing, aggregation feature. This was also
+not previously doable without changing the source code of the service.
+
+We also presented the Jolie Package Manager (JPM). JPM manages a new concept of
+packages. Packages are an extension of the Jolie modules, also developed in
+this thesis. Package extends modules, by adding a package manifest which
+describes the package.
+
+Packages can be published to a registry. Published packages are downloaded from
+the registry, by the JPM tool, and installed into packages.  The JPM tool also
+provides a variety of features that include registry account management,
+lifetime hooks, and integrity checking of packages.
+

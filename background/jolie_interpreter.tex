@@ -43,8 +43,8 @@ phase. The parser is responsible for creating the Abstract Syntax Tree (AST)
     root node, namely the \txtl{Program} node. Includes are thus implemented by
     essentially inserting the contents of the include target. A quirk for Jolie
     includes, is that relative file includes are not resolved relative to the
-    current file, but rather to the current working directory (i.e. where the
-            engine was started).
+    current file, but rather to the current working directory, i.e., where the
+    engine was started.
 
 The third phase traverses the AST to make sure that it is semantically valid.
 This weeds out programs that are syntactically correct, but not semantically

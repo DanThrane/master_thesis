@@ -5,10 +5,9 @@ The \regdb package is responsible for storing information about packages. In
 this section we will cover in depth how this service works and how it is used.
 
 This package provides storage, and querying facilities for package information.
-This package does not provide any storage of actual packages (i.e. the actual
-contents of packages, for example \txtl{.pkg} files). It is left to the client
-of this package to perform this. This allows freedom in how contents is stored,
-which may change between clients.
+This package does not provide any storage of actual packages. It is left to the
+client of this package to perform this. This allows freedom in how contents is
+stored, which may change between clients.
 
 This package is consumed by both the \registry and the \cache packages. How
 these packages communicate with the \regdb package will be covered in their

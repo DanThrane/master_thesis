@@ -224,23 +224,12 @@ communication is performed entirely by Jolie, while the more ``computationally
 heavy'' parts, like parsing, are handled by the internal Java service.  This
 architecture is illustrated in Figure \ref{fig:jolie_java_service}.
 
-\begin{listing}[H]
-\begin{minted}{text}
-+----------------------------------------+
-|                                        |
-| jolie-service ---------+               |
-|                        | local         |
-|                        | communication |
-|                        |               |
-|                        v               |
-|                      +----------------+|
-|                      | java-service   ||
-|                      +----------------+|
-+----------------------------------------+
-\end{minted}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{package_manager/jolie_java_service.eps}
 \caption{A Jolie service using an internal Java service}
 \label{fig:jolie_java_service}
-\end{listing}
+\end{figure}
 
 The Java service uses Gradle as its build system. The build system is capable
 of producing a JAR file. The Jolie engine requires this file to be included in

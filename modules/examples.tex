@@ -20,20 +20,12 @@ services. The main-point of contact for a client is the \txtl{calculator}
 service. This service will delegate the ``hard'' work to the other two
 services, that is \txtl{addition} and \txtl{multiplication}.
 
-\begin{listing}[H]
-\begin{minted}{text}
-+----------------+     +--------------+     +----------------+
-| multiplication | <-- | calculator   | --> | addition       |
-+----------------+     +--------------+     +----------------+
-      |
-      v
-+--------------+
-| numbers      |
-+--------------+
-\end{minted}
+\begin{figure}[H]
+\centering
+\includegraphics[width=1.0\textwidth]{modules/simple_calc.eps}
 \caption{System architecture for the ``calculator system''}
 \label{fig:simple_calc}
-\end{listing}
+\end{figure}
 
 The file structure of our services contained a lot of duplication. The file
 structure is shown in Listing \ref{lst:start_file_structure}. As we can see
@@ -283,7 +275,7 @@ launching the service now is bigger. Currently in order to launch this program
 the following would be needed:
 
 \begin{minted}{text}
-dan@host:/calculator $ jolie                            \
+dan@host:/calculator # jolie                            \
     --mod addition,modules/addition,main.ol             \
     --mod multiplication,modules/multiplication,main.ol \
     --mod numbers,modules/numbers,main.ol               \
@@ -294,14 +286,14 @@ dan@host:/calculator $ jolie                            \
 In contrast this is quite a bit more than previously:
 
 \begin{minted}{text}
-dan@host:/calculator $ jolie calculator.ol
+dan@host:/calculator # jolie calculator.ol
 \end{minted}
 
 However, most of this disappears when using a package manager or similar tool.
 In fact it will be as simple as:
 
 \begin{minted}{text}
-dan@host:/calculator $ jpm start
+dan@host:/calculator # jpm start
 \end{minted}
 
 This is also similar to how, for example, the Java ecosystem ordinarily does

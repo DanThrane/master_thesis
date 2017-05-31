@@ -1,5 +1,34 @@
 \section{Microservices}
 
-\begin{itemize}
-\item General stuff about microservices, actually introduce the thing
-\end{itemize}
+In this section we will summarize the concept of microservices. This summary is
+mostly based on \autocite{MFMS}.
+
+Microservices are most easily explained by comparing them to, perhaps a more
+traditional architecture of, monoliths. A monolithic application is typically
+built as a single unit. This unit will contain all the components of which it
+is built.
+
+Increasingly the industry has been feeling frustrations towards monolithic
+applications.  Changes made to a monolith usually requires the entire
+application to be redeployed.  Over time it may also become increasingly hard
+to keep the boundaries between components clean.  Scaling of monoliths is also
+of concern, as it typically requires the entire application to be scaled, as
+opposed to just the components that need additional resources.
+
+These frustrations led to a new architectural style, eventually named
+microservices. Microservices attempt to tackle each of these problems, but with
+a new architecture also comes new problems.
+
+At its core, a microservice architecture will consist of many individual and
+independently deployable services. The fact that services must be designed to
+be independently deployable can make it significantly easier to scale.  The
+services of a system will communicate with each other through message passing.
+There are no real restrictions on how services should communicate with each
+other. However, in practice services will typically communicate via the
+network, typically using ``dumb'' protocols, such as HTTP.
+
+Microservices typically have a high focus on their own published interfaces.
+This comes, almost automatically, from the fact that they to communicate via
+message passing.
+
+% TODO I'm not sure if we need more here.

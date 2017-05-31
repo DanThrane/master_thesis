@@ -28,9 +28,6 @@ AST.
 The configuration phase works by modifying the AST to insert the configuration
 gathered from the configuration unit. The processed AST is handed to the later
 phases, and the remainder of the pipeline works mostly like it has before.
-% TODO Something about how only modifying the AST increases the likelihood of
-% everything being okay, since for the remainder of the engine the
-% configuration phase might as well not exist.
 
 \subsubsection*{Processing of Configuration Files}
 
@@ -155,10 +152,11 @@ or potentially infinite loops.
 
 With the entire configuration tree in place, merging is performed to create a
 single \javal{Region} which represents the actual configuration. The merging
-occurs between a \txtl{child} and its \txtl{parent} region (i.e. the one it
-extends, if any) and results in a \txtl{merged} region. The \txtl{parent} is
-always merged (via a recursive call) first. The first \txtl{child} selected is
-the \txtl{Region} matching the profile name and package given by the intent.
+occurs between a \txtl{child} and its \txtl{parent} region (that is, the one it
+        extends, if any) and results in a \txtl{merged} region. The
+\txtl{parent} is always merged (via a recursive call) first. The first
+\txtl{child} selected is the \txtl{Region} matching the profile name and
+package given by the intent.
 
 For ports, the merging algorithm works by inserting all the ports of the
 \txtl{child} into the \txtl{merged} region. The ports of the \txtl{parent} are

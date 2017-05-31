@@ -40,25 +40,3 @@ fashion. As a result the \cache is technically capable of performing the exact
 same responsibilities as the \registry. This could for example allow for fully
 offline downloads assuming the data is already loaded into the cache.
 
-%\begin{listing}[H]
-%\begin{minted}{text}
-%+---------------+   +----------------+
-%| packages      |   | checksum       |
-%+---------------+   +----------------+
-%       ^                    ^
-%       |                    |
-%       |    +---------------+
-%       |    |
-%+---------------+   +----------------+
-%| cache         |-->| registry       |
-%+---------------+   +----------------+
-%       |
-%       | (local db)
-%       v
-%+---------------+
-%| registry-db   |
-%+---------------+
-%\end{minted}
-%\caption{}
-%\label{lst:}
-%\end{listing}

@@ -10,8 +10,8 @@ This is a feature which is available in many other types of software, for
 example the popular version control system Git provides such a
 feature\autocite{chacon2009pro}.
 
-All hooks are performed on the client-side, and never on the server side (i.e.
-on registries). Only the hooks of the current package will be run, the
+All hooks are performed on the client-side, and never on the server side, i.e.,
+on registries. Only the hooks of the current package will be run, the
 hooks of a dependency will not be executed. Hooks that run before a certain
 action, denoted by a \verb!pre-! prefix, may stop the corresponding command
 from being executed.  These scripts may do so by returning a non-zero exit
@@ -52,8 +52,8 @@ The following are the hooks that JPM supports:
     invoked on a service.
 
 \item \verb!post-start!: Run right before the \verb!start! command
-    terminates. There is no guarantee that this script is run (i.e. if the
-    service was forcefully terminated).
+    terminates. There is no guarantee that this script is run, e.g., if the
+    service was forcefully terminated.
 
 \item \verb!pre-install!: Runs before the \verb!install! command is invoked.
 
